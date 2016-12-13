@@ -25,7 +25,7 @@ bgzip TAIR10_GFF3_genes.sorted.gff
 tabix -p gff TAIR10_GFF3_genes.sorted.gff.gz
 ```
 
-Service querries annotation with use of `pysam.Tabixfile`.
+Service queries annotation with use of `pysam.Tabixfile`.
 ```py
 gff.fetch("Chr2", 1, 5000, parser=pysam.asGTF())
 ```
