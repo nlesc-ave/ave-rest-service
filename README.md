@@ -31,3 +31,28 @@ gff.fetch("Chr2", 1, 5000, parser=pysam.asGTF())
 ```
 Learn more about pysam.Tabixfile from
 [pysam docs](https://pysam.readthedocs.io/en/latest/index.html)
+
+### SNPs
+SNPs need to be provided in single file in [VCF](https://samtools.github.io/hts-specs/VCFv4.3.pdf)
+They also need to be preprocessed in following way.
+
+#### Sort by chromosome with [VCFtools](http://vcftools.sourceforge.net/perl_module.html)
+```sh
+vcf-sort -c variants.vcf > variants.sorted.vcf
+```
+
+#### Compress by [bgzip](http://www.htslib.org/doc/tabix.html) and index with [tabix](http://www.htslib.org/doc/tabix.html)
+```sh
+bgzip -c variants.sorted.vcf
+tabix -p vcf variants.sorted.vcf.gz
+```
+
+### Convert to [BCF](https://samtools.github.io/hts-specs/BCFv2_qref.pdf) with [bcftools](https://samtools.github.io/bcftools/bcftools.html)
+```sh
+bcftools view -O b variants.sorted.vcf.gz > variants.sorted.bcf
+```
+
+### Index with [bcftools](https://samtools.github.io/bcftools/bcftools.html)
+```sh
+bcftools index variants.sorted.bcf
+```
