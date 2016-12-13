@@ -21,7 +21,7 @@ bedtools sort -i TAIR10_genes.gff > TAIR10_genes.sorted.gff
 
 #### Compress by [bgzip](http://www.htslib.org/doc/tabix.html) and index with [tabix](http://www.htslib.org/doc/tabix.html)
 ```sh
-bgzip TAIR10_GFF3_genes.sorted.gff 
+bgzip -i TAIR10_GFF3_genes.sorted.gff 
 tabix -p gff TAIR10_GFF3_genes.sorted.gff.gz
 ```
 
