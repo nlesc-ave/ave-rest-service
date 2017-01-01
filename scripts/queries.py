@@ -34,13 +34,16 @@ region2_variants = [a for a in variants.fetch(*region2)]
 # arabidopsis data files
 reference_file = 'TAIR10.fa'
 annotation_file = 'TAIR10_GFF3_genes.sorted.gff.gz'
-variant_file = 'at_variants_sorted.bcf'
+variant_file = 'SNPs_only.recode.bcf'
 
 # load reference sequence
 reference = Fasta(reference_file)
 
 # load gene annotations
 annotations = TabixFile(annotation_file)
+
+# load variant annotations
+variants = variants = VariantFile(variant_file)
 
 # regions to query
 region1 = ('2', 35000, 45000)
