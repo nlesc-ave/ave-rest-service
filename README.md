@@ -56,3 +56,6 @@ bcftools view -O b variants.sorted.vcf.gz > variants.sorted.bcf
 ```sh
 bcftools index variants.sorted.bcf
 ```
+
+## REST API
+[swagger UI](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/nlesc-ave/ave-rest-service/master/swagger.yml)
