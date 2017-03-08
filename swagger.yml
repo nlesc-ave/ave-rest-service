@@ -1,0 +1,343 @@
+# this is an example of the Uber API
+# as a demonstration of an API spec in YAML
+swagger: '2.0'
+info:
+  title: AVE REST API
+  description: Allelic Variation Explorer REST API, Serving variant, annotation and genome data for AVE visualisation.
+  version: "0.0.1"
+# the domain of the service
+host: ave.vlpb.org
+# array of all schemes that your API supports
+schemes:
+  - https
+# will be prefixed to all paths
+basePath: /
+produces:
+  - application/json
+  - application/problem+json
+paths:
+  /species:
+    get:
+      summary: List of species
+      description: |
+        Fetch list of the species with available data.
+      tags:
+        - Species
+      responses:
+        200:
+          description: Array of the speecies names
+          schema:
+            type: array
+            items:
+              type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /species/{species_id}/genomes:
+    get:
+      summary: Genomes of selected species
+      description: |
+        List of genomes available for this species id
+      parameters:
+        - name: species_id
+          in: path
+          description: Species id
+          required: true
+          type: string
+      tags:
+        - Species
+      responses:
+        200:
+          description: Array of genome identifiers for seleceted species id
+          schema:
+            type: array
+            items:
+              type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /genomes/{genome_id}/chromosomes:
+    get:
+      summary: Chromosomes of selected genome
+      description: |
+        List of chromosome identifiers for selected genome
+      parameters:
+        - name: genome_id
+          in: path
+          description: Genome id
+          required: true
+          type: string
+      tags:
+        - Genomes
+      responses:
+        200:
+          description: Array of chromosome identifiers for seleceted genome id
+          schema:
+            type: array
+            items:
+              type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /genomes/{genome_id}/features:
+    get:
+      summary: Genomic features of selected genome
+      description: |
+        List of genomic features for selected genome
+      parameters:
+        - name: genome_id
+          in: path
+          description: Genome id
+          required: true
+          type: string
+      tags:
+        - Genomes
+      responses:
+        200:
+          description: Array of genomic features for selected genome id
+          schema:
+            type: array
+            items:
+              type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/reference:
+    get:
+      summary: Reference sequence of genomic region
+      description: |
+        Reference sequence of genomic region of selected genome, chromosome from start position to end position
+      parameters:
+        - name: genome_id
+          in: path
+          description: Genome id
+          required: true
+          type: string
+        - name: chrom_id
+          in: path
+          description: Chromosome id
+          required: true
+          type: string
+        - name: start_position
+          in: path
+          description: Start Position
+          required: true
+          type: integer
+        - name: end_position
+          in: path
+          description: End Position
+          required: true
+          type: integer
+      tags:
+        - Genomes
+      responses:
+        200:
+          description: DNA sequence of selected genomic region
+          schema:
+            $ref: '#/definitions/Sequence'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/features:
+    get:
+      summary: Genomic features of the genomic region
+      description: |
+        Genomic features of genomic region of selected genome, chromosome from start position to end position
+      parameters:
+        - name: genome_id
+          in: path
+          description: Genome id
+          required: true
+          type: string
+        - name: chrom_id
+          in: path
+          description: Chromosome id
+          required: true
+          type: string
+        - name: start_position
+          in: path
+          description: Start Position
+          required: true
+          type: integer
+        - name: end_position
+          in: path
+          description: End Position
+          required: true
+          type: integer
+      tags:
+        - Genomes
+      responses:
+        200:
+          description: Array of genomic features for selected genome id
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Feature'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/variants:
+    get:
+      summary: Genomic variants of the genomic region
+      description: |
+        Genomic variants of genomic region of selected genome, chromosome from start position to end position
+      parameters:
+        - name: genome_id
+          in: path
+          description: Genome id
+          required: true
+          type: string
+        - name: chrom_id
+          in: path
+          description: Chromosome id
+          required: true
+          type: string
+        - name: start_position
+          in: path
+          description: Start Position
+          required: true
+          type: integer
+        - name: end_position
+          in: path
+          description: End Position
+          required: true
+          type: integer
+      tags:
+        - Genomes
+      responses:
+        200:
+          description: Array of genomic variants for selected genome id
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Variant'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  Error:
+    type: object
+    description: >-
+      Problem Details for HTTP APIs, see
+      https://tools.ietf.org/html/draft-ietf-appsawg-http-problem-00
+    properties:
+      status:
+        type: integer
+        format: int32
+      type:
+        type: string
+      detail:
+        type: string
+      title:
+        type: string
+    required:
+    - status
+    - type
+    - title
+    - detail
+  Sequence:
+    type: object
+    description: |
+      Genomic sequence
+    properties:
+      sequence:
+        type: string
+    required:
+    - sequence
+  Feature:
+    type: object
+    description: |
+      Genomic feature
+    properties:
+      sequence:
+        type: string
+        description: The name of the sequence where the feature is located.
+      source:
+        type: string
+        description: Keyword identifying the source of the feature
+      feature:
+        type: string
+        description: The feature type name, like "gene" or "exon".
+      start:
+        type: integer
+        minimum: 1
+        description: Genomic start of the feature, with a 1-base offset.
+      end:
+        type: integer
+        minimum: 1
+        description: Genomic end of the feature, with a 1-base offset.
+      score:
+        type: number
+        description:    Numeric value that generally indicates the confidence of the source on the annotated feature.
+      strand:
+        type: string
+        maxLength: 1
+        description: Single character that indicates the Sense (molecular biology) strand of the feature; it can assume the values of "+" (positive, or 5'->3'), "-", (negative, or 3'->5'), "." (undetermined).
+      phase:
+        type: string
+        maxLength: 1
+        description: |
+          Phase of CDS features; it can be either one of 0, 1, 2 (for CDS features) or "." (for everything else).
+      attributes:
+        type: object
+    required:
+    - sequence
+    - source
+    - feature
+    - start
+    - end
+    - score
+    - strand
+    - phase
+  Variant:
+    type: object
+    description: |
+      Genomic Variant as in vcf description
+      https://en.wikipedia.org/wiki/Variant_Call_Format
+    properties:
+      chrom:
+        type: string
+        description: |
+          The name of the sequence (typically a chromosome) on which the variation is being called.
+          This sequence is usually known as 'the reference sequence',
+          i.e. the sequence against which the given sample varies.
+      pos:
+        type: integer
+        minimum: 1
+        description: |
+          The 1-based position of the variation on the given sequence.
+      id:
+        type: string
+        description: |
+          The identifier of the variation, e.g. a dbSNP rs identifier or just . if unknown. Multiple identifiers should be separated by semi-colons without white-space.
+      ref:
+        type: string
+        description: |
+          The reference base (or bases in the case of an indel) at the given position on the given reference sequence.
+      alt:
+        type: array
+        description: The list of alternative alleles at this position
+        items:
+          type: string
+      qual:
+        type: number
+        description: A quality score associated with the inference of the given alleles.
+      filter:
+        type: object
+        description: A flag indicating which of a given set of filters the variation has passed.
+      info:
+        type: object
+        description: Variation description
+      format:
+        type: object
+        description: An (optional) extensible list of fields for describing the samples
+      samples:
+        type: object
+        description: For each (optional) sample described in the file, values are given for the fields listed in "format"
