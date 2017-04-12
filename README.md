@@ -59,3 +59,18 @@ bcftools index variants.sorted.bcf
 
 ## REST API
 [swagger UI](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/nlesc-ave/ave-rest-service/master/swagger.yml)
+
+## importing data with command line interface
+
+
+
+```sh
+export FLASK_APP=
+
+# add database location
+flask initdb './db/sqlite'
+
+flask import -species 'Solanum Lycopersicum' \
+           -genome 'SL.2.40'
+           -sequence './db/tomato/reference/S_lycopersicum_chromosomes.2.40.fa'
+```
