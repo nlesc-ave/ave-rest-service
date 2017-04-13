@@ -1,1 +1,1 @@
-from .avedata import server
+from .avedata import app

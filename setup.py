@@ -5,6 +5,12 @@ setup(
     packages=['avedata'],
     include_package_data=True,
     install_requires=[
-        'connexion',
+        'flask',
+        'click',
+        'connexion'
     ],
+    entry_points='''
+        [console_scripts]
+        avedata=avedata.commands:cli
+    ''',
 )

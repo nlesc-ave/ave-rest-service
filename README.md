@@ -65,12 +65,11 @@ bcftools index variants.sorted.bcf
 
 
 ```sh
-export FLASK_APP=
-
 # add database location
 flask initdb './db/sqlite'
 
 flask import -species 'Solanum Lycopersicum' \
-           -genome 'SL.2.40'
-           -sequence './db/tomato/reference/S_lycopersicum_chromosomes.2.40.fa'
+             -genome SL.2.40 \
+             -type sequence
+             -file ./db/tomato/reference/S_lycopersicum_chromosomes.2.40.fa
 ```
