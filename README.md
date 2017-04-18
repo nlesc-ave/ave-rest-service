@@ -65,11 +65,19 @@ bcftools index variants.sorted.bcf
 
 
 ```sh
-# add database location
-flask initdb './db/sqlite'
+# initialise the database
+avedata register --species 'Solanum Lycopersicum' \
+                 --genome SL.2.40 \
+                 --datatype sequence \
+                 ./db/tomato/reference/S_lycopersicum_chromosomes.2.40.fa
 
-flask import -species 'Solanum Lycopersicum' \
-             -genome SL.2.40 \
-             -type sequence
-             -file ./db/tomato/reference/S_lycopersicum_chromosomes.2.40.fa
+avedata register --species 'Solanum Lycopersicum' \
+                 --genome SL.2.40 \
+                 --datatype features \
+                 ./db/tomato/gene_models.gff.gz
+
+avedata register --species 'Solanum Lycopersicum' \
+                 --genome SL.2.40 \
+                 --datatype variants \
+                 ./db/tomato/tomato_snps.bcf
 ```

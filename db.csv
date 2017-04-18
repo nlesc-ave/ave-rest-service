@@ -1,4 +1,4 @@
-species, genome, type, file
+species, genome, datatype, filename
 Solanum lycopersicum, SL.2.40, sequence, S_lycopersicum_chromosomes.2.40.fa
 Solanum lycopersicum, SL.2.40, features, gene_models.gff.gz
 Solanum lycopersicum, SL.2.40, variants, tomato_snps.bcf
