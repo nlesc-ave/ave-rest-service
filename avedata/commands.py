@@ -24,14 +24,16 @@ def run():
 def register(species, genome, datatype, filename):
     """Add file metadata iformation to the database"""
     # check if file exists
-    if not os.path.isfile(os.path.join(os.getcwd()), filename):
-        print("File %s does not exist")
+    if not os.path.isfile(os.path.join(os.getcwd(), filename)):
+        print("File %s does not exist" % click.format_filename(filename))
+        return
 
     with app.app.app_context():
         db = get_db()
         query = 'INSERT INTO metadata (species, genome, datatype, filename) VALUES (?,?,?,?)'
         db.cursor().execute(query, (species, genome, datatype, filename))
         db.commit()
+        print("New datafile has been registered.")
 
 @click.command()
 def dropdb():
