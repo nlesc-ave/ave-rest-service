@@ -1,6 +1,7 @@
 import click
 import os
 from .avedata import get_db, app
+from .db import validate_data
 from flask import current_app
 
 
@@ -24,9 +25,12 @@ def run():
 def register(species, genome, datatype, filename):
     """Add file metadata iformation to the database"""
     # check if file exists
-    if not os.path.isfile(os.path.join(os.getcwd(), filename)):
+    file_abs_path = os.path.join(os.getcwd(), filename)
+    if not os.path.isfile(file_abs_path):
         print("File %s does not exist" % click.format_filename(filename))
         return
+
+    validate_data(file_abs_path, datatype);
 
     with app.app.app_context():
         db = get_db()
