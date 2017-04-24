@@ -30,7 +30,7 @@ def register(species, genome, datatype, filename):
         print("File %s does not exist" % click.format_filename(filename))
         return
 
-    validate_data(file_abs_path, datatype);
+    validate_data(file_abs_path, datatype)
 
     with app.app.app_context():
         db = get_db()
@@ -38,6 +38,7 @@ def register(species, genome, datatype, filename):
         db.cursor().execute(query, (species, genome, datatype, filename))
         db.commit()
         print("New datafile has been registered.")
+
 
 @click.command()
 def dropdb():
@@ -47,5 +48,3 @@ def dropdb():
 cli.add_command(run)
 cli.add_command(register)
 cli.add_command(dropdb)
-
-
