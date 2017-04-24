@@ -1,7 +1,0 @@
-species, genome, datatype, filename
-Solanum lycopersicum, SL.2.40, sequence, S_lycopersicum_chromosomes.2.40.fa
-Solanum lycopersicum, SL.2.40, features, gene_models.gff.gz
-Solanum lycopersicum, SL.2.40, variants, tomato_snps.bcf
-Arabidopsis thaliana, TAIR10, sequence, TAIR10.fa
-Arabidopsis thaliana, TAIR10, features, TAIR10_GFF3_genes.sorted.gff.gz
-Arabidopsis thaliana, TAIR10, variants, SNPs_only.recode.bcf
