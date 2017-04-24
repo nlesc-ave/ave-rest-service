@@ -1,6 +1,6 @@
 drop table if exists metadata;
 create table metadata (
-    id integer primary key autoincrement,
+    meta_id integer primary key autoincrement,
     species text not null,
     genome text not null,
     datatype text not null,

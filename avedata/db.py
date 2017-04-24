@@ -5,6 +5,15 @@ from pysam import TabixFile, asGTF
 from cyvcf2 import VCF
 
 
+def dict_from_attributes(attributes_string):
+    """Convert a string with attributes to a dictionary"""
+    attributes_dict = {}
+    key_value_list = attributes_string.split(";")
+    for key_value in key_value_list:
+        key, value = key_value.split("=")
+        attributes_dict[key] = value
+
+
 def validate_data(file_abs_path, datatype):
     """Validate datafile.
     Validation method depends on the datatype
@@ -65,6 +74,23 @@ def is_valid_bcf(vcf_file):
         click.echo(error)
 
 
-def import_gff():
+def import_gff(db, meta_id, filename):
     """Import features from gff file into the sqlite database
     features table."""
+
+    gff = TabixFile(filename, parser=asGTF())
+    for feature in gff.fetch():
+        if feature.feature == 'gene':
+            # fetch attributes
+            attributes = dict_from_attributes(feature.attributes)
+            name = attributes['name']
+            chromosome = feature.contig
+            start = feature.start
+            end = feature.end
+
+            # create a database query
+            query = """INSERT INTO features (meta_id, name, chromosome, start, end)
+                       VALUES (?,?,?,?)"""
+            db.cursor().execute(query, (meta_id, name, chromosome, start, end))
+            # commit database updates
+            db.commit()

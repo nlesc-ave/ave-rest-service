@@ -1,5 +1,4 @@
 import os
-import click
 import connexion
 import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, abort, \
@@ -12,7 +11,9 @@ app = connexion.App(__name__, specification_dir='../')
 app.app.config.update(dict(
         DATABASE='ave.db'
 ))
-app.app.config.from_pyfile(os.path.join(os.getcwd(), 'settings.cfg'), silent=True)
+app.app.config.from_pyfile(os.path.join(os.getcwd(),
+                           'settings.cfg'), silent=True)
+
 
 def connect_db():
     """Connects to sqlite database with metadata"""

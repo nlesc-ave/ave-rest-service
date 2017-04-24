@@ -1,7 +1,7 @@
 import click
 import os
 from .avedata import get_db, app
-from .db import validate_data
+from .db import validate_data, import_gff
 from flask import current_app
 
 
@@ -30,13 +30,23 @@ def register(species, genome, datatype, filename):
         print("File %s does not exist" % click.format_filename(filename))
         return
 
+    # validate if the provided files can be accessed
+    # by relevant libraries
     validate_data(file_abs_path, datatype)
 
     with app.app.app_context():
         db = get_db()
-        query = 'INSERT INTO metadata (species, genome, datatype, filename) VALUES (?,?,?,?)'
+        query = """INSERT INTO metadata (species, genome, datatype, filename)
+                   VALUES (?,?,?,?)"""
         db.cursor().execute(query, (species, genome, datatype, filename))
+        meta_id = db.cursor().lastrowid
+        # commit database updates
         db.commit()
+        # if gff file is registered import featur info into features table
+
+        import_gff(db, meta_id, rowfilename)
+
+
         print("New datafile has been registered.")
 
 

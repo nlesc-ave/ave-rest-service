@@ -28,8 +28,9 @@ tabix -p gff TAIR10_GFF3_genes.sorted.gff.gz
 Service queries annotation with use of
 [pysam.Tabixfile](https://pysam.readthedocs.io/en/latest/api.html#pysam.TabixFile).
 ```py
+import pysam
 from pysam import TabixFile
-gff = pysam.TabixFile("gene_models.gff.gz", parser=pysam.asGTF())
+gff = TabixFile("gene_models.gff.gz", parser=pysam.asGTF())
 for feature in gff.fetch("SL2.40ch06", 1, 5000):
     print(f.start)
 ```
