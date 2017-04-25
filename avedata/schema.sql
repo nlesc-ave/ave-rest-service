@@ -1,13 +1,13 @@
-drop table if exists metadata;
-create table metadata (
+DROP TABLE IF exists metadata;
+CREATE TABLE metadata (
     meta_id integer primary key autoincrement,
     species text not null,
     genome text not null,
     datatype text not null,
     filename text not null
 );
-
-CREATE TABLE IF NOT EXISTS  features (
+DROP TABLE IF exists features;
+CREATE TABLE features (
     meta_id integer not null,
     name text not null,
     chromosome text not null,

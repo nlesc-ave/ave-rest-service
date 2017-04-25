@@ -38,13 +38,14 @@ def register(species, genome, datatype, filename):
         db = get_db()
         query = """INSERT INTO metadata (species, genome, datatype, filename)
                    VALUES (?,?,?,?)"""
-        db.cursor().execute(query, (species, genome, datatype, filename))
-        meta_id = db.cursor().lastrowid
+        cursor = db.cursor()
+        cursor.execute(query, (species, genome, datatype, filename))
+        meta_id = cursor.lastrowid
         # commit database updates
         db.commit()
         # if gff file is registered import featur info into features table
 
-        import_gff(db, meta_id, rowfilename)
+        import_gff(db, meta_id, filename)
 
 
         print("New datafile has been registered.")

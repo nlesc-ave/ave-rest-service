@@ -12,6 +12,7 @@ def dict_from_attributes(attributes_string):
     for key_value in key_value_list:
         key, value = key_value.split("=")
         attributes_dict[key] = value
+    return attributes_dict
 
 
 def validate_data(file_abs_path, datatype):
@@ -83,14 +84,14 @@ def import_gff(db, meta_id, filename):
         if feature.feature == 'gene':
             # fetch attributes
             attributes = dict_from_attributes(feature.attributes)
-            name = attributes['name']
+            name = attributes['Name']
             chromosome = feature.contig
             start = feature.start
             end = feature.end
 
             # create a database query
             query = """INSERT INTO features (meta_id, name, chromosome, start, end)
-                       VALUES (?,?,?,?)"""
+                       VALUES (?,?,?,?,?)"""
             db.cursor().execute(query, (meta_id, name, chromosome, start, end))
             # commit database updates
             db.commit()
