@@ -1,8 +1,9 @@
 import click
 import os
-from .avedata import get_db, app
-from .db import validate_data, import_gff
-from flask import current_app
+from .db import get_db
+from .avedata import connexion_app, app
+from connexion.resolver import RestyResolver
+from .register import validate_data, import_gff
 
 
 @click.group()
@@ -13,7 +14,8 @@ def cli():
 @click.command()
 def run():
     """Run web service"""
-    app.run(port=8080, debug=True)
+    connexion_app.add_api('swagger.yml', arguments=app.config, resolver=RestyResolver('avedata.api'))
+    connexion_app.run(port=8080, debug=True)
 
 
 @click.command()
@@ -34,7 +36,7 @@ def register(species, genome, datatype, filename):
     # by relevant libraries
     validate_data(file_abs_path, datatype)
 
-    with app.app.app_context():
+    with app.app_context():
         db = get_db()
         query = """INSERT INTO metadata (species, genome, datatype, filename)
                    VALUES (?,?,?,?)"""
