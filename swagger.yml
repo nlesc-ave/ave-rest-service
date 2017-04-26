@@ -18,6 +18,7 @@ produces:
 paths:
   /species:
     get:
+      operationId: avedata.api.species.all
       summary: List of species
       description: |
         Fetch list of the species with available data.
@@ -34,30 +35,31 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  # /species/{species_id}/genomes:
-  #   get:
-  #     summary: Genomes of selected species
-  #     description: |
-  #       List of genomes available for this species id
-  #     parameters:
-  #       - name: species_id
-  #         in: path
-  #         description: Species id
-  #         required: true
-  #         type: string
-  #     tags:
-  #       - Species
-  #     responses:
-  #       200:
-  #         description: Array of genome identifiers for seleceted species id
-  #         schema:
-  #           type: array
-  #           items:
-  #             type: string
-  #       default:
-  #         description: Unexpected error
-  #         schema:
-  #           $ref: '#/definitions/Error'
+  /species/{species_id}/genomes:
+    get:
+      operationId: avedata.api.species.genomes
+      summary: Genomes of selected species
+      description: |
+        List of genomes available for this species id
+      parameters:
+        - name: species_id
+          in: path
+          description: Species id
+          required: true
+          type: string
+      tags:
+        - Species
+      responses:
+        200:
+          description: Array of genome identifiers for seleceted species id
+          schema:
+            type: array
+            items:
+              type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   # /genomes/{genome_id}/chromosomes:
   #   get:
   #     summary: Chromosomes of selected genome
