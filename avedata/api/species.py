@@ -1,5 +1,6 @@
 from ..db import get_db
 
+
 def all():
     """Fetch list of the species with available data."""
     species_list = []

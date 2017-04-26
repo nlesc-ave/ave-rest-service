@@ -60,30 +60,31 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  # /genomes/{genome_id}/chromosomes:
-  #   get:
-  #     summary: Chromosomes of selected genome
-  #     description: |
-  #       List of chromosome identifiers for selected genome
-  #     parameters:
-  #       - name: genome_id
-  #         in: path
-  #         description: Genome id
-  #         required: true
-  #         type: string
-  #     tags:
-  #       - Genomes
-  #     responses:
-  #       200:
-  #         description: Array of chromosome identifiers for seleceted genome id
-  #         schema:
-  #           type: array
-  #           items:
-  #             type: string
-  #       default:
-  #         description: Unexpected error
-  #         schema:
-  #           $ref: '#/definitions/Error'
+  /genomes/{genome_id}/chromosomes:
+    get:
+      operationId: avedata.api.genomes.chromosomes
+      summary: Chromosomes of selected genome
+      description: |
+        List of chromosome identifiers for selected genome
+      parameters:
+        - name: genome_id
+          in: path
+          description: Genome id
+          required: true
+          type: string
+      tags:
+        - Genomes
+      responses:
+        200:
+          description: Array of chromosome identifiers for selected genome id
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Chromosome'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   # /genomes/{genome_id}/features:
   #   get:
   #     summary: Genomic features of selected genome
@@ -343,3 +344,15 @@ definitions:
       samples:
         type: object
         description: For each (optional) sample described in the file, values are given for the fields listed in "format"
+  Chromosome:
+    type: object
+    description: |
+      Chromosome information
+    properties:
+      chrom_id:
+        type: string
+      length:
+        type: integer
+    required:
+    - chrom_id
+    - length

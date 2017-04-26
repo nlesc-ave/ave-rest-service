@@ -7,7 +7,6 @@ connexion_app = connexion.App(__name__, specification_dir='../')
 app = connexion_app.app
 
 
-
 app.config.update(dict(
         DATABASE='ave.db'
 ))
