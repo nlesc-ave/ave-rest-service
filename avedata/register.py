@@ -35,7 +35,7 @@ def is_valid_fasta(fasta_file):
 
     # try to open file with `pyfaidx`
     # check if there is an idex file
-    index_file = os.path.join(fasta_file, '.fai')
+    index_file = ".".join([fasta_file, 'fai'])
     if not os.path.isfile(index_file):
         message = "Fasta index not found. The index will be created"
         click.echo(click.style(message, fg='green'))
@@ -52,7 +52,6 @@ def is_valid_fasta(fasta_file):
 
 def is_valid_gff(gff_file):
     """Check if provided gff file is in proper format"""
-
     try:
         gff = TabixFile(gff_file, parser=asGTF())
     except OSError as err:

@@ -46,8 +46,8 @@ def register(species, genome, datatype, filename):
         # commit database updates
         db.commit()
         # if gff file is registered import featur info into features table
-
-        import_gff(db, meta_id, filename)
+        if datatype == "features":
+            import_gff(db, meta_id, filename)
 
 
         print("New datafile has been registered.")
