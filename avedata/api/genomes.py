@@ -8,12 +8,12 @@ def chromosomes(genome_id):
         get list of chromosomes and fetch their 'chrom_id': len
         retun [{'chrom_id': lenght},]
     """
-    db = get_db
+    db = get_db()
     query = """SELECT filename
                FROM metadata
-               WHERE genome=? AND datatype=sequence"""
+               WHERE genome=? AND datatype='sequence'"""
     cursor = db.cursor()
     cursor.execute(query, (genome_id, ))
-    filename = cursor.fetchone()['filename']
+    filename = cursor.fetchone()[0]
     chrominfo = get_chrominfo(filename)
     return chrominfo
