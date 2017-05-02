@@ -85,30 +85,31 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  # /genomes/{genome_id}/features:
-  #   get:
-  #     summary: Genomic features of selected genome
-  #     description: |
-  #       List of genomic features for selected genome
-  #     parameters:
-  #       - name: genome_id
-  #         in: path
-  #         description: Genome id
-  #         required: true
-  #         type: string
-  #     tags:
-  #       - Genomes
-  #     responses:
-  #       200:
-  #         description: Array of genomic features for selected genome id
-  #         schema:
-  #           type: array
-  #           items:
-  #             type: string
-  #       default:
-  #         description: Unexpected error
-  #         schema:
-  #           $ref: '#/definitions/Error'
+  /genomes/{genome_id}/features:
+    get:
+      operationId: avedata.api.genomes.features
+      summary: Genomic features of selected genome
+      description: |
+        List of genomic features for selected genome
+      parameters:
+        - name: genome_id
+          in: path
+          description: Genome id
+          required: true
+          type: string
+      tags:
+        - Genomes
+      responses:
+        200:
+          description: Array of genomic features for selected genome id
+          schema:
+            type: array
+            items:
+              type: string
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   # /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/reference:
   #   get:
   #     summary: Reference sequence of genomic region

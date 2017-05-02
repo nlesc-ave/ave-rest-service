@@ -1,5 +1,6 @@
 from ..db import get_db
 from ..sequence import get_chrominfo
+from ..features import get_featuretypes
 
 
 def chromosomes(genome_id):
@@ -17,3 +18,16 @@ def chromosomes(genome_id):
     filename = cursor.fetchone()[0]
     chrominfo = get_chrominfo(filename)
     return chrominfo
+
+def features(genome_id):
+    """Fetch genomic features of selected genomes
+    Return list of genomic features.
+    """
+    db = get_db()
+    query = """SELECT filename
+               FROM metadata
+               WHERE genome=? AND datatype='features'"""
+    cursor = db.cursor()
+    cursor.execute(query, (genome_id, ))
+    filename = cursor.fetchone()[0]
+    return get_featuretypes(filename)
