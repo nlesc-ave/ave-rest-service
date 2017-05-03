@@ -29,5 +29,5 @@ def features(genome_id):
                WHERE genome=? AND datatype='features'"""
     cursor = db.cursor()
     cursor.execute(query, (genome_id, ))
-    filename = cursor.fetchone()[0]
+    filename = cursor.fetchone()['filename']
     return get_featuretypes(filename)
