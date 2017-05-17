@@ -30,7 +30,7 @@ paths:
           schema:
             type: array
             items:
-              type: '#/definitions/Species'
+              $ref: '#/definitions/Species'
         default:
           description: Unexpected error
           schema:
@@ -44,43 +44,17 @@ paths:
       parameters:
         - name: species_id
           in: path
-          description: Species id
+          description: Species identifier
           required: true
           type: string
       tags:
         - Species
       responses:
         200:
-          description: Array of genome identifiers for seleceted species id
           schema:
             type: array
             items:
-              type: string
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /genomes/{genome_id}/chromosomes:
-    get:
-      operationId: avedata.api.genomes.chromosomes
-      summary: Chromosomes of selected genome
-      description: |
-        List of chromosome identifiers for selected genome
-      parameters:
-        - name: genome_id
-          in: path
-          description: Genome id
-          required: true
-          type: string
-      tags:
-        - Genomes
-      responses:
-        200:
-          description: Array of chromosome identifiers for selected genome id
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Chromosome'
+              $ref: '#/definitions/Genome'
         default:
           description: Unexpected error
           schema:
@@ -88,9 +62,9 @@ paths:
   /genomes/{genome_id}:
     get:
       operationId: avedata.api.genomes.get
-      summary: Genomic information of selected genome
+      summary: Genome information of selected genome
       description: |
-        Genomic information for selected genome
+        Genome information for selected genome
       parameters:
         - name: genome_id
           in: path
