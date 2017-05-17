@@ -4,7 +4,7 @@ swagger: '2.0'
 info:
   title: AVE REST API
   description: Allelic Variation Explorer REST API, Serving variant, annotation and genome data for AVE visualisation.
-  version: "0.0.1"
+  version: "0.0.2"
 # the domain of the service
 host: {{HOSTPORT}}
 # array of all schemes that your API supports
@@ -85,12 +85,12 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /genomes/{genome_id}/features:
+  /genomes/{genome_id}:
     get:
-      operationId: avedata.api.genomes.features
-      summary: Genomic features of selected genome
+      operationId: avedata.api.genomes.get
+      summary: Genomic information of selected genome
       description: |
-        List of genomic features for selected genome
+        Genomic information for selected genome
       parameters:
         - name: genome_id
           in: path
@@ -103,19 +103,12 @@ paths:
         200:
           description: Array of genomic features for selected genome id
           schema:
-            type: array
-            items:
-              type: string
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
-  /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/reference:
+            $ref: '#/definitions/Genome'
+  /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/genes:
     get:
-      operationId: avedata.api.genomes.reference
-      summary: Reference sequence of genomic region
+      summary: Genomic features of the genomic region
       description: |
-        Reference sequence of genomic region of selected genome, chromosome from start position to end position
+        Genomic features of genomic region of selected genome, chromosome from start position to end position
       parameters:
         - name: genome_id
           in: path
@@ -141,91 +134,92 @@ paths:
         - Genomes
       responses:
         200:
-          description: DNA sequence of selected genomic region
+          description: Array of genomic features for selected genome id
           schema:
-            $ref: '#/definitions/Sequence'
+            type: array
+            items:
+              $ref: '#/definitions/Annotation'
         default:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  # /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/features:
-  #   get:
-  #     summary: Genomic features of the genomic region
-  #     description: |
-  #       Genomic features of genomic region of selected genome, chromosome from start position to end position
-  #     parameters:
-  #       - name: genome_id
-  #         in: path
-  #         description: Genome id
-  #         required: true
-  #         type: string
-  #       - name: chrom_id
-  #         in: path
-  #         description: Chromosome id
-  #         required: true
-  #         type: string
-  #       - name: start_position
-  #         in: path
-  #         description: Start Position
-  #         required: true
-  #         type: integer
-  #       - name: end_position
-  #         in: path
-  #         description: End Position
-  #         required: true
-  #         type: integer
-  #     tags:
-  #       - Genomes
-  #     responses:
-  #       200:
-  #         description: Array of genomic features for selected genome id
-  #         schema:
-  #           type: array
-  #           items:
-  #             $ref: '#/definitions/Feature'
-  #       default:
-  #         description: Unexpected error
-  #         schema:
-  #           $ref: '#/definitions/Error'
-  # /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/variants:
-  #   get:
-  #     summary: Genomic variants of the genomic region
-  #     description: |
-  #       Genomic variants of genomic region of selected genome, chromosome from start position to end position
-  #     parameters:
-  #       - name: genome_id
-  #         in: path
-  #         description: Genome id
-  #         required: true
-  #         type: string
-  #       - name: chrom_id
-  #         in: path
-  #         description: Chromosome id
-  #         required: true
-  #         type: string
-  #       - name: start_position
-  #         in: path
-  #         description: Start Position
-  #         required: true
-  #         type: integer
-  #       - name: end_position
-  #         in: path
-  #         description: End Position
-  #         required: true
-  #         type: integer
-  #     tags:
-  #       - Genomes
-  #     responses:
-  #       200:
-  #         description: Array of genomic variants for selected genome id
-  #         schema:
-  #           type: array
-  #           items:
-  #             $ref: '#/definitions/Variant'
-  #       default:
-  #         description: Unexpected error
-  #         schema:
-  #           $ref: '#/definitions/Error'
+  /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/annotations:
+    get:
+      summary: Genomic features of the genomic region
+      description: |
+        Genomic features of genomic region of selected genome, chromosome from start position to end position
+      parameters:
+        - name: genome_id
+          in: path
+          description: Genome id
+          required: true
+          type: string
+        - name: chrom_id
+          in: path
+          description: Chromosome id
+          required: true
+          type: string
+        - name: start_position
+          in: path
+          description: Start Position
+          required: true
+          type: integer
+        - name: end_position
+          in: path
+          description: End Position
+          required: true
+          type: integer
+      tags:
+        - Genomes
+      responses:
+        200:
+          description: Array of genomic features for selected genome id
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Annotation'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+
+  /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/haplotypes:
+    get:
+      summary: Genomic variants of the genomic region
+      description: |
+        Genomic variants of genomic region of selected genome, chromosome from start position to end position
+      parameters:
+        - name: genome_id
+          in: path
+          description: Genome id
+          required: true
+          type: string
+        - name: chrom_id
+          in: path
+          description: Chromosome id
+          required: true
+          type: string
+        - name: start_position
+          in: path
+          description: Start Position
+          required: true
+          type: integer
+        - name: end_position
+          in: path
+          description: End Position
+          required: true
+          type: integer
+      tags:
+        - Genomes
+      responses:
+        200:
+          description: Array of genomic variants for selected genome id
+          schema:
+            $ref: '#/definitions/Haplotypes'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 definitions:
   Error:
     type: object
@@ -256,10 +250,10 @@ definitions:
         type: string
     required:
     - sequence
-  Feature:
+  Annotation:
     type: object
     description: |
-      Genomic feature
+      Genomic annotation
     properties:
       sequence:
         type: string
@@ -358,3 +352,57 @@ definitions:
     required:
     - chrom_id
     - length
+  Genome:
+    type: object
+    properties:
+      genome_id: 
+        type: string
+      chromosomes:
+        type: array
+        items:
+          $ref: '#/definitions/Chromosome'
+      annotation_feature_types:
+        type: array
+        items:
+          type: string
+      accessions:
+        description: Available accession for genome. Used to give list of accessions for haplotype to filter on. 
+        type: array
+        items:
+          type: string
+      reference:
+        type: string
+        format: uri
+        description: Url of 2bit file
+  HaplotypeNode:
+    type: object
+    properties:
+      haplotype_id:
+        type: string
+      children:
+        type: array
+        items: 
+          $ref: '#/definitions/HaplotypeNode'
+  Haplotype:
+    type: object
+    properties:
+      haplotype_id:
+        type: string
+      accessions:
+        description: Available accession for haplotype.
+        type: array
+        items:
+          type: string
+      variants:
+        type: array
+        items:
+          $ref: '#/definitions/Variant'      
+  Haplotypes:
+    type: object
+    properties:
+      hierarchy:
+        $ref: '#/definitions/HaplotypeNode'
+      haplotypes:
+        type: array
+        items:
+          $ref: '#/definitions/Haplotype'
