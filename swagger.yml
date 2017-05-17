@@ -30,7 +30,7 @@ paths:
           schema:
             type: array
             items:
-              type: string
+              type: '#/definitions/species'
         default:
           description: Unexpected error
           schema:
@@ -241,6 +241,19 @@ definitions:
     - type
     - title
     - detail
+  Species:
+    type: object
+    description: |
+      Species information
+    properties:
+      name:
+        type: string
+      species_id:
+        type: string
+        description: URI friendly species identifier
+    required:
+    - name
+    - species_id
   Sequence:
     type: object
     description: |
@@ -355,7 +368,7 @@ definitions:
   Genome:
     type: object
     properties:
-      genome_id: 
+      genome_id:
         type: string
       chromosomes:
         type: array
@@ -366,7 +379,7 @@ definitions:
         items:
           type: string
       accessions:
-        description: Available accession for genome. Used to give list of accessions for haplotype to filter on. 
+        description: Available accession for genome. Used to give list of accessions for haplotype to filter on.
         type: array
         items:
           type: string
@@ -381,7 +394,7 @@ definitions:
         type: string
       children:
         type: array
-        items: 
+        items:
           $ref: '#/definitions/HaplotypeNode'
   Haplotype:
     type: object
@@ -396,7 +409,7 @@ definitions:
       variants:
         type: array
         items:
-          $ref: '#/definitions/Variant'      
+          $ref: '#/definitions/Variant'
   Haplotypes:
     type: object
     properties:
