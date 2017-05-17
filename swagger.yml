@@ -30,7 +30,7 @@ paths:
           schema:
             type: array
             items:
-              type: '#/definitions/species'
+              type: '#/definitions/Species'
         default:
           description: Unexpected error
           schema:
@@ -248,8 +248,10 @@ definitions:
     properties:
       name:
         type: string
+        example: Solanum lycopersicum
       species_id:
         type: string
+        example: Solanum_lycopersicum
         description: URI friendly species identifier
     required:
     - name
