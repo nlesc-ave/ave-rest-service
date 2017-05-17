@@ -110,43 +110,44 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  # /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/reference:
-  #   get:
-  #     summary: Reference sequence of genomic region
-  #     description: |
-  #       Reference sequence of genomic region of selected genome, chromosome from start position to end position
-  #     parameters:
-  #       - name: genome_id
-  #         in: path
-  #         description: Genome id
-  #         required: true
-  #         type: string
-  #       - name: chrom_id
-  #         in: path
-  #         description: Chromosome id
-  #         required: true
-  #         type: string
-  #       - name: start_position
-  #         in: path
-  #         description: Start Position
-  #         required: true
-  #         type: integer
-  #       - name: end_position
-  #         in: path
-  #         description: End Position
-  #         required: true
-  #         type: integer
-  #     tags:
-  #       - Genomes
-  #     responses:
-  #       200:
-  #         description: DNA sequence of selected genomic region
-  #         schema:
-  #           $ref: '#/definitions/Sequence'
-  #       default:
-  #         description: Unexpected error
-  #         schema:
-  #           $ref: '#/definitions/Error'
+  /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/reference:
+    get:
+      operationId: avedata.api.genomes.reference
+      summary: Reference sequence of genomic region
+      description: |
+        Reference sequence of genomic region of selected genome, chromosome from start position to end position
+      parameters:
+        - name: genome_id
+          in: path
+          description: Genome id
+          required: true
+          type: string
+        - name: chrom_id
+          in: path
+          description: Chromosome id
+          required: true
+          type: string
+        - name: start_position
+          in: path
+          description: Start Position
+          required: true
+          type: integer
+        - name: end_position
+          in: path
+          description: End Position
+          required: true
+          type: integer
+      tags:
+        - Genomes
+      responses:
+        200:
+          description: DNA sequence of selected genomic region
+          schema:
+            $ref: '#/definitions/Sequence'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
   # /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/features:
   #   get:
   #     summary: Genomic features of the genomic region
