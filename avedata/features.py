@@ -11,8 +11,6 @@ def attributes_dict_from_string(attributes_string):
     return attributes_dict
 
 def dict_from_gff(gff):
-    gff_fields = ['sqid', 'source', 'type', 'start', 'end', 'score',
-                  'strand', 'phase', 'attributes']
     gff_dict={
         'seqid': gff.contig,
         'source': gff.source,
@@ -40,8 +38,10 @@ def get_genes(filename, chrom_id, start_position, end_position):
     featuretypes = ['CDS', 'exon', 'five_prime_UTR', 'gene', 'intron',
                      'mRNA', 'three_prime_UTR']
     gff = TabixFile(filename, parser=pysam.asGTF())
-    genes = [gene for gene in gff.fetch() if gene.feature in featuretypes]
+    genes = [gene for gene in gff.fetch(chrom_id, start_position, end_position)
+             if gene.feature in featuretypes]
     genes = [dict_from_gff(g) for g in genes]
+    print(len(genes))
     return genes
 
 def get_annotations(filename, chrom_id, start_position, end_position):
@@ -50,7 +50,7 @@ def get_annotations(filename, chrom_id, start_position, end_position):
                      'mRNA', 'three_prime_UTR']
     gff = TabixFile(filename, parser=pysam.asGTF())
     annotations = [annotation
-                   for annotation in gff.fetch()
+                   for annotation in gff.fetch(chrom_id, start_position, end_position)
                    if annotation.feature not in featuretypes]
     annotations = [dict_from_gff(a) for a in annotations]
     return annotations

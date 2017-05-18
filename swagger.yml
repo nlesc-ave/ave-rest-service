@@ -35,30 +35,30 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /species/{species_id}/genomes:
-    get:
-      operationId: avedata.api.species.genomes
-      summary: Genomes of selected species
-      description: |
-        List of genomes available for this species id
-      parameters:
-        - name: species_id
-          in: path
-          description: Species identifier
-          required: true
-          type: string
-      tags:
-        - Species
-      responses:
-        200:
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Genome'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
+  # /species/{species_id}/genomes:
+  #   get:
+  #     operationId: avedata.api.species.genomes
+  #     summary: Genomes of selected species
+  #     description: |
+  #       List of genomes available for this species id
+  #     parameters:
+  #       - name: species_id
+  #         in: path
+  #         description: Species identifier
+  #         required: true
+  #         type: string
+  #     tags:
+  #       - Species
+  #     responses:
+  #       200:
+  #         schema:
+  #           type: array
+  #           items:
+  #             $ref: '#/definitions/Genome'
+  #       default:
+  #         description: Unexpected error
+  #         schema:
+  #           $ref: '#/definitions/Error'
   # /genomes/{genome_id}:
   #   get:
   #     operationId: avedata.api.genomes.get

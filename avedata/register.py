@@ -1,6 +1,6 @@
 import os
 import click
-from features import attributes_dict_from_string
+from .features import attributes_dict_from_string
 from pyfaidx import Fasta
 from pysam import TabixFile, asGTF
 from cyvcf2 import VCF

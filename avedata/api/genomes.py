@@ -43,10 +43,10 @@ def genes(genome_id, chrom_id, start_position, end_position):
     cursor = db.cursor()
     cursor.execute(query, (genome_id, ))
     filename = cursor.fetchone()['filename']
-    return get_genes(filename, genome_id, chrom_id, start_position, end_position)
+    return get_genes(filename, chrom_id, start_position, end_position)
 
 
-def annotations(genome_id):
+def annotations(genome_id, chrom_id, start_position, end_position):
     """Fetch genomic features of selected genomes
     Return list of genomic features.
     """
@@ -57,4 +57,4 @@ def annotations(genome_id):
     cursor = db.cursor()
     cursor.execute(query, (genome_id, ))
     filename = cursor.fetchone()['filename']
-    return get_annotations(filename)
+    return get_annotations(filename, chrom_id, start_position, end_position)
