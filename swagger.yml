@@ -183,6 +183,13 @@ paths:
           description: End Position
           required: true
           type: integer
+        - name: accessions
+          description: Calculate haplotypes on subset of accessions
+          in: query
+          type: array
+          items:
+            type: string
+          minItems: 0
       tags:
         - Genomes
       responses:
