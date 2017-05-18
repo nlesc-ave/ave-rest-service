@@ -1,25 +1,14 @@
 import os
 import click
+from features import attributes_dict_from_string
 from pyfaidx import Fasta
 from pysam import TabixFile, asGTF
 from cyvcf2 import VCF
-
-
-def dict_from_attributes(attributes_string):
-    """Convert a string with attributes to a dictionary"""
-    attributes_dict = {}
-    key_value_list = attributes_string.split(";")
-    for key_value in key_value_list:
-        key, value = key_value.split("=")
-        attributes_dict[key] = value
-    return attributes_dict
-
 
 def validate_data(file_abs_path, datatype):
     """Validate datafile.
     Validation method depends on the datatype
     """
-
     if datatype == "sequence":
         is_valid_fasta(file_abs_path)
     elif datatype == "features":
@@ -82,7 +71,7 @@ def import_gff(db, meta_id, filename):
     for feature in gff.fetch():
         if feature.feature == 'gene':
             # fetch attributes
-            attributes = dict_from_attributes(feature.attributes)
+            attributes = attributes_dict_from_string(feature.attributes)
             name = attributes['Name']
             chromosome = feature.contig
             start = feature.start
