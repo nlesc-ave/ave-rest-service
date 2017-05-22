@@ -31,6 +31,8 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Species'
+          examples:
+            application/json: ['Solanum lycopersicum', 'Arabidopsis thaliana']
         default:
           description: Unexpected error
           schema:
