@@ -32,7 +32,10 @@ paths:
             items:
               $ref: '#/definitions/Species'
           examples:
-            application/json: ['Solanum lycopersicum', 'Arabidopsis thaliana']
+            application/json: [{'name': 'Solanum lycopersicum',
+                               'species_id': 'Solanum%20Lycopersicum'},
+                               {'name': 'Arabidopsis thaliana',
+                                'species_id': 'Arabidopsis%thaliana'}]
         default:
           description: Unexpected error
           schema:
