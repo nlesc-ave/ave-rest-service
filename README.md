@@ -11,17 +11,24 @@ sequences should be in single FASTA file with `.fa` extension.
 `SeqID`'s shoould match once in coresponding gff and bcf files.
 
 ### Genomic features annotations
+
+Gene annotations (transcripts) are treated differently than other feature annotations. It has
+to do with the fact that transcripts are displayed in separated track where
+UTRs, CDSs, exons and introns are rendered differently within one track.
+Gene annotations can be provided as bigBed files or gff3 files.
+
+#### gff3 annotations
 Information about annotations should be in [gff3](https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md)
 format. You can validate gff files on [genome tools website](http://genometools.org/cgi-bin/gff3validator.cgi).
 
-#### Sort features with [bedtools](https://bedtools.readthedocs.io/en/latest/)
+##### Sort features with [bedtools](https://bedtools.readthedocs.io/en/latest/)
 ```sh
 bedtools sort -i TAIR10_genes.gff > TAIR10_genes.sorted.gff
 ```
 
-#### Compress by [bgzip](http://www.htslib.org/doc/tabix.html) and index with [tabix](http://www.htslib.org/doc/tabix.html)
+##### Compress by [bgzip](http://www.htslib.org/doc/tabix.html) and index with [tabix](http://www.htslib.org/doc/tabix.html)
 ```sh
-bgzip -i TAIR10_GFF3_genes.sorted.gff 
+bgzip -i TAIR10_GFF3_genes.sorted.gff
 tabix -p gff TAIR10_GFF3_genes.sorted.gff.gz
 ```
 
@@ -36,6 +43,19 @@ for feature in gff.fetch("SL2.40ch06", 1, 5000):
 ```
 Learn more about pysam.Tabixfile from
 [pysam docs](https://pysam.readthedocs.io/en/latest/index.html)
+
+#### bigBed annotations
+Gene annotations are directly served from bigBed files (`*.bb`). To enable
+serching by gene names or other annotations, those are also indexed and stored
+in sqlite database. Indexing is done in python with use of `pybedtools`. To be
+able to read `bigBed` files `bigBedToBed` tool available in the path and
+executable is necessary. The tool can be dowloaded from
+[USCS download page](http://hgdownload.cse.ucsc.edu/admin/exe/).
+
+```py
+import pybedtools
+bed = pybedtools.contrib.bigbed.bigbed_to_bed("S_lycopersicum_May_2012.bb")
+```
 
 ### SNPs
 SNPs need to be provided in single file in [VCF](https://samtools.github.io/hts-specs/VCFv4.3.pdf)
