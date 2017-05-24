@@ -56,6 +56,7 @@ paths:
         - Species
       responses:
         200:
+          description: Genomes of selected species
           schema:
             type: array
             items:
@@ -118,7 +119,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Annotation'
+              $ref: '#/definitions/GeneAnnotation'
         default:
           description: Unexpected error
           schema:
@@ -208,6 +209,54 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
+  /genomes/{genome_id}/genes:
+    get:
+      parameters:
+        - name: genome_id
+          in: path
+          description: Genome id
+          required: true
+          type: string
+        - name: query
+          in: query
+          type: string
+      tags:
+      - Genomes
+      responses:
+        200:
+          description: Search results
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/GeneAnnotation'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /genomes/{genome_id}/annotations:
+    get:
+      parameters:
+        - name: genome_id
+          in: path
+          description: Genome id
+          required: true
+          type: string
+        - name: query
+          in: query
+          type: string
+      tags:
+      - Genomes
+      responses:
+        200:
+          description: Search results
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Annotation'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'            
 definitions:
   Error:
     type: object
@@ -244,15 +293,6 @@ definitions:
     required:
     - name
     - species_id
-  Sequence:
-    type: object
-    description: |
-      Genomic sequence
-    properties:
-      sequence:
-        type: string
-    required:
-    - sequence
   Annotation:
     type: object
     description: |
@@ -298,6 +338,77 @@ definitions:
     - score
     - strand
     - phase
+  GeneAnnotation:
+    type: object
+    properties:
+      position:
+        type: object
+        properties:
+          chrom:
+            type: string
+            description: |
+              The name of the sequence (typically a chromosome) on which the variation is being called.
+              This sequence is usually known as 'the reference sequence',
+              i.e. the sequence against which the given sample varies.    
+          start:
+            type: integer
+            minimum: 1
+            description: Genomic start of the feature, with a 1-base offset.
+          end:
+            type: integer
+            minimum: 1
+            description: Genomic end of the feature, with a 1-base offset.
+        required:
+        - chrom
+        - start
+        - end
+      id:
+        description: Transcript identifier
+        type: string
+      strand:
+        type: string
+      coding_region:
+        type: object
+        properties:
+          start:
+            type: integer
+            minimum: 1
+            description: Genomic start of the feature, with a 1-base offset.
+          end:
+            type: integer
+            minimum: 1
+            description: Genomic end of the feature, with a 1-base offset.
+        required:
+        - start
+        - end
+      exons:
+        type: array
+        items:
+          type: object
+          properties:
+            start:
+              type: integer
+              minimum: 1
+              description: Genomic start of the feature, with a 1-base offset.
+            end:
+              type: integer
+              minimum: 1
+              description: Genomic end of the feature, with a 1-base offset.
+          required:
+          - start
+          - end
+      gene_id:
+        type: string
+      name:
+        type: string
+    required:
+    - position
+    - id
+    - strand
+    - coding_region
+    - exons
+    - gene_id
+    - name
   Variant:
     type: object
     description: |
@@ -332,17 +443,26 @@ definitions:
         type: number
         description: A quality score associated with the inference of the given alleles.
       filter:
-        type: object
+        type: string
         description: A flag indicating which of a given set of filters the variation has passed.
       info:
-        type: object
+        type: string
         description: Variation description
       format:
-        type: object
+        type: string
         description: An (optional) extensible list of fields for describing the samples
       samples:
-        type: object
+        type: string
         description: For each (optional) sample described in the file, values are given for the fields listed in "format"
+    required:
+    - chrom
+    - pos
+    - id
+    - ref
+    - alt
+    - qual
+    - filter
+    - info
   Chromosome:
     type: object
     description: |
@@ -377,6 +497,12 @@ definitions:
         type: string
         format: uri
         description: Url of 2bit file
+    required:
+    - genome_id
+    - chromosomes
+    - annotation_feature_types
+    - accessions
+    - reference
   HaplotypeNode:
     type: object
     properties:
@@ -400,6 +526,10 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Variant'
+    required:
+    - haplotype_id
+    - accessions
+    - variants
   Haplotypes:
     type: object
     properties:
@@ -409,3 +539,6 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Haplotype'
+    required:
+    - hierarchy
+    - haplotypes
