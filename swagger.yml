@@ -124,9 +124,9 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/annotations:
+  /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/features:
     get:
-      operationId: avedata.api.genomes.annotations
+      operationId: avedata.api.genomes.features
       summary: Genomic features of the genomic region
       description: |
         Genomic features of genomic region of selected genome, chromosome from start position to end position
@@ -159,7 +159,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Annotation'
+              $ref: '#/definitions/FeatureAnnotation'
         default:
           description: Unexpected error
           schema:
@@ -233,7 +233,7 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  /genomes/{genome_id}/annotations:
+  /genomes/{genome_id}/features:
     get:
       parameters:
         - name: genome_id
@@ -252,11 +252,11 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Annotation'
+              $ref: '#/definitions/FeatureAnnotation'
         default:
           description: Unexpected error
           schema:
-            $ref: '#/definitions/Error'            
+            $ref: '#/definitions/Error'
 definitions:
   Error:
     type: object
@@ -293,10 +293,10 @@ definitions:
     required:
     - name
     - species_id
-  Annotation:
+  FeatureAnnotation:
     type: object
     description: |
-      Genomic annotation
+      Genomic feature annotation, excluding gene annotation
     properties:
       sequence:
         type: string
@@ -349,7 +349,7 @@ definitions:
             description: |
               The name of the sequence (typically a chromosome) on which the variation is being called.
               This sequence is usually known as 'the reference sequence',
-              i.e. the sequence against which the given sample varies.    
+              i.e. the sequence against which the given sample varies.
           start:
             type: integer
             minimum: 1
@@ -484,7 +484,7 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Chromosome'
-      annotation_feature_types:
+      feature_types:
         type: array
         items:
           type: string
@@ -500,7 +500,7 @@ definitions:
     required:
     - genome_id
     - chromosomes
-    - annotation_feature_types
+    - feature_types
     - accessions
     - reference
   HaplotypeNode:
