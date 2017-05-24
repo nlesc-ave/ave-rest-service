@@ -40,49 +40,49 @@ paths:
           description: Unexpected error
           schema:
             $ref: '#/definitions/Error'
-  # /species/{species_id}/genomes:
-  #   get:
-  #     operationId: avedata.api.species.genomes
-  #     summary: Genomes of selected species
-  #     description: |
-  #       List of genomes available for this species id
-  #     parameters:
-  #       - name: species_id
-  #         in: path
-  #         description: Species identifier
-  #         required: true
-  #         type: string
-  #     tags:
-  #       - Species
-  #     responses:
-  #       200:
-  #         schema:
-  #           type: array
-  #           items:
-  #             $ref: '#/definitions/Genome'
-  #       default:
-  #         description: Unexpected error
-  #         schema:
-  #           $ref: '#/definitions/Error'
-  # /genomes/{genome_id}:
-  #   get:
-  #     operationId: avedata.api.genomes.get
-  #     summary: Genome information of selected genome
-  #     description: |
-  #       Genome information for selected genome
-  #     parameters:
-  #       - name: genome_id
-  #         in: path
-  #         description: Genome id
-  #         required: true
-  #         type: string
-  #     tags:
-  #       - Genomes
-  #     responses:
-  #       200:
-  #         description: Array of genomic features for selected genome id
-  #         schema:
-  #           $ref: '#/definitions/Genome'
+  /species/{species_id}/genomes:
+    get:
+      operationId: avedata.api.species.genomes
+      summary: Genomes of selected species
+      description: |
+        List of genomes available for this species id
+      parameters:
+        - name: species_id
+          in: path
+          description: Species identifier
+          required: true
+          type: string
+      tags:
+        - Species
+      responses:
+        200:
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Genome'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /genomes/{genome_id}:
+    get:
+      operationId: avedata.api.genomes.get
+      summary: Genome information of selected genome
+      description: |
+        Genome information for selected genome
+      parameters:
+        - name: genome_id
+          in: path
+          description: Genome id
+          required: true
+          type: string
+      tags:
+        - Genomes
+      responses:
+        200:
+          description: Array of genomic features for selected genome id
+          schema:
+            $ref: '#/definitions/Genome'
   /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/genes:
     get:
       operationId: avedata.api.genomes.genes
@@ -164,50 +164,50 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  # /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/haplotypes:
-  #   get:
-  #     summary: Genomic variants of the genomic region
-  #     description: |
-  #       Genomic variants of genomic region of selected genome, chromosome from start position to end position
-  #     parameters:
-  #       - name: genome_id
-  #         in: path
-  #         description: Genome id
-  #         required: true
-  #         type: string
-  #       - name: chrom_id
-  #         in: path
-  #         description: Chromosome id
-  #         required: true
-  #         type: string
-  #       - name: start_position
-  #         in: path
-  #         description: Start Position
-  #         required: true
-  #         type: integer
-  #       - name: end_position
-  #         in: path
-  #         description: End Position
-  #         required: true
-  #         type: integer
-  #       - name: accessions
-  #         description: Calculate haplotypes on subset of accessions
-  #         in: query
-  #         type: array
-  #         items:
-  #           type: string
-  #         minItems: 0
-  #     tags:
-  #       - Genomes
-  #     responses:
-  #       200:
-  #         description: Array of genomic variants for selected genome id
-  #         schema:
-  #           $ref: '#/definitions/Haplotypes'
-  #       default:
-  #         description: Unexpected error
-  #         schema:
-  #           $ref: '#/definitions/Error'
+  /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/haplotypes:
+    get:
+      summary: Genomic variants of the genomic region
+      description: |
+        Genomic variants of genomic region of selected genome, chromosome from start position to end position
+      parameters:
+        - name: genome_id
+          in: path
+          description: Genome id
+          required: true
+          type: string
+        - name: chrom_id
+          in: path
+          description: Chromosome id
+          required: true
+          type: string
+        - name: start_position
+          in: path
+          description: Start Position
+          required: true
+          type: integer
+        - name: end_position
+          in: path
+          description: End Position
+          required: true
+          type: integer
+        - name: accessions
+          description: Calculate haplotypes on subset of accessions
+          in: query
+          type: array
+          items:
+            type: string
+          minItems: 0
+      tags:
+        - Genomes
+      responses:
+        200:
+          description: Array of genomic variants for selected genome id
+          schema:
+            $ref: '#/definitions/Haplotypes'
+        default:
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
 definitions:
   Error:
     type: object
