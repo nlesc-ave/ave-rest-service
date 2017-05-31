@@ -65,3 +65,4 @@ def dropdb():
 cli.add_command(run)
 cli.add_command(register)
 cli.add_command(dropdb)
+cli.add_command(initdb)
