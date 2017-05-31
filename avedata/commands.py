@@ -40,7 +40,6 @@ def register(species, genome, datatype, filename):
     # validate if the provided files can be accessed
     # by relevant libraries
     validate_data(file_abs_path, datatype)
-    return
 
     with app.app_context():
         db = get_db()
