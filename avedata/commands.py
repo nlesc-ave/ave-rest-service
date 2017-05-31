@@ -1,6 +1,6 @@
 import click
 import os
-from .db import get_db
+from .db import get_db, init_db
 from .avedata import connexion_app, app
 from connexion.resolver import RestyResolver
 from .register import validate_data, import_gff
@@ -53,6 +53,9 @@ def register(species, genome, datatype, filename):
 
         print("New datafile has been registered.")
 
+@click.command()
+def initdb():
+    init_db()
 
 @click.command()
 def dropdb():
