@@ -2,10 +2,11 @@ import os
 import connexion
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
+from flask_corse import CORS
 
 connexion_app = connexion.App(__name__, specification_dir='../')
 app = connexion_app.app
-
+CORS(app)
 
 app.config.update(dict(
         DATABASE='ave.db'
