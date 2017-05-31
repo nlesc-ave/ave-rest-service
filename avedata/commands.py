@@ -55,7 +55,8 @@ def register(species, genome, datatype, filename):
 
 @click.command()
 def initdb():
-    init_db()
+    with app.app_context():
+        init_db()
 
 @click.command()
 def dropdb():
