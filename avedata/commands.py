@@ -30,7 +30,11 @@ def register(species, genome, datatype, filename):
     # check if file exists
     file_abs_path = os.path.join(os.getcwd(), filename)
     if not os.path.isfile(file_abs_path):
-        print("File %s does not exist" % click.format_filename(filename))
+        try:
+            requests.head(filename)
+            print("File %s is not available" % click.format_filename(filename))
+        except requests.HTTPError:
+            print("URL %s is not available" % click.format_filename(filename))
         return
 
     # validate if the provided files can be accessed
