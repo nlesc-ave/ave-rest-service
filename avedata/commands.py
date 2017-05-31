@@ -33,14 +33,14 @@ def register(species, genome, datatype, filename):
     if not os.path.isfile(file_abs_path):
         try:
             requests.head(filename)
-            print("File %s is not available" % click.format_filename(filename))
         except requests.HTTPError:
-            print("URL %s is not available" % click.format_filename(filename))
-        return
+            print("file or URL %s is not available" % click.format_filename(filename))
+            return
 
     # validate if the provided files can be accessed
     # by relevant libraries
     validate_data(file_abs_path, datatype)
+    return
 
     with app.app_context():
         db = get_db()
