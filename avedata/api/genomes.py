@@ -3,6 +3,20 @@ from ..sequence import get_chrominfo
 from ..sequence import get_reference
 from ..features import get_genes
 from ..features import get_annotations
+from ..features import get_featuretypes
+from ..variants import get_accessions_list
+
+def get(genome_id):
+
+    genome_info = {
+        'genome_id': genome_id,
+        'chromosomes': chromosomes(genome_id),
+        'feature_types': featuretypes(genome_id),
+        'accessions': accession_list(genome_id),
+        'reference': two_bit_uri(genome_id),
+        'gene_track': gene_track_uri(genome_id)
+    }
+    return genome_info
 
 def chromosomes(genome_id):
     """Fetch fasta file name for this genome
@@ -20,6 +34,25 @@ def chromosomes(genome_id):
     chrominfo = get_chrominfo(filename)
     return chrominfo
 
+def featuretypes(genome_id):
+    db = get_db()
+    query = """SELECT filename
+               FROM metadata
+               WHERE genome=? AND datatype='features'"""
+    cursor = db.cursor()
+    cursor.execute(query, (genome_id, ))
+    filename = cursor.fetchone()[0]
+    return get_featuretypes(filename)
+
+def accession_list(genome_id):
+    db = get_db()
+    query = """SELECT filename
+               FROM metadata
+               WHERE genome=? AND datatype='variants'"""
+    cursor = db.cursor()
+    cursor.execute(query, (genome_id, ))
+    filename = cursor.fetchone()[0]
+    return get_accessions_list(filename)
 
 def reference(genome_id, chrom_id, start_position, end_position):
     """Fetch reference sequence of genomic region"""
@@ -32,6 +65,26 @@ def reference(genome_id, chrom_id, start_position, end_position):
     filename = cursor.fetchone()['filename']
     return get_reference(filename, chrom_id, start_position, end_position)
 
+def two_bit_uri(genome_id):
+    db = get_db()
+    query = """SELECT filename
+               FROM metadata
+               WHERE genome=? AND datatype='2bit'"""
+    cursor = db.cursor()
+    cursor.execute(query, (genome_id, ))
+    filename = cursor.fetchone()['filename']
+    return filename
+
+
+def gene_track_uri(genome_id):
+    db = get_db()
+    query = """SELECT filename
+               FROM metadata
+               WHERE genome=? AND datatype='bigbed'"""
+    cursor = db.cursor()
+    cursor.execute(query, (genome_id, ))
+    filename = cursor.fetchone()['filename']
+    return filename
 
 def genes(genome_id, chrom_id, start_position, end_position):
     """Fetch all gene annototion information for particular location.
@@ -46,7 +99,7 @@ def genes(genome_id, chrom_id, start_position, end_position):
     return get_genes(filename, chrom_id, start_position, end_position)
 
 
-def annotations(genome_id, chrom_id, start_position, end_position):
+def features(genome_id, chrom_id, start_position, end_position):
     """Fetch genomic features of selected genomes
     Return list of genomic features.
     """
@@ -58,3 +111,15 @@ def annotations(genome_id, chrom_id, start_position, end_position):
     cursor.execute(query, (genome_id, ))
     filename = cursor.fetchone()['filename']
     return get_annotations(filename, chrom_id, start_position, end_position)
+
+
+def haplotypes(genome_id, chrom_id, start_position, end_position):
+    raise NotImplementedError()
+
+
+def gene_search(genome_id, query):
+    raise NotImplementedError()
+
+
+def feature_search(genome_id, query):
+    raise NotImplementedError()

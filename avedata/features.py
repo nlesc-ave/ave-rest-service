@@ -1,6 +1,9 @@
 import pysam
 from pysam import TabixFile
 
+GENE_FEATURES = ['CDS', 'exon', 'five_prime_UTR', 'gene', 'intron',
+                'mRNA', 'three_prime_UTR']
+
 def attributes_dict_from_string(attributes_string):
     """Convert a string with attributes to a dictionary"""
     attributes_dict = {}
@@ -30,16 +33,17 @@ def get_featuretypes(filename):
     gff = TabixFile(filename, parser=pysam.asGTF())
     featuretypes = set()
     for f in gff.fetch():
-        featuretypes.add(f.feature)
+        if f.feature not in GENE_FEATURES:
+            featuretypes.add(f.feature)
     return list(featuretypes)
 
 def get_genes(filename, chrom_id, start_position, end_position):
     """Fetch genes from defined region"""
-    featuretypes = ['CDS', 'exon', 'five_prime_UTR', 'gene', 'intron',
+    gene_features = ['CDS', 'exon', 'five_prime_UTR', 'gene', 'intron',
                      'mRNA', 'three_prime_UTR']
     gff = TabixFile(filename, parser=pysam.asGTF())
     genes = [gene for gene in gff.fetch(chrom_id, start_position, end_position)
-             if gene.feature in featuretypes]
+             if gene.feature in GENE_FEATURES]
     genes = [dict_from_gff(g) for g in genes]
     print(len(genes))
     return genes
@@ -52,5 +56,5 @@ def get_annotations(filename, chrom_id, start_position, end_position):
     annotations = [annotation
                    for annotation in gff.fetch(chrom_id, start_position, end_position)
                    if annotation.feature not in featuretypes]
-    annotations = [dict_from_gff(a) for a in annotations]
+    annotations = [dict_from_gff(a) for a in GENE_FEATURES]
     return annotations

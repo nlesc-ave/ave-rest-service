@@ -167,6 +167,7 @@ paths:
 
   /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/haplotypes:
     get:
+      operationId: avedata.api.genomes.haplotypes
       summary: Genomic variants of the genomic region
       description: |
         Genomic variants of genomic region of selected genome, chromosome from start position to end position
