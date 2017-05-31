@@ -2,7 +2,7 @@ import os
 import connexion
 from flask import Flask, request, session, g, redirect, url_for, abort, \
      render_template, flash
-from flask_corse import CORS
+from flask_cors import CORS
 
 connexion_app = connexion.App(__name__, specification_dir='../')
 app = connexion_app.app
