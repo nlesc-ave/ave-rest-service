@@ -1,4 +1,5 @@
 from ..db import get_db
+from .genomes import get as get_genome
 import urllib
 
 
@@ -16,10 +17,12 @@ def all():
 
 
 def genomes(species_id):
-    genomes_list = []
+    genome_ids = []
     db = get_db()
     query = "SELECT DISTINCT genome FROM metadata WHERE species=?"
     cursor = db.cursor()
     for row in cursor.execute(query, (species_id, )):
-        genomes_list.append(row['genome'])
-    return genomes_list
+        genome_ids.append(row['genome'])
+
+    genome_list = [get_genome(genome_id) for genome_id in genome_ids]
+    return genome_list
