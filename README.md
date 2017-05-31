@@ -105,4 +105,14 @@ avedata register --species 'Solanum Lycopersicum' \
                  --genome SL.2.40 \
                  --datatype variants \
                  ./db/tomato/tomato_snps.bcf
+
+avedata register --species 'Solanum Lycopersicum' \
+                 --genome SL.2.40 \
+                 --datatype 2bit \
+                 http://<dataserver>.S_lycopersicum_chromosomes.2.40.fa.2bit
+
+avedata register --species 'Solanum Lycopersicum' \
+                 --genome SL.2.40 \
+                 --datatype bigbed \
+                 http://<dataserver>.gene_models.bb
 ```
