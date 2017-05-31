@@ -496,7 +496,11 @@ definitions:
       reference:
         type: string
         format: uri
-        description: Url of 2bit file
+        description: URL of 2bit file
+      gene_track:
+        type: string
+        format: uri
+        description: URL of bigBed file with gene annotations
     required:
     - genome_id
     - chromosomes
