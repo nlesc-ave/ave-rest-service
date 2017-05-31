@@ -211,6 +211,7 @@ paths:
             $ref: '#/definitions/Error'
   /genomes/{genome_id}/genes:
     get:
+      operationId: avedata.api.genomes.gene_search
       parameters:
         - name: genome_id
           in: path
@@ -220,6 +221,7 @@ paths:
         - name: query
           in: query
           type: string
+          required: true
       tags:
       - Genomes
       responses:
@@ -235,6 +237,7 @@ paths:
             $ref: '#/definitions/Error'
   /genomes/{genome_id}/features:
     get:
+      operationId: avedata.api.genomes.feature_search
       parameters:
         - name: genome_id
           in: path
@@ -244,6 +247,7 @@ paths:
         - name: query
           in: query
           type: string
+          required: true
       tags:
       - Genomes
       responses:
