@@ -1,5 +1,6 @@
 import click
 import os
+import requests
 from .db import get_db, init_db
 from .avedata import connexion_app, app
 from connexion.resolver import RestyResolver
