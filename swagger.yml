@@ -61,6 +61,19 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Genome'
+                    examples:
+            application/json: [{'genome_id': 'SL.2.40',
+                                'chromosomes': {},
+                                'feature_types': [],
+                                'accessions': [],
+                                'reference': '',
+                                'gene_track': ''},
+                              'genome_id': 'TAIR10',
+                                'chromosomes': {},
+                                'feature_types': [],
+                                'accessions': [],
+                                'reference': '',
+                                'gene_track': ''}]
         default:
           description: Unexpected error
           schema:
@@ -535,10 +548,14 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Variant'
+      sequence:
+        type: string
+        description: DNA sequence of the haplotype. Reference with variants.
     required:
     - haplotype_id
     - accessions
     - variants
+    - sequence
   Haplotypes:
     type: object
     properties:
