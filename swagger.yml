@@ -520,6 +520,11 @@ definitions:
         type: string
         format: uri
         description: URL of 2bit file
+      vcf_header:
+        type: object
+        additionalProperties:
+          type: string
+        description: dictionary of vcf FORMAT and INFO maping id to description
       gene_track:
         type: string
         format: uri
@@ -530,6 +535,7 @@ definitions:
     - feature_types
     - accessions
     - reference
+    - vcf_header
   HaplotypeNode:
     type: object
     properties:
