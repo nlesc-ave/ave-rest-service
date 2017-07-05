@@ -61,19 +61,21 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Genome'
-                    examples:
+          examples:
             application/json: [{'genome_id': 'SL.2.40',
                                 'chromosomes': {},
                                 'feature_types': [],
                                 'accessions': [],
                                 'reference': '',
                                 'gene_track': ''},
-                              'genome_id': 'TAIR10',
+                                {
+                                'genome_id': 'TAIR10',
                                 'chromosomes': {},
                                 'feature_types': [],
                                 'accessions': [],
                                 'reference': '',
-                                'gene_track': ''}]
+                                'gene_track': ''
+                              }]
         default:
           description: Unexpected error
           schema:
@@ -464,14 +466,16 @@ definitions:
         type: string
         description: A flag indicating which of a given set of filters the variation has passed.
       info:
-        type: string
+        type: object
+        additionalProperties:
+          type: string
         description: Variation description
-      format:
-        type: string
-        description: An (optional) extensible list of fields for describing the samples
-      samples:
-        type: string
-        description: For each (optional) sample described in the file, values are given for the fields listed in "format"
+      genotypes:
+        type: object
+        additionalProperties:
+          type: string
+        description: Genotype information for accession and position
+
     required:
     - chrom
     - pos
@@ -481,6 +485,7 @@ definitions:
     - qual
     - filter
     - info
+    - genotypes
   Chromosome:
     type: object
     description: |
