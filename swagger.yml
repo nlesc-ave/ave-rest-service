@@ -63,19 +63,20 @@ paths:
               $ref: '#/definitions/Genome'
           examples:
             application/json: [{'genome_id': 'SL.2.40',
-                                'chromosomes': {},
+                                'chromosomes': [
+                                  {'chrom_id': 'SL2.40ch00',
+                                   'length': '21805821'},
+                                  {'chrom_id': 'SL2.40ch01',
+                                   'length': '90304244'},
+                                ],
                                 'feature_types': [],
-                                'accessions': [],
-                                'reference': '',
-                                'gene_track': ''},
-                                {
-                                'genome_id': 'TAIR10',
-                                'chromosomes': {},
-                                'feature_types': [],
-                                'accessions': [],
-                                'reference': '',
-                                'gene_track': ''
-                              }]
+                                'accessions': [
+                                  'RF_001_SZAXPI008746-45',
+                                  'RF_002_SZAXPI009284-57',
+                                  'RF_003_SZAXPI009285-62'],
+                                'reference': 'latest/tomato/S_lycopersicum_chromosomes.2.40.2bit',
+                                'gene_track': 'latest/tomato/S_lycopersicum_May_2012.bb'},
+                                ]
         default:
           description: Unexpected error
           schema:
