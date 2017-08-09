@@ -22,7 +22,7 @@ def chromosomes(genome_id):
     """Fetch fasta file name for this genome
         open file with pyfaidx
         get list of chromosomes and fetch their 'chrom_id': len
-        retun [{'chrom_id': lenght},]
+        return [{'chrom_id': length},]
     """
     db = get_db()
     query = """SELECT filename
@@ -113,8 +113,28 @@ def features(genome_id, chrom_id, start_position, end_position):
     return get_annotations(filename, chrom_id, start_position, end_position)
 
 
-def haplotypes(genome_id, chrom_id, start_position, end_position):
-    raise NotImplementedError()
+def haplotypes(genome_id, chrom_id, start_position, end_position, accessions):
+    """
+    Calculate haplotypes for chosen region and set of accessions.
+    """
+    db = get_db()
+    query = """SELECT filename
+               FROM metadata
+               WHERE genome=? AND datatype='variants'"""
+    cursor = db.cursor()
+    cursor.execute(query, (genome_id, ))
+    filename = cursor.fetchone()['filename']
+
+
+
+    haplotypes_list = {
+        hierarchy: {},
+        heplotypes: [{'haplotype_id': '',
+                     'accessions': [],
+                     'variants': []},
+                     'sequence']
+    }
+    return
 
 
 def gene_search(genome_id, query):
