@@ -134,7 +134,7 @@ def haplotypes(genome_id, chrom_id, start_position, end_position, accessions):
                      'variants': []},
                      'sequence']
     }
-    return
+    return filename
 
 
 def gene_search(genome_id, query):
