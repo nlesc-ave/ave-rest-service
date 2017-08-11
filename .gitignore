@@ -59,3 +59,6 @@ target/
 # PyCharm
 .idea/
 settings.cfg
+
+# VS Code stuff
+.vscode/
