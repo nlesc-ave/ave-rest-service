@@ -503,7 +503,7 @@ definitions:
         type: array
         description: Genotype information for accession and position
         items:
-          type: Genotype
+          $ref: '#/definitions/Genotype'
     required:
     - chrom
     - pos
