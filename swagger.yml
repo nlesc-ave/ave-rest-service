@@ -449,6 +449,15 @@ definitions:
     - exons
     - gene_id
     - name
+  Genotype:
+    type: object
+    properties:
+      accession:
+        type: string
+    additionalProperties:
+      type: string
+    required:
+      - accession
   Variant:
     type: object
     description: |
@@ -491,11 +500,10 @@ definitions:
           type: string
         description: Variation description
       genotypes:
-        type: object
-        additionalProperties:
-          type: string
+        type: array
         description: Genotype information for accession and position
-
+        items:
+          type: Genotype
     required:
     - chrom
     - pos
