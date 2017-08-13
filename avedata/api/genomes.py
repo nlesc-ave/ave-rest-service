@@ -5,6 +5,7 @@ from ..features import get_genes
 from ..features import get_annotations
 from ..features import get_featuretypes
 from ..variants import get_accessions_list
+form ..variants import get_haplotypes
 
 def get(genome_id):
 
@@ -118,23 +119,29 @@ def haplotypes(genome_id, chrom_id, start_position, end_position, accessions):
     Calculate haplotypes for chosen region and set of accessions.
     """
     db = get_db()
+    # to construct haplotypes, both:
+    # variants from bcf file and
+    # reference sequence from 2bit (or fasta)
+    # are needed
+
     query = """SELECT filename
                FROM metadata
                WHERE genome=? AND datatype='variants'"""
     cursor = db.cursor()
     cursor.execute(query, (genome_id, ))
-    filename = cursor.fetchone()['filename']
+    variant_file = cursor.fetchone()['filename']
 
+    query = """SELECT filename
+            FROM metadata
+            WHERE genome=?
+            AND datatype='2bit'"""
+    cursor = db.coursor()
+    cursor.ececute(query, (genome_id), ))
+    ref_file = cursor.fetchone()['filename']
 
+    haplotypes = get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_position, [])
 
-    haplotypes_list = {
-        hierarchy: {},
-        heplotypes: [{'haplotype_id': '',
-                     'accessions': [],
-                     'variants': []},
-                     'sequence']
-    }
-    return filename
+    return haplotypes
 
 
 def gene_search(genome_id, query):
