@@ -136,7 +136,7 @@ def haplotypes(genome_id, chrom_id, start_position, end_position, accessions=[])
             WHERE genome=?
             AND datatype='2bit'"""
     cursor = db.cursor()
-    cursor.execute(query, (genome_id), )
+    cursor.execute(query, (genome_id, ))
     ref_file = cursor.fetchone()['filename']
 
     haplotypes = get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_position, accessions)
