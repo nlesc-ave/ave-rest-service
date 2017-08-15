@@ -135,7 +135,7 @@ def haplotypes(genome_id, chrom_id, start_position, end_position, accessions=[])
             FROM metadata
             WHERE genome=?
             AND datatype='2bit'"""
-    cursor = db.coursor()
+    cursor = db.cursor()
     cursor.execute(query, (genome_id), )
     ref_file = cursor.fetchone()['filename']
 
