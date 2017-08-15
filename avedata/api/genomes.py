@@ -114,7 +114,7 @@ def features(genome_id, chrom_id, start_position, end_position):
     return get_annotations(filename, chrom_id, start_position, end_position)
 
 
-def haplotypes(genome_id, chrom_id, start_position, end_position, accessions):
+def haplotypes(genome_id, chrom_id, start_position, end_position, accessions=[]):
     """
     Calculate haplotypes for chosen region and set of accessions.
     """
@@ -139,7 +139,7 @@ def haplotypes(genome_id, chrom_id, start_position, end_position, accessions):
     cursor.execute(query, (genome_id), )
     ref_file = cursor.fetchone()['filename']
 
-    haplotypes = get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_position, [])
+    haplotypes = get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_position, accessions)
 
     return haplotypes
 
