@@ -85,9 +85,37 @@ bcftools index variants.sorted.bcf
 ## REST API
 [swagger UI](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/nlesc-ave/ave-rest-service/master/swagger.yml)
 
+## INSTALL
+
+Ave requires a [Anaconda3](https://www.continuum.io/downloads) or [miniconda3](https://conda.io/miniconda.html) installation.
+
+To create a new Anaconda environment with all the ave dependencies installed.
+```bash
+conda env create -f environment.yml
+```
+For osx use `enviroment.osx.yml` instead of `environment.yml`.
+
+Activate the environment
+```bash
+source activate ave2
+```
+
+Install ave for production with
+```bash
+python setup.py install
+```
+
+Install ave for development with
+```bash
+python setup.py develop
+```
+
+If dependencies are changed in `environment.yml` then update conda env by runnning
+```
+conda env update -f environment.yml
+```
+
 ## importing data with command line interface
-
-
 
 ```sh
 # initialise the database

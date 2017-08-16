@@ -16,6 +16,7 @@ dependencies:
 - bioconda::samtools=1.4=0
 - bioconda::ucsc-bedtobigbed=332=0
 - bioconda::ucsc-fatotwobit=332=0
+- conda-forge::appnope=0.1.0=py35_0
 - conda-forge::blas=1.1=openblas
 - conda-forge::bzip2=1.0.6=1
 - conda-forge::ca-certificates=2017.1.23=0
@@ -26,7 +27,7 @@ dependencies:
 - conda-forge::freetype=2.7=1
 - conda-forge::ipython=5.3.0=py35_0
 - conda-forge::ipython_genutils=0.2.0=py35_0
-- libgfortran=3.0=0
+- conda-forge::libgfortran=3.0.0=0
 - conda-forge::libpng=1.6.28=0
 - conda-forge::matplotlib=2.0.0=np112py35_3
 - conda-forge::ncurses=5.9=10
@@ -79,4 +80,3 @@ dependencies:
   - swagger-spec-validator==2.1.0
   - werkzeug==0.12.1
   - python-Levenshtein
-
