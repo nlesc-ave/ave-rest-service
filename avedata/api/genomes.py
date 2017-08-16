@@ -129,7 +129,7 @@ def features(genome_id, chrom_id, start_position, end_position):
     return get_annotations(filename, chrom_id, start_position, end_position)
 
 
-def haplotypes(genome_id, chrom_id, start_position, end_position, accessions):
+def haplotypes(genome_id, chrom_id, start_position, end_position, accessions=None):
     """
     Calculate haplotypes for chosen region and set of accessions.
     """
