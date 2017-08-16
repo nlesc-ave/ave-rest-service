@@ -29,13 +29,18 @@ def scipyclust2json(clusters, labels):
         if node.right: add_node( node.right, newNode )
 
     # Initialize nested dictionary for d3, then recursively iterate through tree
-    d3Dendro = dict(children=[], name="Root1")
+    d3Dendro = dict(children=[])
     add_node( T, d3Dendro )
+
+    ordered_haplotype_ids = []
 
     # Label each node with the names of each leaf in its subtree
     def label_tree( n ):
         # If the node is a leaf, then we have its name
         if len(n["children"]) == 0:
+            n['haplotype_id'] = id2name[n["node_id"]]
+            ordered_haplotype_ids.append(n['haplotype_id'])
+            del n['children']
             leafNames = [ id2name[n["node_id"]] ]
 
         # If not, flatten all the leaves in the node's subtree
@@ -46,13 +51,10 @@ def scipyclust2json(clusters, labels):
         # it makes for cleaner JSON
         del n["node_id"]
 
-        # Labeling convention: "-"-separated leaf names
-        n["name"] = name = "-".join(sorted(map(str, leafNames)))
-
         return leafNames
 
     label_tree( d3Dendro["children"][0] )
-    return d3Dendro
+    return d3Dendro, ordered_haplotype_ids
 
 
 def get_accessions_list(filename):
@@ -70,11 +72,12 @@ def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_positio
     region = '{0}:{1}-{2}'.format(chrom_id, start_position, end_position)
     vcf = VCF(variant_file)
     vcf_variants = vcf(region)
+    all_accessions = vcf.samples
     if len(accessions) == 0:
-        accessions = vcf.samples
+        accessions = all_accessions
 
-    if not set(accessions).issubset(set(vcf.samples)):
-        raise AccessionsLookupError(set(accessions).difference(set(vcf.samples)))
+    if not set(accessions).issubset(set(all_accessions)):
+        raise AccessionsLookupError(set(accessions).difference(set(all_accessions)))
 
     # sequences in a dictionar
     # with accession names as keys
@@ -84,20 +87,21 @@ def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_positio
     # store all the variant objects in an array
     variants = []
     for v in vcf_variants:
-        #
-        variant = {
-            'chrom': v.CHROM,
-            'pos': v.POS,
-            'id': v.ID,
-            'ref': v.REF,
-            'alt': v.ALT,
-            'qual': v.QUAL,
-            'filter': v.FILTER,
-            'info': dict(v.INFO),
-            'genotypes': []
-        }
         if v.is_snp:
-            for idx, (acc, genotype) in enumerate(zip(accessions, v.genotypes)):
+            variant = {
+                'chrom': v.CHROM,
+                'pos': v.POS,
+                'id': v.ID,
+                'ref': v.REF,
+                'alt': v.ALT,
+                'qual': v.QUAL,
+                'filter': v.FILTER,
+                'info': dict(v.INFO),
+                'genotypes': []
+            }
+            for idx, (acc, genotype) in enumerate(zip(all_accessions, v.genotypes)):
+                if acc not in accessions:
+                    continue
                 if genotype[0] == -1:
                     sequences[acc] += v.REF
                 else:
@@ -114,53 +118,58 @@ def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_positio
                     for f in v.FORMAT[1:]:
                         genotype[f] = str(v.format(f)[idx])
                     variant['genotypes'].append(genotype)
-        variants.append(variant)
+            variants.append(variant)
 
     # concatenate sequences into strings
     # sequences = [''.join(s) for s in sequences]
     acc1_list = []
     acc2_list = []
     distances_list = []
-    # calculate distances for all the accession pairs
-    for acc1, acc2 in permutations(accessions, 2):
-        acc1_list.append(acc1)
-        acc2_list.append(acc2)
-        seq1 = sequences[acc1]
-        seq2 = sequences[acc2]
-        distances_list.append(hamming(seq1, seq2))
 
-    # create a pandas dataframe with the distances
-    # between each accession
-    dists = pd.DataFrame({
-        "acc1": acc1_list,
-        "acc2": acc2_list,
-        "distance": distances_list
-    })
-
-    # get list of accessions in each haplotype
-    accessions_set = set(dists['acc1'])
     haplotypes = {}
-
-    # group accessions into haplotypes
-    while len(accessions_set):
-        # get one accession from the set
-        acc = accessions_set.pop()
-        # get all the comparisons with this accession
-        single_accession = dists[(dists['acc1'] == acc)]
-        # fetch rows with zero distance
-        zero_distance = single_accession[(single_accession['distance'] == 0)]
-        haplotype_accessions = list(zero_distance['acc2'])
-        unique_ha = []
-        for ha in haplotype_accessions:
-            if ha in accessions_set:
-                unique_ha.append(ha)
-                # those accesssion cannot be in any other haplotype
-                # remove them from the set
-                accessions_set.discard(ha)
-        unique_ha.append(acc)
-        # generate unique labels for the haplotypes
+    if len(accessions) == 1:
         haplotype_id = uuid.uuid4().hex
-        haplotypes[haplotype_id] = {'accessions': unique_ha}
+        haplotypes[haplotype_id] = {'accessions': [accessions[0]]}
+    else:
+        # calculate distances for all the accession pairs
+        for acc1, acc2 in permutations(accessions, 2):
+            acc1_list.append(acc1)
+            acc2_list.append(acc2)
+            seq1 = sequences[acc1]
+            seq2 = sequences[acc2]
+            distances_list.append(hamming(seq1, seq2))
+
+        # create a pandas dataframe with the distances
+        # between each accession
+        dists = pd.DataFrame({
+            "acc1": acc1_list,
+            "acc2": acc2_list,
+            "distance": distances_list
+        })
+
+        # get list of accessions in each haplotype
+        accessions_set = set(dists['acc1'])
+
+        # group accessions into haplotypes
+        while len(accessions_set):
+            # get one accession from the set
+            acc = accessions_set.pop()
+            # get all the comparisons with this accession
+            single_accession = dists[(dists['acc1'] == acc)]
+            # fetch rows with zero distance
+            zero_distance = single_accession[(single_accession['distance'] == 0)]
+            haplotype_accessions = list(zero_distance['acc2'])
+            unique_ha = []
+            for ha in haplotype_accessions:
+                if ha in accessions_set:
+                    unique_ha.append(ha)
+                    # those accession cannot be in any other haplotype
+                    # remove them from the set
+                    accessions_set.discard(ha)
+            unique_ha.append(acc)
+            # generate unique labels for the haplotypes
+            haplotype_id = uuid.uuid4().hex
+            haplotypes[haplotype_id] = {'accessions': unique_ha}
 
     # add variant information to haplotypes
     # variants should only contain genotype information
@@ -186,13 +195,28 @@ def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_positio
     for h in haplotypes.values():
         haplotype_sequence = list(ref_seq)
         for v in haplotype['variants']:
-            haplotype_sequence[v['pos']] = v['alt'][0]
+            # TODO start_position is 1-based, while seq and vcf is 0-based, require -1 | +1 ?
+            haplotype_sequence[v['pos'] - start_position] = v['alt'][0]
         h['sequence'] = "".join(haplotype_sequence)
 
     # get distances between the haplotypes based on the distances between
     # the accessions
     haplotype_ids = list(haplotypes.keys())
     haplotype_distances = []
+
+    # if there is just one haplotype, due to for example no variants in region, then hierarchy will be a single node
+    if len(haplotype_ids) < 2:
+        haplotype_id = haplotype_ids[0]
+        haplotype = haplotypes[haplotype_id]
+        haplotype['haplotype_id'] = haplotype_id
+        return {
+            'haplotypes': [
+                haplotype
+            ],
+            'hierarchy': {
+                'haplotype_id': haplotype_id
+            }
+        }
 
     for h1, h2 in combinations(haplotype_ids, 2):
         # get name of the first accession in both compared haplotypes
@@ -205,7 +229,14 @@ def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_positio
         haplotype_distances.append(dist)
 
     clusters = hcl.linkage(np.array(haplotype_distances))
+    root_node, ordered_haplotype_ids = scipyclust2json(clusters, haplotype_ids)
+    ordered_haplotypes = []
+    for haplotype_id in ordered_haplotype_ids:
+        haplotype = haplotypes[haplotype_id]
+        haplotype['haplotype_id'] = haplotype_id
+        ordered_haplotypes.append(haplotype)
 
-    return clusters, haplotype_ids
-    # hierarchy = {'haplotype_id': '',
-    #              'children': accessions}
+    return {
+        'hierarchy': root_node,
+        'haplotypes': ordered_haplotypes
+    }
