@@ -1,12 +1,14 @@
 import uuid
+from itertools import combinations, permutations
+from collections import defaultdict
+from functools import reduce
+
 from cyvcf2 import VCF
 import pandas as pd
 import numpy as np
 import scipy.cluster.hierarchy as hcl
 import scipy.cluster
-from itertools import combinations, permutations
-from collections import defaultdict
-from functools import reduce
+from Levenshtein import hamming
 
 from avedata.sequence import get_sequence
 
@@ -220,18 +222,22 @@ def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_positio
             }
         }
 
+    # compute distances between haplotypes
     for h1, h2 in combinations(haplotype_ids, 2):
         # get name of the first accession in both compared haplotypes
         acc1 = haplotypes[h1]['accessions'][0]
         acc2 = haplotypes[h2]['accessions'][0]
-        # get distance between those based on dists df
-        df1 = dists[(dists['acc1'] == acc1)]
-        df2 = df1[(df1['acc2'] == acc2)]
-        dist = df2.iloc[0]['distance']
+        # compute distance between those based on their sequence
+        seq1 = sequences[acc1]
+        seq2 = sequences[acc1]
+        dist = distances_list.append(hamming(seq1, seq2))
         haplotype_distances.append(dist)
 
     clusters = hcl.linkage(np.array(haplotype_distances))
     root_node, ordered_haplotype_ids = scipyclust2json(clusters, haplotype_ids)
+
+    # the haplotypes and hierarchy are rendered in seperate panels next to each other
+    # so the first leaf in the hierarchy should be the same as the first haplotype in the list
     ordered_haplotypes = []
     for haplotype_id in ordered_haplotype_ids:
         haplotype = haplotypes[haplotype_id]

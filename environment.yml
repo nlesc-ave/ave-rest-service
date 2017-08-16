@@ -82,4 +82,4 @@ dependencies:
   - swagger-spec-validator==2.1.0
   - werkzeug==0.12.1
   - pyfaidx==0.5.0
-
+  - python-Levenshtein
