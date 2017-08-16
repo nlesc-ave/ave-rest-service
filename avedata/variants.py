@@ -1,6 +1,5 @@
 import uuid
 from cyvcf2 import VCF
-from Levenshtein import hamming
 import pandas as pd
 import numpy as np
 import scipy.cluster.hierarchy as hcl
@@ -137,7 +136,10 @@ def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_positio
             acc2_list.append(acc2)
             seq1 = sequences[acc1]
             seq2 = sequences[acc2]
-            distances_list.append(hamming(seq1, seq2))
+            if seq1 == seq2:
+                distances_list.append(0)
+            else:
+                distances_list.append(1)
 
         # create a pandas dataframe with the distances
         # between each accession
@@ -175,7 +177,7 @@ def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_positio
     # variants should only contain genotype information
     # about genotypes present in particular haplotype
     for h_id, haplotype in haplotypes.items():
-        haplotypes[h_id]['variants'] = []
+        haplotype['variants'] = []
         for v in variants:
             genotypes = []
             for g in v['genotypes']:
@@ -194,7 +196,7 @@ def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_positio
     # are indexed from zero
     for h in haplotypes.values():
         haplotype_sequence = list(ref_seq)
-        for v in haplotype['variants']:
+        for v in h['variants']:
             # TODO start_position is 1-based, while seq and vcf is 0-based, require -1 | +1 ?
             haplotype_sequence[v['pos'] - start_position] = v['alt'][0]
         h['sequence'] = "".join(haplotype_sequence)
