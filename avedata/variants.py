@@ -177,7 +177,6 @@ def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_positio
                 haplotype_variant['genotypes'] = genotypes
                 haplotypes[h_id]['variants'].append(haplotype_variant)
 
-
     # load reference sequence from a 2bit file
     ref_seq = get_sequence(ref_file, chrom_id, start_position, end_position)
 
@@ -208,8 +207,5 @@ def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_positio
     clusters = hcl.linkage(np.array(haplotype_distances))
 
     return clusters, haplotype_ids
-
-
-
-    hierarchy = {'haplotype_id': '',
-                 'children': accessions}
+    # hierarchy = {'haplotype_id': '',
+    #              'children': accessions}

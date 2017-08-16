@@ -170,8 +170,8 @@ def haplotypes(genome_id, chrom_id, start_position, end_position, accessions=Non
         return get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_position, accessions)
     except AccessionsLookupError as e:
         ext = {'genome_id': genome_id, 'accessions': e.accessions}
-        msg = "Not Found", "Accessions {1} of genome with id \'{0}\' not found".format(genome_id, e.accessions)
-        return connexion.problem(404, msg, ext=ext)
+        msg = "Accessions {1} of genome with id \'{0}\' not found".format(genome_id, e.accessions)
+        return connexion.problem(404, "Not Found", msg, ext=ext)
 
 
 def gene_search(genome_id, query):

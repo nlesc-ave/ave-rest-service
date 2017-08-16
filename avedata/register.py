@@ -5,6 +5,7 @@ from pyfaidx import Fasta
 from pysam import TabixFile, asGTF
 from cyvcf2 import VCF
 
+
 def validate_data(file_abs_path, datatype):
     """Validate datafile.
     Validation method depends on the datatype

@@ -1,6 +1,6 @@
 # ave-rest-service
-Serving variant, annotation and genome data for AVE visualisation.
 
+Serving variant, annotation and genome data for AVE visualisation.
 
 ## REST API
 [swagger UI](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/nlesc-ave/ave-rest-service/master/swagger.yml)
