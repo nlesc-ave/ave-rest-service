@@ -3,7 +3,6 @@ import os
 import requests
 from .db import get_db, init_db
 from .avedata import connexion_app, app
-from connexion.resolver import RestyResolver
 from .register import validate_data, import_gff
 
 
@@ -23,8 +22,7 @@ def run():
 @click.option('--species', help='Species name')
 @click.option('--genome', help='Name of the reference genome')
 @click.option('--datatype', help='Type of the data',
-              type=click.Choice(['sequence', 'features', 'variants',
-                                 '2bit', 'bigbed']))
+              type=click.Choice(['features', 'variants', '2bit', 'bigbed']))
 @click.argument('filename')
 def register(species, genome, datatype, filename):
     """Add file metadata iformation to the database"""
@@ -54,13 +52,14 @@ def register(species, genome, datatype, filename):
         if datatype == "features":
             import_gff(db, meta_id, filename)
 
-
         print("New datafile has been registered.")
+
 
 @click.command()
 def initdb():
     with app.app_context():
         init_db()
+
 
 @click.command()
 def dropdb():

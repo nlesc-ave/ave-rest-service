@@ -16,6 +16,8 @@ dependencies:
 - bioconda::samtools=1.4=0
 - bioconda::ucsc-bedtobigbed=332=0
 - bioconda::ucsc-fatotwobit=332=0
+- bioconda::ucsc-twobittofa=332=0
+- bioconda::ucsc-twoBitInfo=332=0
 - conda-forge::appnope=0.1.0=py35_0
 - conda-forge::blas=1.1=openblas
 - conda-forge::bzip2=1.0.6=1
@@ -68,6 +70,7 @@ dependencies:
   - connexion==1.1.9
   - editdistance==0.3.1
   - flask==0.12.1
+  - flask-cors==3.0.3
   - inflection==0.3.1
   - ipython-genutils==0.2.0
   - itsdangerous==0.24
@@ -79,4 +82,5 @@ dependencies:
   - requests==2.13.0
   - swagger-spec-validator==2.1.0
   - werkzeug==0.12.1
+  - pyfaidx==0.5.0
   - python-Levenshtein

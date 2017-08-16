@@ -5,11 +5,12 @@ import pandas as pd
 import numpy as np
 import scipy.cluster.hierarchy as hcl
 import scipy.cluster
-from scipy.spatial.distance import squareform
 from itertools import combinations, permutations
 from collections import defaultdict
 from functools import reduce
-import twobitreader as tbr
+
+from avedata.sequence import get_sequence
+
 
 def scipyclust2json(clusters, labels):
     T = scipy.cluster.hierarchy.to_tree( clusters , rd=False )
@@ -58,11 +59,23 @@ def get_accessions_list(filename):
     variants = VCF(filename)
     return variants.samples
 
+
+class AccessionsLookupError(LookupError):
+    def __init__(self, accessions):
+        super().__init__()
+        self.accessions = accessions
+
+
 def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_position, accessions):
     region = '{0}:{1}-{2}'.format(chrom_id, start_position, end_position)
     vcf = VCF(variant_file)
     vcf_variants = vcf(region)
-    accessions = vcf.samples
+    if len(accessions) == 0:
+        accessions = vcf.samples
+
+    if not set(accessions).issubset(set(vcf.samples)):
+        raise AccessionsLookupError(set(accessions).difference(set(vcf.samples)))
+
     # sequences in a dictionar
     # with accession names as keys
     sequences = defaultdict(str)
@@ -166,9 +179,7 @@ def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_positio
 
 
     # load reference sequence from a 2bit file
-    f = tbr.TwoBitFile(ref_file)
-    chromosome = f[chrom_id]
-    ref_seq = chromosome[start_position:end_position]
+    ref_seq = get_sequence(ref_file, chrom_id, start_position, end_position)
 
     # reconstruct the sequence based on reference and variant information of the
     # haplotype; both the sequence (a python string) and the variants from vcf

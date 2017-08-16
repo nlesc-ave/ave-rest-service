@@ -1,14 +1,31 @@
-from pyfaidx import Fasta
+from os import linesep
+from subprocess import check_output
+
 
 def get_chrominfo(filename):
     """Get list of chromosome ids and their lengths"""
-    chromosomes = Fasta(filename)
-    chrominfo = [{'chrom_id': chrom_id, 'length': len(chromosomes[chrom_id])}
-                 for chrom_id in chromosomes.keys()]
-    return chrominfo
+    args = (
+        'twoBitInfo',
+        filename,
+        'stdout'
+    )
+    tabulated_chromosomes = check_output(args).decode('ascii')
+    chromosomes = []
+    for line in tabulated_chromosomes.splitlines():
+        (chrom_id, length) = line.split('\t')
+        chromosomes.append({'chrom_id': chrom_id, 'length': int(length)})
+    return chromosomes
 
-def get_reference(filename, chrom_id, start_position, end_position):
-    """Fetch reference sequence of genomic region"""
-    chromosomes = Fasta(filename)
-    reference = chromosomes[chrom_id][start_position:end_position].seq
-    return reference
+
+def get_sequence(filename, chrom_id, start_position, end_position):
+    args = (
+        'twoBitToFa',
+        '-seq=' + chrom_id,
+        '-start=' + str(start_position),
+        '-end=' + str(end_position),
+        filename,
+        'stdout'
+    )
+    fasta = check_output(args).decode('ascii')
+    header = '>' + chrom_id + ':' + str(start_position) + '-' + str(end_position) + linesep
+    return fasta.replace(header, '').replace(linesep, '')

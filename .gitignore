@@ -58,7 +58,10 @@ target/
 
 # PyCharm
 .idea/
-settings.cfg
 
 # VS Code stuff
 .vscode/
+
+# Default files
+settings.cfg
+ave.db

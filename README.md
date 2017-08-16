@@ -1,14 +1,63 @@
 # ave-rest-service
 Serving variant, annotation and genome data for AVE visualisation.
 
-## Data preprocessing.
+
+## REST API
+[swagger UI](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/nlesc-ave/ave-rest-service/master/swagger.yml)
+
+## INSTALL
+
+Ave requires a [Anaconda3](https://www.continuum.io/downloads) or [miniconda3](https://conda.io/miniconda.html) installation.
+
+To create a new Anaconda environment with all the ave dependencies installed.
+```bash
+conda env create -f environment.yml
+```
+On osx use `enviroment.osx.yml` instead of `environment.yml`.
+
+Activate the environment
+```bash
+source activate ave2
+```
+
+Install ave for production with
+```bash
+python setup.py install
+```
+
+Install ave for development with
+```bash
+python setup.py develop
+```
+
+If dependencies are changed in `environment.yml` then update conda env by runnning
+```
+conda env update -f environment.yml
+```
+
+## Configure
+
+The directory in which `avadata` is run should contain a `settings.cfg` configuration file.
+
+The repo contains an example config file called `settings.example.cfg`.
+
+## Data preprocessing
+
 Before data can be served it has to be preprocessed in following way.
 
 ### Genome sequence
-Genome sequence in [FASTA](https://en.wikipedia.org/wiki/FASTA_format) format is used. It is idexed and accessed by
-[pyfaidx](https://github.com/mdshw5/pyfaidx). All chromosome
-sequences should be in single FASTA file with `.fa` extension.
-`SeqID`'s shoould match once in coresponding gff and bcf files.
+
+Genome sequence in [2bit](https://genome.ucsc.edu/goldenpath/help/twoBit.html) format is used.
+
+When you have a genome sequence in [FASTA](https://en.wikipedia.org/wiki/FASTA_format) format, where each chromosome is a sequence in the file.
+
+The FASTA file can be converted to 2bit using:
+
+```sh
+faToTwoBit genome.fa genome.2bit
+```
+
+The (chromosome) sequence identifiers should match the ones in corresponding gff and bcf files.
 
 ### Genomic features annotations
 
@@ -82,52 +131,16 @@ bcftools view -O b variants.sorted.vcf.gz > variants.sorted.bcf
 bcftools index variants.sorted.bcf
 ```
 
-## REST API
-[swagger UI](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/nlesc-ave/ave-rest-service/master/swagger.yml)
+## Register data
 
-## INSTALL
-
-Ave requires a [Anaconda3](https://www.continuum.io/downloads) or [miniconda3](https://conda.io/miniconda.html) installation.
-
-To create a new Anaconda environment with all the ave dependencies installed.
-```bash
-conda env create -f environment.yml
-```
-For osx use `enviroment.osx.yml` instead of `environment.yml`.
-
-Activate the environment
-```bash
-source activate ave2
-```
-
-Install ave for production with
-```bash
-python setup.py install
-```
-
-Install ave for development with
-```bash
-python setup.py develop
-```
-
-If dependencies are changed in `environment.yml` then update conda env by runnning
-```
-conda env update -f environment.yml
-```
-
-## importing data with command line interface
+Register data with command line interface
 
 ```sh
 # initialise the database
 avedata register --species 'Solanum Lycopersicum' \
                  --genome SL.2.40 \
-                 --datatype sequence \
-                 ./db/tomato/reference/S_lycopersicum_chromosomes.2.40.fa
-
-avedata register --species 'Solanum Lycopersicum' \
-                 --genome SL.2.40 \
-                 --datatype features \
-                 ./db/tomato/gene_models.gff.gz
+                 --datatype 2bit \
+                 http://<dataserver>.S_lycopersicum_chromosomes.2.40.fa.2bit
 
 avedata register --species 'Solanum Lycopersicum' \
                  --genome SL.2.40 \
@@ -136,11 +149,21 @@ avedata register --species 'Solanum Lycopersicum' \
 
 avedata register --species 'Solanum Lycopersicum' \
                  --genome SL.2.40 \
-                 --datatype 2bit \
-                 http://<dataserver>.S_lycopersicum_chromosomes.2.40.fa.2bit
+                 --datatype bigbed \
+                 http://<dataserver>.gene_models.bb
 
 avedata register --species 'Solanum Lycopersicum' \
                  --genome SL.2.40 \
-                 --datatype bigbed \
-                 http://<dataserver>.gene_models.bb
+                 --datatype features \
+                 ./db/tomato/gene_models.gff.gz
 ```
+
+## Run service
+
+```bash
+avadata run
+```
+It will print the `<url>` it is hosting at.
+
+The api endpoint is at `<url>/api/`.
+The swagger ui is at `<url>/api/ui`.
