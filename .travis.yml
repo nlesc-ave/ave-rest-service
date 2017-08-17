@@ -6,6 +6,7 @@ before_install:
   - if [ ! -e $HOME/conda/bin/activate ]; then
     wget -nc https://repo.continuum.io/miniconda/$INSTALLER;
     bash $INSTALLER -f -b -p $HOME/conda;
+    touch /home/travis/conda/envs/ave2/lib/python3.5/site-packages/easy-install.pth;
     $HOME/conda/bin/conda env create -f environment.yml;
     fi
   - $HOME/conda/bin/conda env update -f environment.yml
