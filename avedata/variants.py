@@ -69,7 +69,7 @@ class AccessionsLookupError(LookupError):
         self.accessions = accessions
 
 
-def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_position, accessions):
+def get_variants(variant_file, chrom_id, start_position, end_position, accessions):
     region = '{0}:{1}-{2}'.format(chrom_id, start_position, end_position)
     vcf = VCF(variant_file)
     vcf_variants = vcf(region)
@@ -80,7 +80,7 @@ def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_positio
     if not set(accessions).issubset(set(all_accessions)):
         raise AccessionsLookupError(set(accessions).difference(set(all_accessions)))
 
-    # sequences in a dictionar
+    # sequences in a dictionary
     # with accession names as keys
     sequences = defaultdict(str)
     # positions of the variants in a dictionary
@@ -120,20 +120,25 @@ def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_positio
                         genotype[f] = str(v.format(f)[idx])
                     variant['genotypes'].append(genotype)
             variants.append(variant)
+    return variants, sequences
 
-    # concatenate sequences into strings
-    # sequences = [''.join(s) for s in sequences]
+
+def cluster_sequences(sequences):
     acc1_list = []
     acc2_list = []
     distances_list = []
 
-    haplotypes = {}
-    if len(accessions) == 1:
-        haplotype_id = uuid.uuid4().hex
-        haplotypes[haplotype_id] = {'accessions': [accessions[0]]}
+    haplotypes = []
+    if len(sequences) == 1:
+        accession = list(sequences.keys())[0]
+        haplotype = {
+            'accessions': [accession],
+            'haplotype_id': uuid.uuid4().hex
+        }
+        haplotypes.append(haplotype)
     else:
         # calculate distances for all the accession pairs
-        for acc1, acc2 in permutations(accessions, 2):
+        for acc1, acc2 in permutations(sorted(sequences.keys()), 2):
             acc1_list.append(acc1)
             acc2_list.append(acc2)
             seq1 = sequences[acc1]
@@ -173,12 +178,19 @@ def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_positio
             unique_ha.append(acc)
             # generate unique labels for the haplotypes
             haplotype_id = uuid.uuid4().hex
-            haplotypes[haplotype_id] = {'accessions': unique_ha}
+            haplotype = {
+                'accessions': unique_ha,
+                'haplotype_id': haplotype_id
+            }
+            haplotypes.append(haplotype)
+    return haplotypes
 
+
+def add_variants2haplotypes(haplotypes, variants):
     # add variant information to haplotypes
     # variants should only contain genotype information
     # about genotypes present in particular haplotype
-    for h_id, haplotype in haplotypes.items():
+    for haplotype in haplotypes:
         haplotype['variants'] = []
         for v in variants:
             genotypes = []
@@ -188,63 +200,71 @@ def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_positio
             if len(genotypes):
                 haplotype_variant = v
                 haplotype_variant['genotypes'] = genotypes
-                haplotypes[h_id]['variants'].append(haplotype_variant)
+                haplotype['variants'].append(haplotype_variant)
 
-    # load reference sequence from a 2bit file
-    ref_seq = get_sequence(ref_file, chrom_id, start_position, end_position)
 
+def add_sequence2haplotypes(haplotypes, ref_seq, start_position):
     # reconstruct the sequence based on reference and variant information of the
     # haplotype; both the sequence (a python string) and the variants from vcf
     # are indexed from zero
-    for h in haplotypes.values():
+    for h in haplotypes:
         haplotype_sequence = list(ref_seq)
         for v in h['variants']:
             # TODO start_position is 1-based, while seq and vcf is 0-based, require -1 | +1 ?
             haplotype_sequence[v['pos'] - start_position] = v['alt'][0]
         h['sequence'] = "".join(haplotype_sequence)
 
+
+def cluster_haplotypes(haplotypes):
     # get distances between the haplotypes based on the distances between
     # the accessions
-    haplotype_ids = list(haplotypes.keys())
+    haplotype_ids = [h['haplotype_id'] for h in haplotypes]
     haplotype_distances = []
 
     # if there is just one haplotype, due to for example no variants in region, then hierarchy will be a single node
-    if len(haplotype_ids) < 2:
-        haplotype_id = haplotype_ids[0]
-        haplotype = haplotypes[haplotype_id]
-        haplotype['haplotype_id'] = haplotype_id
-        return {
-            'haplotypes': [
-                haplotype
-            ],
-            'hierarchy': {
-                'haplotype_id': haplotype_id
-            }
+    if len(haplotypes) == 1:
+        root_node = {
+            'haplotype_id': haplotypes[0]['haplotype_id']
         }
+        return root_node, haplotypes
 
     # compute distances between haplotypes
-    for h1, h2 in combinations(haplotype_ids, 2):
-        # get name of the first accession in both compared haplotypes
-        acc1 = haplotypes[h1]['accessions'][0]
-        acc2 = haplotypes[h2]['accessions'][0]
-        # compute distance between those based on their sequence
-        seq1 = sequences[acc1]
-        seq2 = sequences[acc2]
+    for h1, h2 in combinations(haplotypes, 2):
+        seq1 = h1['sequence']
+        seq2 = h2['sequence']
+        # TODO check if computing distance between haplotype sequence is slower/worse
+        # than using the variant of the first accession of each haplotype
         dist = hamming(seq1, seq2)
         haplotype_distances.append(dist)
 
     clusters = hcl.linkage(np.array(haplotype_distances))
     root_node, ordered_haplotype_ids = scipyclust2json(clusters, haplotype_ids)
 
-    # the haplotypes and hierarchy are rendered in seperate panels next to each other
+    # the haplotypes and hierarchy are rendered in separate panels next to each other
     # so the first leaf in the hierarchy should be the same as the first haplotype in the list
     ordered_haplotypes = []
     for haplotype_id in ordered_haplotype_ids:
-        haplotype = haplotypes[haplotype_id]
-        haplotype['haplotype_id'] = haplotype_id
+        haplotype = [h for h in haplotypes if h['haplotype_id'] == haplotype_id][0]
         ordered_haplotypes.append(haplotype)
 
+    return root_node, ordered_haplotypes
+
+
+def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_position, accessions):
+    (variants, sequences) = get_variants(variant_file, chrom_id, start_position, end_position,
+                                         accessions)
+
+    haplotypes = cluster_sequences(sequences)
+    add_variants2haplotypes(haplotypes, variants)
+
+    # load reference sequence from a 2bit file
+    ref_seq = get_sequence(ref_file, chrom_id, start_position, end_position)
+
+    add_sequence2haplotypes(haplotypes, ref_seq, start_position)
+
+    (hierarchy, ordered_haplotypes) = cluster_haplotypes(haplotypes)
+
     return {
-        'hierarchy': root_node,
+        'hierarchy': hierarchy,
         'haplotypes': ordered_haplotypes
     }

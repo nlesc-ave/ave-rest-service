@@ -1,0 +1,26 @@
+language: java
+jdk: oraclejdk8
+env:
+  - INSTALLER=Miniconda3-latest-Linux-x86_64.sh
+before_install:
+  - if [ ! -e $HOME/conda/bin/activate ]; then
+    wget -nc https://repo.continuum.io/miniconda/$INSTALLER;
+    bash $INSTALLER -f -b -p $HOME/conda;
+    conda env create -f environment.yml;
+    fi
+  - conda env update -f environment.yml
+  - source $HOME/conda/bin/activate ave2
+install: python setup.py develop
+script:
+- py.test --cov
+- sonar-scanner -Dsonar.login=$SONAR_TOKEN
+sudo: false
+cache:
+  directories:
+    - $HOME/.cache/pip
+    - $HOME/conda
+before_cache:
+  - rm $HOME/.cache/pip/log/debug.log $HOME/conda/bin/kripodb $HOME/conda/lib/*/*/kripodb.egg-link
+addons:
+  sonarcloud:
+    organization: "nlesc-ave"

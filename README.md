@@ -1,5 +1,7 @@
 # ave-rest-service
 
+[![Build Status](https://travis-ci.org/nlesc-ave/ave-rest-service.svg?branch=master)](https://travis-ci.org/nlesc-ave/ave-rest-service)
+
 Serving variant, annotation and genome data for AVE visualisation.
 
 ## REST API
@@ -41,7 +43,7 @@ The directory in which `avadata` is run should contain a `settings.cfg` configur
 
 The repo contains an example config file called `settings.example.cfg`.
 
-## Data preprocessing
+## Data pre processing
 
 Before data can be served it has to be preprocessed in following way.
 
