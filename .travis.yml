@@ -12,10 +12,11 @@ before_install:
     fi
   - $HOME/conda/bin/conda env update -f environment.yml
   - source $HOME/conda/bin/activate ave2
+  - pip install pylint
 install: python setup.py develop
 script:
-- py.test --cov
-- sonar-scanner -Dsonar.login=$SONAR_TOKEN
+- py.test --cov --junit-xml=xunit-result.xml --cov-report=xml
+- sonar-scanner -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=ave-rest-service -Dsources=avedata -Dsonar.python.xunit.reportPath=xunit-result.xml -Dsonar.python.coverage.reportPath=coverage.xml
 sudo: false
 cache:
   directories:
