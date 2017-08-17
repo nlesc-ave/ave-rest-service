@@ -229,8 +229,8 @@ def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_positio
         acc2 = haplotypes[h2]['accessions'][0]
         # compute distance between those based on their sequence
         seq1 = sequences[acc1]
-        seq2 = sequences[acc1]
-        dist = distances_list.append(hamming(seq1, seq2))
+        seq2 = sequences[acc2]
+        dist = hamming(seq1, seq2)
         haplotype_distances.append(dist)
 
     clusters = hcl.linkage(np.array(haplotype_distances))
