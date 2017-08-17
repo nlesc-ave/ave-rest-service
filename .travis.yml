@@ -4,10 +4,10 @@ env:
   - INSTALLER=Miniconda3-latest-Linux-x86_64.sh
 before_install:
   - if [ ! -e $HOME/conda/bin/activate ]; then
-    wget -nc https://repo.continuum.io/miniconda/$INSTALLER;
+    wget -q -nc https://repo.continuum.io/miniconda/$INSTALLER;
     bash $INSTALLER -f -b -p $HOME/conda;
     $HOME/conda/bin/conda env create -n ave2;
-    mkdir -p  /home/travis/conda/envs/ave2/lib/python3.5/site-packages;
+    mkdir -p /home/travis/conda/envs/ave2/lib/python3.5/site-packages;
     touch /home/travis/conda/envs/ave2/lib/python3.5/site-packages/easy-install.pth;
     fi
   - $HOME/conda/bin/conda env update -f environment.yml
@@ -16,7 +16,7 @@ before_install:
 install: python setup.py develop
 script:
 - py.test --cov --junit-xml=xunit-result.xml --cov-report=xml
-- sonar-scanner -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=ave-rest-service -Dsources=avedata -Dsonar.python.xunit.reportPath=xunit-result.xml -Dsonar.python.coverage.reportPath=coverage.xml
+- sonar-scanner -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=ave-rest-service -Dsonar.sources=avedata -Dsonar.python.xunit.reportPath=xunit-result.xml -Dsonar.python.coverage.reportPath=coverage.xml
 sudo: false
 cache:
   directories:
