@@ -1,10 +1,10 @@
 import uuid
-from itertools import combinations, permutations
+from itertools import combinations
 from collections import defaultdict
 from functools import reduce
+from copy import deepcopy
 
 from cyvcf2 import VCF
-import pandas as pd
 import numpy as np
 import scipy.cluster.hierarchy as hcl
 import scipy.cluster
@@ -124,66 +124,16 @@ def get_variants(variant_file, chrom_id, start_position, end_position, accession
 
 
 def cluster_sequences(sequences):
-    acc1_list = []
-    acc2_list = []
-    distances_list = []
-
-    haplotypes = []
-    if len(sequences) == 1:
-        accession = list(sequences.keys())[0]
-        haplotype = {
-            'accessions': [accession],
-            'haplotype_id': uuid.uuid4().hex
-        }
-        haplotypes.append(haplotype)
-    else:
-        # calculate distances for all the accession pairs
-        for acc1, acc2 in permutations(sorted(sequences.keys()), 2):
-            acc1_list.append(acc1)
-            acc2_list.append(acc2)
-            seq1 = sequences[acc1]
-            seq2 = sequences[acc2]
-            if seq1 == seq2:
-                distances_list.append(0)
-            else:
-                distances_list.append(1)
-
-        # create a pandas dataframe with the distances
-        # between each accession
-        dists = pd.DataFrame({
-            "acc1": acc1_list,
-            "acc2": acc2_list,
-            "distance": distances_list
-        })
-
-        # get list of accessions in each haplotype
-        accessions_set = set(dists['acc1'])
-
-        # group accessions into haplotypes
-        while len(accessions_set):
-            # get one accession from the set
-            acc = accessions_set.pop()
-            # get all the comparisons with this accession
-            single_accession = dists[(dists['acc1'] == acc)]
-            # fetch rows with zero distance
-            zero_distance = single_accession[(single_accession['distance'] == 0)]
-            haplotype_accessions = list(zero_distance['acc2'])
-            unique_ha = []
-            for ha in haplotype_accessions:
-                if ha in accessions_set:
-                    unique_ha.append(ha)
-                    # those accession cannot be in any other haplotype
-                    # remove them from the set
-                    accessions_set.discard(ha)
-            unique_ha.append(acc)
-            # generate unique labels for the haplotypes
-            haplotype_id = uuid.uuid4().hex
-            haplotype = {
-                'accessions': unique_ha,
-                'haplotype_id': haplotype_id
+    clusters = {}
+    for (accession, sequence) in sequences.items():
+        if sequence in clusters:
+            clusters[sequence]['accessions'].append(accession)
+        else:
+            clusters[sequence] = {
+                'accessions': [accession],
+                'haplotype_id': uuid.uuid4().hex
             }
-            haplotypes.append(haplotype)
-    return haplotypes
+    return list(clusters.values())
 
 
 def add_variants2haplotypes(haplotypes, variants):
@@ -198,7 +148,7 @@ def add_variants2haplotypes(haplotypes, variants):
                 if g['accession'] in haplotype['accessions']:
                     genotypes.append(g)
             if len(genotypes):
-                haplotype_variant = v
+                haplotype_variant = deepcopy(v)
                 haplotype_variant['genotypes'] = genotypes
                 haplotype['variants'].append(haplotype_variant)
 
