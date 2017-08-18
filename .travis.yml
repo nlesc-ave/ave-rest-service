@@ -23,6 +23,7 @@ cache:
   directories:
     - $HOME/.cache/pip
     - $HOME/conda
+    - $HOME/.sonar/cache
 before_cache:
   - rm $HOME/.cache/pip/log/debug.log $HOME/conda/envs/ave2/bin/avedata $HOME/conda/envs/ave2/lib/*/*/avedata.egg-link
 addons:
