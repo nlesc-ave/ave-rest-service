@@ -12,18 +12,19 @@ before_install:
     fi
   - $HOME/conda/bin/conda env update -f environment.yml
   - source $HOME/conda/bin/activate ave2
-  - pip install pylint
 install: python setup.py develop
 script:
 - py.test --cov --junit-xml=xunit-result.xml --cov-report=xml
-- sonar-scanner -Dsonar.login=$SONAR_TOKEN -Dsonar.projectKey=ave-rest-service -Dsonar.sources=avedata -Dsonar.python.xunit.reportPath=xunit-result.xml -Dsonar.python.coverage.reportPath=coverage.xml
+- pip install pylint
+- pylint avedata -r n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > pylint-report.txt
+- sonar-scanner -Dsonar.login=$SONAR_TOKEN
 sudo: false
 cache:
   directories:
     - $HOME/.cache/pip
     - $HOME/conda
 before_cache:
-  - rm $HOME/.cache/pip/log/debug.log $HOME/conda/bin/avedata $HOME/conda/lib/*/*/avedata.egg-link
+  - rm $HOME/.cache/pip/log/debug.log $HOME/conda/envs/ave2/bin/avedata $HOME/conda/envs/ave2/lib/*/*/avedata.egg-link
 addons:
   sonarcloud:
     organization: "nlesc-ave"

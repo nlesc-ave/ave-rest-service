@@ -42,6 +42,8 @@ htmlcov/
 nosetests.xml
 coverage.xml
 *,cover
+pylint-report.txt
+xunit-result.xml
 
 # Translations
 *.mo
