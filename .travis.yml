@@ -17,7 +17,7 @@ script:
 - py.test --cov --junit-xml=xunit-result.xml --cov-report=xml
 - pip install pylint
 - 'pylint avedata -r n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" > pylint-report.txt || true'
-- sonar-scanner -Dsonar.login=$SONAR_TOKEN
+- sonar-scanner -Dsonar.login=$SONAR_TOKEN -X
 sudo: false
 cache:
   directories:
