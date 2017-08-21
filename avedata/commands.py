@@ -15,7 +15,7 @@ def cli():
 def run():
     """Run web service"""
     connexion_app.add_api('swagger.yml', arguments=app.config)
-    connexion_app.run(port=8080, debug=True)
+    connexion_app.run(port=8080)
 
 
 @click.command()
