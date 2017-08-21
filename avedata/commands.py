@@ -1,6 +1,9 @@
-import click
 import os
+
+import click
 import requests
+from werkzeug.contrib.profiler import ProfilerMiddleware
+
 from .db import get_db, init_db
 from .avedata import connexion_app, app
 from .register import validate_data, import_gff
@@ -13,8 +16,12 @@ def cli():
 
 @click.command()
 @click.option('--debug', help='Enable debug mode', is_flag=True)
-def run(debug=False):
+@click.option('--profiler', help='Enable profiler mode', is_flag=True)
+def run(debug=False, profiler=False):
     """Run web service"""
+    if profiler:
+        app.config['PROFILE'] = True
+        app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[30])
     connexion_app.add_api('swagger.yml', arguments=app.config)
     connexion_app.run(port=8080, debug=debug)
 
