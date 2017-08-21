@@ -16,7 +16,8 @@ before_install:
   - mkdir reports
 install: python setup.py develop
 script:
-- py.test --cov=reports/coverage.xml --junit-xml=reports/xunit-result.xml --cov-report=xml --
+- py.test --cov --junit-xml=reports/xunit-result.xml --cov-report=xml --
+- mv coverage.xml reports/coverage.xml
 - sonar-scanner -Dsonar.login=$SONAR_TOKEN -X
 sudo: false
 cache:
