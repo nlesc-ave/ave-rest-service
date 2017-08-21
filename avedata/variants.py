@@ -164,8 +164,8 @@ def add_sequence2haplotypes(haplotypes, ref_seq, start_position):
     for h in haplotypes:
         haplotype_sequence = list(ref_seq)
         for v in h['variants']:
-            # TODO start_position is 1-based, while seq and vcf is 0-based, require -1 | +1 ?
-            haplotype_sequence[v['pos'] - start_position] = v['alt'][0]
+            # start_position is 1-based and vcf, while seq is 0-based, require -1
+            haplotype_sequence[v['pos'] - start_position - 1] = v['alt'][0]
         h['sequence'] = "".join(haplotype_sequence)
 
 

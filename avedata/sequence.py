@@ -18,6 +18,17 @@ def get_chrominfo(filename):
 
 
 def get_sequence(filename, chrom_id, start_position, end_position):
+    """Retrieve sequence of a region in a 2bit file
+
+    Args:
+        filename: Filename of 2bit file
+        chrom_id: Chromosome identifier
+        start_position: Start at given position in sequence (zero-based)
+        end_position: End at given position in sequence (non-inclusive)
+
+    Returns:
+        DNA sequence as a string
+    """
     args = (
         'twoBitToFa',
         '-seq=' + chrom_id,

@@ -707,7 +707,7 @@ class Test_add_sequence2haplotypes(object):
         expected = [{
             'haplotype_id': 'hap1',
             'accessions': ['acc1'],
-            'sequence': 'CCCTCCCCCCTC',
+            'sequence': 'CCTCCCCCCTCC',
             'variants': [{
                 'genotypes': [{
                     'accession': 'acc1',
