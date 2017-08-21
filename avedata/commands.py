@@ -12,10 +12,11 @@ def cli():
 
 
 @click.command()
-def run():
+@click.option('--debug', help='Enable debug mode', is_flag=True)
+def run(debug=False):
     """Run web service"""
     connexion_app.add_api('swagger.yml', arguments=app.config)
-    connexion_app.run(port=8080)
+    connexion_app.run(port=8080, debug=debug)
 
 
 @click.command()
