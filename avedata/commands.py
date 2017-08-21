@@ -26,14 +26,15 @@ def run(debug=False):
               type=click.Choice(['features', 'variants', '2bit', 'bigbed']))
 @click.argument('filename')
 def register(species, genome, datatype, filename):
-    """Add file metadata iformation to the database"""
+    """Add file metadata information to the database"""
     # check if file exists
     file_abs_path = os.path.join(os.getcwd(), filename)
     if not os.path.isfile(file_abs_path):
         try:
             requests.head(filename)
         except requests.HTTPError:
-            print("file or URL %s is not available" % click.format_filename(filename))
+            print("file or URL %s is not available" %
+                  click.format_filename(filename))
             return
 
     # validate if the provided files can be accessed

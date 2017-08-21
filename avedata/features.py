@@ -2,7 +2,8 @@ import pysam
 from pysam import TabixFile
 
 GENE_FEATURES = ['CDS', 'exon', 'five_prime_UTR', 'gene', 'intron',
-                'mRNA', 'three_prime_UTR']
+                 'mRNA', 'three_prime_UTR']
+
 
 def attributes_dict_from_string(attributes_string):
     """Convert a string with attributes to a dictionary"""
@@ -13,8 +14,9 @@ def attributes_dict_from_string(attributes_string):
         attributes_dict[key] = value
     return attributes_dict
 
+
 def dict_from_gff(gff):
-    gff_dict={
+    gff_dict = {
         'seqid': gff.contig,
         'source': gff.source,
         'type': gff.feature,
@@ -27,6 +29,7 @@ def dict_from_gff(gff):
     }
     return gff_dict
 
+
 def get_featuretypes(filename):
     """Return a list of all types of features in
        registered gff file"""
@@ -36,6 +39,7 @@ def get_featuretypes(filename):
         if f.feature not in GENE_FEATURES:
             featuretypes.add(f.feature)
     return list(featuretypes)
+
 
 def get_genes(filename, chrom_id, start_position, end_position):
     """Fetch genes from defined region"""
@@ -48,10 +52,11 @@ def get_genes(filename, chrom_id, start_position, end_position):
     print(len(genes))
     return genes
 
+
 def get_annotations(filename, chrom_id, start_position, end_position):
     """Fetch genes from defined region"""
     featuretypes = ['CDS', 'exon', 'five_prime_UTR', 'gene', 'intron',
-                     'mRNA', 'three_prime_UTR']
+                    'mRNA', 'three_prime_UTR']
     gff = TabixFile(filename, parser=pysam.asGTF())
     annotations = [annotation
                    for annotation in gff.fetch(chrom_id, start_position, end_position)

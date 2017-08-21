@@ -14,48 +14,51 @@ from avedata.sequence import get_sequence
 
 
 def scipyclust2json(clusters, labels):
-    T = scipy.cluster.hierarchy.to_tree( clusters , rd=False )
+    T = scipy.cluster.hierarchy.to_tree(clusters, rd=False)
 
     # Create dictionary for labeling nodes by their IDs
     id2name = dict(zip(range(len(labels)), labels))
 
     # Create a nested dictionary from the ClusterNode's returned by SciPy
-    def add_node(node, parent ):
+    def add_node(node, parent):
         # First create the new node and append it to its parent's children
-        newNode = dict( node_id=node.id, children=[] )
-        parent["children"].append( newNode )
+        new_node = dict(node_id=node.id, children=[])
+        parent["children"].append(new_node)
 
         # Recursively add the current node's children
-        if node.left: add_node( node.left, newNode )
-        if node.right: add_node( node.right, newNode )
+        if node.left:
+            add_node(node.left, new_node)
+        if node.right:
+            add_node(node.right, new_node)
 
     # Initialize nested dictionary for d3, then recursively iterate through tree
-    d3Dendro = dict(children=[])
-    add_node( T, d3Dendro )
+    d3_dendro = dict(children=[])
+    add_node(T, d3_dendro)
 
     ordered_haplotype_ids = []
 
     # Label each node with the names of each leaf in its subtree
-    def label_tree( n ):
+    def label_tree(n):
         # If the node is a leaf, then we have its name
         if len(n["children"]) == 0:
             n['haplotype_id'] = id2name[n["node_id"]]
             ordered_haplotype_ids.append(n['haplotype_id'])
             del n['children']
-            leafNames = [ id2name[n["node_id"]] ]
+            leaf_names = [id2name[n["node_id"]]]
 
         # If not, flatten all the leaves in the node's subtree
         else:
-            leafNames = reduce(lambda ls, c: ls + label_tree(c), n["children"], [])
+            leaf_names = reduce(lambda ls, c: ls +
+                                label_tree(c), n["children"], [])
 
         # Delete the node id since we don't need it anymore and
         # it makes for cleaner JSON
         del n["node_id"]
 
-        return leafNames
+        return leaf_names
 
-    label_tree( d3Dendro["children"][0] )
-    return d3Dendro, ordered_haplotype_ids
+    label_tree(d3_dendro["children"][0])
+    return d3_dendro, ordered_haplotype_ids
 
 
 def get_accessions_list(filename):
@@ -78,7 +81,8 @@ def get_variants(variant_file, chrom_id, start_position, end_position, accession
         accessions = all_accessions
 
     if not set(accessions).issubset(set(all_accessions)):
-        raise AccessionsLookupError(set(accessions).difference(set(all_accessions)))
+        raise AccessionsLookupError(
+            set(accessions).difference(set(all_accessions)))
 
     # sequences in a dictionary
     # with accession names as keys
@@ -194,7 +198,8 @@ def cluster_haplotypes(haplotypes):
     # so the first leaf in the hierarchy should be the same as the first haplotype in the list
     ordered_haplotypes = []
     for haplotype_id in ordered_haplotype_ids:
-        haplotype = [h for h in haplotypes if h['haplotype_id'] == haplotype_id][0]
+        haplotype = [h for h in haplotypes if h['haplotype_id']
+                     == haplotype_id][0]
         ordered_haplotypes.append(haplotype)
 
     return root_node, ordered_haplotypes

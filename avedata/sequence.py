@@ -27,5 +27,6 @@ def get_sequence(filename, chrom_id, start_position, end_position):
         'stdout'
     )
     fasta = check_output(args).decode('ascii')
-    header = '>' + chrom_id + ':' + str(start_position) + '-' + str(end_position) + linesep
+    header = '>' + chrom_id + ':' + \
+        str(start_position) + '-' + str(end_position) + linesep
     return fasta.replace(header, '').replace(linesep, '')

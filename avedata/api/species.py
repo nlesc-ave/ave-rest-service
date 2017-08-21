@@ -10,9 +10,9 @@ def all():
     query = "SELECT DISTINCT species FROM metadata"
     cursor = db.cursor()
     for row in cursor.execute(query):
-            name = row['species']
-            species_id = urllib.parse.quote(name)
-            species_list.append({'name': name, "species_id": species_id})
+        name = row['species']
+        species_id = urllib.parse.quote(name)
+        species_list.append({'name': name, "species_id": species_id})
     return species_list
 
 
