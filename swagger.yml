@@ -119,46 +119,6 @@ paths:
               "genome_id": "SL.2.40",
               "reference": "latest/tomato/S_lycopersicum_chromosomes.2.40.2bit"
             }
-  /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/genes:
-    get:
-      operationId: avedata.api.genomes.genes
-      summary: Genomic features of the genomic region
-      description: |
-        Genomic features of genomic region of selected genome, chromosome from start position to end position
-      parameters:
-        - name: genome_id
-          in: path
-          description: Genome id
-          required: true
-          type: string
-        - name: chrom_id
-          in: path
-          description: Chromosome id
-          required: true
-          type: string
-        - name: start_position
-          in: path
-          description: Start Position
-          required: true
-          type: integer
-        - name: end_position
-          in: path
-          description: End Position
-          required: true
-          type: integer
-      tags:
-        - Genomes
-      responses:
-        200:
-          description: Array of genomic features for selected genome id
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/GeneAnnotation'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
   /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/features:
     get:
       operationId: avedata.api.genomes.features
@@ -426,14 +386,14 @@ definitions:
         items:
           type: object
           properties:
+            size:
+              type: integer
+              minimum: 1
+              description: Size of the exon.
             start:
               type: integer
               minimum: 1
-              description: Genomic start of the feature, with a 1-base offset.
-            end:
-              type: integer
-              minimum: 1
-              description: Genomic end of the feature, with a 1-base offset.
+              description: Genomic start of the exon, with a 1-base offset.  It is relative to the start of the gene (position field).
           required:
           - start
           - end
