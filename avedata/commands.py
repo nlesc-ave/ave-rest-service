@@ -7,7 +7,10 @@ from werkzeug.contrib.profiler import ProfilerMiddleware
 from .db import get_db, init_db
 from .avedata import connexion_app, app
 from .register import validate_data, import_gff
+from .genes import big_bed_2_whoosh
 
+from urllib.parse import urlparse
+from flask import current_app
 
 @click.group()
 def cli():
@@ -38,7 +41,8 @@ def register(species, genome, datatype, filename):
     file_abs_path = os.path.join(os.getcwd(), filename)
     if not os.path.isfile(file_abs_path):
         try:
-            requests.head(filename)
+            s = requests.Session()
+            s.head(filename)
         except requests.HTTPError:
             print("file or URL %s is not available" %
                   click.format_filename(filename))
@@ -60,9 +64,23 @@ def register(species, genome, datatype, filename):
         # if gff file is registered import featur info into features table
         if datatype == "features":
             import_gff(db, meta_id, filename)
+        if datatype == 'bigbed':
+            whoosh_dir = get_woosh_dir(filename)
+            big_bed_2_whoosh(filename, whoosh_dir)
 
         print("New datafile has been registered.")
 
+
+def get_woosh_dir(url):
+    """
+    Based on the bigbed url and base whoosh directory
+    from settings generate the path for whoosh directory for index of this bed file
+    """
+    path = urlparse(url).path
+    filename = path.split('/')[-1]
+    whoosh_base_dir = current_app.config['WHOOSH_BASE_DIR']
+    whoosh_dir = os.path.join(whoosh_base_dir, filename)
+    return whoosh_dir
 
 @click.command()
 def initdb():

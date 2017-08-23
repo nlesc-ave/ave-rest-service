@@ -33,3 +33,4 @@ dependencies:
   - python-Levenshtein
   - pytest==3.2.1
   - pytest-cov==2.5.1
+  - whoosh==2.7.4
