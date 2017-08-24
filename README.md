@@ -45,6 +45,8 @@ The directory in which `avadata` is run should contain a `settings.cfg` configur
 
 The repo contains an example config file called `settings.example.cfg`.
 
+Make sure the `WHOOSH_BASE_DIR` directory exists.
+
 ## Data pre processing
 
 Before data can be served it has to be preprocessed in following way.
