@@ -67,7 +67,6 @@ def import_gff(db, meta_id, filename):
     """Import features from gff file into the sqlite database
     features table."""
 
-    schema = wf.Schema()
     gff = TabixFile(filename, parser=asGTF())
     for feature in gff.fetch():
         if feature.feature == 'gene':
