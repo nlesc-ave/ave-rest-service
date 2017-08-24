@@ -222,11 +222,11 @@ paths:
       - Genomes
       responses:
         200:
-          description: Search results
+          description: Top ten search results
           schema:
             type: array
             items:
-              $ref: '#/definitions/GeneAnnotation'
+              $ref: '#/definitions/GeneSearchResult'
         default:
           description: Unexpected error
           schema:
@@ -338,75 +338,26 @@ definitions:
     - score
     - strand
     - phase
-  GeneAnnotation:
+  GeneSearchResult:
     type: object
     properties:
-      position:
-        type: object
-        properties:
-          chrom:
-            type: string
-            description: |
-              The name of the sequence (typically a chromosome) on which the variation is being called.
-              This sequence is usually known as 'the reference sequence',
-              i.e. the sequence against which the given sample varies.
-          start:
-            type: integer
-            minimum: 1
-            description: Genomic start of the feature, with a 1-base offset.
-          end:
-            type: integer
-            minimum: 1
-            description: Genomic end of the feature, with a 1-base offset.
-        required:
-        - chrom
-        - start
-        - end
+      start:
+        description: start of the transcript
+        type: integer
+      end:
+        description: end of the transcript
+        type: integer
       id:
         description: Transcript identifier
         type: string
-      strand:
-        type: string
-      coding_region:
-        type: object
-        properties:
-          start:
-            type: integer
-            minimum: 1
-            description: Genomic start of the feature, with a 1-base offset.
-          end:
-            type: integer
-            minimum: 1
-            description: Genomic end of the feature, with a 1-base offset.
-        required:
-        - start
-        - end
-      exons:
-        type: array
-        items:
-          type: object
-          properties:
-            size:
-              type: integer
-              minimum: 1
-              description: Size of the exon.
-            start:
-              type: integer
-              minimum: 1
-              description: Genomic start of the exon, with a 1-base offset.  It is relative to the start of the gene (position field).
-          required:
-          - start
-          - end
       gene_id:
         type: string
       name:
         type: string
     required:
-    - position
+    - start
+    - end
     - id
-    - strand
-    - coding_region
-    - exons
     - gene_id
     - name
   Genotype:

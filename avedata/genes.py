@@ -1,14 +1,17 @@
-from whoosh.index import create_in
+from whoosh.index import create_in, open_dir
+from whoosh import analysis
 import whoosh.fields as wf
+from whoosh.qparser import MultifieldParser
 from pybedtools.contrib.bigbed import bigbed_to_bed
 import os
 
+analyzer = analysis.NgramWordAnalyzer(minsize=3)
 schema = wf.Schema(chrom=wf.ID(stored=True),
                    start=wf.ID(stored=True),
                    end=wf.ID(stored=True),
-                   id=wf.TEXT(stored=True),
-                   gene_id=wf.TEXT(stored=True),
-                   name=wf.TEXT(stored=True))
+                   id=wf.TEXT(analyzer=analyzer, stored=True),
+                   gene_id=wf.TEXT(analyzer=analyzer, stored=True),
+                   name=wf.TEXT(analyzer=analyzer, stored=True))
 
 def big_bed_2_whoosh(filename, whoosh_dir):
     os.mkdir(whoosh_dir)
@@ -25,3 +28,14 @@ def big_bed_2_whoosh(filename, whoosh_dir):
                             name = fields[13])
     writer.commit()
     ix.close()
+
+def find_genes(whoosh_dir, query):
+    ix = open_dir(whoosh_dir)
+    results =[]
+    with ix.searcher() as searcher:
+        whoosh_query = MultifieldParser(["gene_id", "id", "name"], ix.schema).parse(query)
+        whoosh_results = searcher.search(whoosh_query)
+        print(whoosh_query)
+        results = [dict(r) for r in whoosh_results]
+
+    return results

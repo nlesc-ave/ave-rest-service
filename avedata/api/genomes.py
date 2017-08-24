@@ -7,7 +7,9 @@ from ..features import get_genes
 from ..sequence import get_chrominfo
 from ..variants import get_accessions_list, AccessionsLookupError
 from ..variants import get_haplotypes
-
+from ..commands import get_woosh_dir
+from ..genes import find_genes
+import json
 
 def get(genome_id):
     try:
@@ -174,7 +176,26 @@ def haplotypes(genome_id, chrom_id, start_position, end_position, accessions=Non
 
 
 def gene_search(genome_id, query):
-    raise NotImplementedError()
+    # first we need to mach all big bed files for this genome
+    # based on info in metadata sqlite table
+    db = get_db()
+    sql_query = """SELECT filename
+               FROM metadata
+               WHERE genome=? AND datatype='bigbed'"""
+    cursor = db.cursor()
+    cursor.execute(sql_query, (genome_id, ))
+    bigbed_row = cursor.fetchone()
+    if bigbed_row is None:
+        ext = {'genome_id': genome_id}
+        return connexion.problem(404, "Not Found", "Genome with id \'{0}\' not found".format(genome_id), ext=ext)
+
+    bigbed_file = bigbed_row['filename']
+
+    # then we'll find out what is the whoosh path for index of this bigbed file
+    whoosh_dir = get_woosh_dir(bigbed_file)
+    resutls = find_genes(whoosh_dir, query)
+
+    return find_genes(whoosh_dir, query)
 
 
 def feature_search(genome_id, query):
