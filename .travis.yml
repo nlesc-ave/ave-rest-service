@@ -18,7 +18,7 @@ script:
 - py.test --cov --junit-xml=xunit-result.xml --
 - coverage xml -i
 # SonarCloud does not understand coverage file with filenames relative to avedata so make . sourcedir
-- perl -p -e 's@/avedata@@;s@filename="@filename="avedata/@' coverage.xml
+- perl -pi -e 's@/avedata@@;s@filename="@filename="avedata/@' coverage.xml
 - sonar-scanner -Dsonar.login=$SONAR_TOKEN -X
 sudo: false
 cache:
