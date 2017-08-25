@@ -341,6 +341,9 @@ definitions:
   GeneSearchResult:
     type: object
     properties:
+      chrom:
+        description: name of the sequence (typically a chromosome)
+        type: string
       start:
         description: start of the transcript
         type: integer
@@ -355,6 +358,7 @@ definitions:
       name:
         type: string
     required:
+    - chrom
     - start
     - end
     - id
