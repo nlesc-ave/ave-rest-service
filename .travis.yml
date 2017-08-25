@@ -12,12 +12,11 @@ before_install:
     fi
   - $HOME/conda/bin/conda env update -f environment.yml
   - source $HOME/conda/bin/activate ave2
-  - pip install pylint
-  - mkdir reports
+  - pip install pylint coverage
 install: python setup.py develop
 script:
-- py.test --cov --junit-xml=reports/xunit-result.xml --cov-report=xml --
-- mv coverage.xml reports/coverage.xml
+- py.test --cov --junit-xml=xunit-result.xml --
+- coverage xml -i
 - sonar-scanner -Dsonar.login=$SONAR_TOKEN -X
 sudo: false
 cache:
