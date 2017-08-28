@@ -119,46 +119,6 @@ paths:
               "genome_id": "SL.2.40",
               "reference": "latest/tomato/S_lycopersicum_chromosomes.2.40.2bit"
             }
-  /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/features:
-    get:
-      operationId: avedata.api.genomes.features
-      summary: Genomic features of the genomic region
-      description: |
-        Genomic features of genomic region of selected genome, chromosome from start position to end position
-      parameters:
-        - name: genome_id
-          in: path
-          description: Genome id
-          required: true
-          type: string
-        - name: chrom_id
-          in: path
-          description: Chromosome id
-          required: true
-          type: string
-        - name: start_position
-          in: path
-          description: Start Position
-          required: true
-          type: integer
-        - name: end_position
-          in: path
-          description: End Position
-          required: true
-          type: integer
-      tags:
-        - Genomes
-      responses:
-        200:
-          description: Array of genomic features for selected genome id
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/FeatureAnnotation'
-        default:
-          description: Unexpected error
-          schema:
-            $ref: '#/definitions/Error'
 
   /genomes/{genome_id}/chromosomes/{chrom_id}/start/{start_position}/end/{end_position}/haplotypes:
     get:
@@ -252,7 +212,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/FeatureAnnotation'
+              $ref: '#/definitions/FeatureSearchResult'
         default:
           description: Unexpected error
           schema:
@@ -293,51 +253,33 @@ definitions:
     required:
     - name
     - species_id
-  FeatureAnnotation:
+  FeatureSearchResult:
     type: object
-    description: |
-      Genomic feature annotation, excluding gene annotation
     properties:
-      sequence:
+      chrom:
+        description: name of the sequence (typically a chromosome)
         type: string
-        description: The name of the sequence where the feature is located.
-      source:
-        type: string
-        description: Keyword identifying the source of the feature
-      feature:
-        type: string
-        description: The feature type name, like "gene" or "exon".
       start:
+        description: start of the feature
         type: integer
-        minimum: 1
-        description: Genomic start of the feature, with a 1-base offset.
       end:
+        description: end of the feature
         type: integer
-        minimum: 1
-        description: Genomic end of the feature, with a 1-base offset.
-      score:
-        type: number
-        description:    Numeric value that generally indicates the confidence of the source on the annotated feature.
-      strand:
+      name:
+        description: Feature identifier
         type: string
-        maxLength: 1
-        description: Single character that indicates the Sense (molecular biology) strand of the feature; it can assume the values of "+" (positive, or 5'->3'), "-", (negative, or 3'->5'), "." (undetermined).
-      phase:
-        type: string
-        maxLength: 1
-        description: |
-          Phase of CDS features; it can be either one of 0, 1, 2 (for CDS features) or "." (for everything else).
       attributes:
-        type: object
+        type: string
+      track:
+        description: Feature track name
+        type: string
     required:
-    - sequence
-    - source
-    - feature
+    - chrom
     - start
     - end
-    - score
-    - strand
-    - phase
+    - name
+    - attributes
+    - track
   GeneSearchResult:
     type: object
     properties:
@@ -441,6 +383,18 @@ definitions:
     required:
     - chrom_id
     - length
+  Track:
+    type: object
+    properties:
+      label:
+        type: string
+      url:
+        type: string
+        format: uri
+        description: URL of bigBed file with feature annotations
+    required:
+    - label
+    - url
   Genome:
     type: object
     properties:
@@ -450,10 +404,10 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Chromosome'
-      feature_types:
+      feature_tracks:
         type: array
         items:
-          type: string
+          $ref: '#/definitions/Track'
       accessions:
         description: Available accession for genome. Used to give list of accessions for haplotype to filter on.
         type: array
@@ -475,7 +429,7 @@ definitions:
     required:
     - genome_id
     - chromosomes
-    - feature_types
+    - feature_tracks
     - accessions
     - reference
     - vcf_header

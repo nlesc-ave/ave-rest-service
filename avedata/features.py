@@ -1,65 +1,58 @@
-import pysam
-from pysam import TabixFile
+import os
+from urllib.parse import urlparse
 
-GENE_FEATURES = ['CDS', 'exon', 'five_prime_UTR', 'gene', 'intron',
-                 'mRNA', 'three_prime_UTR']
+from whoosh.index import create_in, open_dir
+from whoosh import analysis
+import whoosh.fields as wf
+from whoosh.qparser import MultifieldParser
+from pybedtools.contrib.bigbed import bigbed_to_bed
 
-
-def attributes_dict_from_string(attributes_string):
-    """Convert a string with attributes to a dictionary"""
-    attributes_dict = {}
-    key_value_list = attributes_string.split(";")
-    for key_value in key_value_list:
-        key, value = key_value.split("=")
-        attributes_dict[key] = value
-    return attributes_dict
-
-
-def dict_from_gff(gff):
-    gff_dict = {
-        'seqid': gff.contig,
-        'source': gff.source,
-        'type': gff.feature,
-        'start': gff.start,
-        'end': gff.end,
-        'score': gff.score,
-        'strand': gff.strand,
-        'phase': gff.frame,
-        'attributes': attributes_dict_from_string(gff.keys()[0])
-    }
-    return gff_dict
+analyzer = analysis.NgramWordAnalyzer(minsize=3)
+schema = wf.Schema(chrom=wf.ID(stored=True),
+                   start=wf.ID(stored=True),
+                   end=wf.ID(stored=True),
+                   track=wf.ID(stored=True),
+                   attributes=wf.TEXT(analyzer=analyzer, stored=True),
+                   name=wf.TEXT(analyzer=analyzer, stored=True))
 
 
-def get_featuretypes(filename):
-    """Return a list of all types of features in
-       registered gff file"""
-    gff = TabixFile(filename, parser=pysam.asGTF())
-    featuretypes = set()
-    for f in gff.fetch():
-        if f.feature not in GENE_FEATURES:
-            featuretypes.add(f.feature)
-    return list(featuretypes)
+def featurebb2label(url):
+    return os.path.splitext(os.path.split(urlparse(url).path)[-1])[0]
 
 
-def get_genes(filename, chrom_id, start_position, end_position):
-    """Fetch genes from defined region"""
-    gene_features = ['CDS', 'exon', 'five_prime_UTR', 'gene', 'intron',
-                     'mRNA', 'three_prime_UTR']
-    gff = TabixFile(filename, parser=pysam.asGTF())
-    genes = [gene for gene in gff.fetch(chrom_id, start_position, end_position)
-             if gene.feature in GENE_FEATURES]
-    genes = [dict_from_gff(g) for g in genes]
-    print(len(genes))
-    return genes
+def features_2_whoosh(url, whoosh_dir):
+    try:
+        os.mkdir(whoosh_dir)
+    except FileExistsError:
+        pass
+    ix = create_in(whoosh_dir, schema)
+    writer = ix.writer()
+    bed = bigbed_to_bed(url)
+
+    track = featurebb2label(url)
+    for feature in bed:
+        fields = feature.fields
+        writer.add_document(chrom=fields[0],
+                            start=fields[1],
+                            end=fields[2],
+                            name=fields[3],
+                            track=track,
+                            attributes=fields[9])
+    writer.commit()
+    ix.close()
 
 
-def get_annotations(filename, chrom_id, start_position, end_position):
-    """Fetch genes from defined region"""
-    featuretypes = ['CDS', 'exon', 'five_prime_UTR', 'gene', 'intron',
-                    'mRNA', 'three_prime_UTR']
-    gff = TabixFile(filename, parser=pysam.asGTF())
-    annotations = [annotation
-                   for annotation in gff.fetch(chrom_id, start_position, end_position)
-                   if annotation.feature not in featuretypes]
-    annotations = [dict_from_gff(a) for a in GENE_FEATURES]
-    return annotations
+def map_hit(r):
+    h = dict(r)
+    h['start'] = int(h['start'])
+    h['end'] = int(h['end'])
+    return h
+
+
+def find_features(whoosh_dir, query):
+    ix = open_dir(whoosh_dir)
+    with ix.searcher() as searcher:
+        whoosh_query = MultifieldParser(["name", "attributes"], ix.schema).parse(query)
+        whoosh_results = searcher.search(whoosh_query)
+        ix.close()
+        return [map_hit(r) for r in whoosh_results]

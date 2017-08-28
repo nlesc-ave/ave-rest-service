@@ -15,7 +15,7 @@ schema = wf.Schema(chrom=wf.ID(stored=True),
                    name=wf.TEXT(analyzer=analyzer, stored=True))
 
 
-def big_bed_2_whoosh(filename, whoosh_dir):
+def genes_2_whoosh(filename, whoosh_dir):
     os.mkdir(whoosh_dir)
     ix = create_in(whoosh_dir, schema)
     writer = ix.writer()
@@ -44,4 +44,5 @@ def find_genes(whoosh_dir, query):
     with ix.searcher() as searcher:
         whoosh_query = MultifieldParser(["gene_id", "id", "name"], ix.schema).parse(query)
         whoosh_results = searcher.search(whoosh_query)
+        ix.close()
         return [map_hit(r) for r in whoosh_results]

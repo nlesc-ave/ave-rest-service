@@ -1,9 +1,8 @@
 import os
 import click
-from .features import attributes_dict_from_string
 from pyfaidx import Fasta
-from pysam import TabixFile, asGTF
 from cyvcf2 import VCF
+
 
 def validate_data(file_abs_path, datatype):
     """Validate datafile.
@@ -11,10 +10,9 @@ def validate_data(file_abs_path, datatype):
     """
     if datatype == "sequence":
         is_valid_fasta(file_abs_path)
-    elif datatype == "features":
-        is_valid_gff(file_abs_path)
     elif datatype == "variants":
         is_valid_bcf(file_abs_path)
+    # TODO add validate for genes/features bigbed urls
 
 
 def is_valid_fasta(fasta_file):
@@ -39,19 +37,6 @@ def is_valid_fasta(fasta_file):
         click.echo(err)
 
 
-def is_valid_gff(gff_file):
-    """Check if provided gff file is in proper format"""
-    try:
-        gff = TabixFile(gff_file, parser=asGTF())
-    except OSError as err:
-        message = """Error while parsing gff file.\n
-        Please ensure it is valid gff file, sorted, compressed with bgzip
-        and indexed with tabix.
-        """
-        click.echo(click.style(message, fg='red'))
-        click.echo(err)
-
-
 def is_valid_bcf(vcf_file):
     """Check if provided bcf file is in proper format"""
 
@@ -62,24 +47,3 @@ def is_valid_bcf(vcf_file):
         click.echo(click.style(message, fg='red'))
         click.echo(error)
 
-
-def import_gff(db, meta_id, filename):
-    """Import features from gff file into the sqlite database
-    features table."""
-
-    gff = TabixFile(filename, parser=asGTF())
-    for feature in gff.fetch():
-        if feature.feature == 'gene':
-            # fetch attributes
-            attributes = attributes_dict_from_string(feature.attributes)
-            name = attributes['Name']
-            chromosome = feature.contig
-            start = feature.start
-            end = feature.end
-
-            # create a database query
-            query = """INSERT INTO features (meta_id, name, chromosome, start, end)
-                       VALUES (?,?,?,?,?)"""
-            db.cursor().execute(query, (meta_id, name, chromosome, start, end))
-            # commit database updates
-    db.commit()

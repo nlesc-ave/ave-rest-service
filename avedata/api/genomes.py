@@ -1,22 +1,20 @@
 import connexion
 from flask import current_app
 from ..db import get_db
-from ..features import get_annotations
-from ..features import get_featuretypes
-from ..features import get_genes
+from ..features import featurebb2label, find_features
 from ..sequence import get_chrominfo
 from ..variants import get_accessions_list, AccessionsLookupError
 from ..variants import get_haplotypes
 from ..commands import get_woosh_dir
 from ..genes import find_genes
-import json
+
 
 def get(genome_id):
     try:
         genome_info = {
             'genome_id': genome_id,
             'chromosomes': chromosomes(genome_id),
-            'feature_types': featuretypes(genome_id),
+            'feature_tracks': feature_tracks(genome_id),
             'accessions': accession_list(genome_id),
             'reference': two_bit_uri(genome_id),
         }
@@ -48,18 +46,22 @@ def chromosomes(genome_id):
     return get_chrominfo(filename)
 
 
-def featuretypes(genome_id):
+def feature_tracks(genome_id):
     db = get_db()
     query = """SELECT filename
                FROM metadata
                WHERE genome=? AND datatype='features'"""
     cursor = db.cursor()
-    cursor.execute(query, (genome_id, ))
-    result = cursor.fetchone()
-    if result is None:
-        return []
-    filename = result[0]
-    return get_featuretypes(filename)
+    tracks = []
+    for row in cursor.execute(query, (genome_id, )):
+        url = row[0]
+        label = featurebb2label(url)
+        track = {
+            'label': label,
+            'url': url
+        }
+        tracks.append(track)
+    return tracks
 
 
 def accession_list(genome_id):
@@ -102,33 +104,6 @@ def gene_track_uri(genome_id):
         return None
     filename = result['filename']
     return filename
-
-
-def genes(genome_id, chrom_id, start_position, end_position):
-    """Fetch all gene annototion information for particular location.
-    Return list of dicts with gff information."""
-    db = get_db()
-    query = """SELECT filename
-               FROM metadata
-               WHERE genome=? AND datatype='features'"""
-    cursor = db.cursor()
-    cursor.execute(query, (genome_id, ))
-    filename = cursor.fetchone()['filename']
-    return get_genes(filename, chrom_id, start_position, end_position)
-
-
-def features(genome_id, chrom_id, start_position, end_position):
-    """Fetch genomic features of selected genomes
-    Return list of genomic features.
-    """
-    db = get_db()
-    query = """SELECT filename
-               FROM metadata
-               WHERE genome=? AND datatype='features'"""
-    cursor = db.cursor()
-    cursor.execute(query, (genome_id, ))
-    filename = cursor.fetchone()['filename']
-    return get_annotations(filename, chrom_id, start_position, end_position)
 
 
 def haplotypes(genome_id, chrom_id, start_position, end_position, accessions=None):
@@ -189,22 +164,34 @@ def gene_search(genome_id, query):
     db = get_db()
     sql_query = """SELECT filename
                FROM metadata
-               WHERE genome=? AND datatype='bigbed'"""
+               WHERE genome=? AND datatype='genes'"""
     cursor = db.cursor()
     cursor.execute(sql_query, (genome_id, ))
-    bigbed_row = cursor.fetchone()
-    if bigbed_row is None:
+    row = cursor.fetchone()
+    if row is None:
         ext = {'genome_id': genome_id}
         return connexion.problem(404, "Not Found", "Genome with id \'{0}\' not found".format(genome_id), ext=ext)
 
-    bigbed_file = bigbed_row['filename']
+    genes_file = row['filename']
 
     # then we'll find out what is the whoosh path for index of this bigbed file
-    whoosh_dir = get_woosh_dir(bigbed_file)
-    resutls = find_genes(whoosh_dir, query)
-
+    whoosh_dir = get_woosh_dir(genes_file)
     return find_genes(whoosh_dir, query)
 
 
 def feature_search(genome_id, query):
-    raise NotImplementedError()
+    # first we need to mach all big bed files for this genome
+    # based on info in metadata sqlite table
+    db = get_db()
+    sql_query = """SELECT filename
+               FROM metadata
+               WHERE genome=? AND datatype='features'"""
+    cursor = db.cursor()
+    cursor.execute(sql_query, (genome_id, ))
+    row = cursor.fetchone()
+    if row is None:
+        ext = {'genome_id': genome_id}
+        return connexion.problem(404, "Not Found", "Genome with id \'{0}\' not found".format(genome_id), ext=ext)
+
+    whoosh_dir = get_woosh_dir(genome_id + '-features')
+    return find_features(whoosh_dir, query)

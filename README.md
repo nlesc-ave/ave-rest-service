@@ -70,46 +70,34 @@ The (chromosome) sequence identifiers should match the ones in corresponding gff
 Gene annotations (transcripts) are treated differently than other feature annotations. It has
 to do with the fact that transcripts are displayed in separated track where
 UTRs, CDSs, exons and introns are rendered differently within one track.
-Gene annotations can be provided as bigBed files or gff3 files.
 
-#### gff3 annotations
-Information about annotations should be in [gff3](https://github.com/The-Sequence-Ontology/Specifications/blob/master/gff3.md)
-format. You can validate gff files on [genome tools website](http://genometools.org/cgi-bin/gff3validator.cgi).
+Gene or feature annotations must be provided as [bigBed](http://genome.ucsc.edu/goldenPath/help/bigBed.html) files.
 
-##### Sort features with [bedtools](https://bedtools.readthedocs.io/en/latest/)
-```sh
+Some gene bed files can be downloaded from http://bioviz.org/quickload/
+To convert a gene bed file to bigbed use:
+```bash
+# Fetch chrom sizes
+twoBitInfo genome.2bit chrom.sizes
+# the version for mac os is available also available http://hgdownload.cse.ucsc.edu/admin/exe/macOSX.x86_64/bedToBigBed
+chmod +x bedToBigBed
+# description field is too long for bedToBigBed so it must be trimmed
+gunzip -c S_lycopersicum_May_2012.bed.gz | perl -n -e 'chomp;@F=split(/\t/);$F[13] = substr($F[13],0,255); print join("\t", @F),"\n";'  > S_lycopersicum_May_2012.bed.trimmed
+bedToBigBed -tab -type=bed12+2 S_lycopersicum_May_2012.bed.trimmed genome.txt S_lycopersicum_May_2012.bb
+```
+
+To convert a gff feature file to bigbed use:
+
+```bash
+# Download a gff file
+wget ftp://ftp.solgenomics.net/tomato_genome/microarrays_mapping/A-AFFY-87_AffyGeneChipTomatoGenome.probes_ITAG2.3genome_mapping.gff
+# Sort gff
 bedtools sort -i TAIR10_genes.gff > TAIR10_genes.sorted.gff
-```
-
-##### Compress by [bgzip](http://www.htslib.org/doc/tabix.html) and index with [tabix](http://www.htslib.org/doc/tabix.html)
-```sh
-bgzip -i TAIR10_GFF3_genes.sorted.gff
-tabix -p gff TAIR10_GFF3_genes.sorted.gff.gz
-```
-
-Service queries annotation with use of
-[pysam.Tabixfile](https://pysam.readthedocs.io/en/latest/api.html#pysam.TabixFile).
-```py
-import pysam
-from pysam import TabixFile
-gff = TabixFile("gene_models.gff.gz", parser=pysam.asGTF())
-for feature in gff.fetch("SL2.40ch06", 1, 5000):
-    print(f.start)
-```
-Learn more about pysam.Tabixfile from
-[pysam docs](https://pysam.readthedocs.io/en/latest/index.html)
-
-#### bigBed annotations
-Gene annotations are directly served from bigBed files (`*.bb`). To enable
-serching by gene names or other annotations, those are also indexed and stored
-in sqlite database. Indexing is done in python with use of `pybedtools`. To be
-able to read `bigBed` files `bigBedToBed` tool available in the path and
-executable is necessary. The tool can be dowloaded from
-[USCS download page](http://hgdownload.cse.ucsc.edu/admin/exe/).
-
-```py
-import pybedtools
-bed = pybedtools.contrib.bigbed.bigbed_to_bed("S_lycopersicum_May_2012.bb")
+# Convert gff to bed
+gff2bed < A-AFFY-87_AffyGeneChipTomatoGenome.probes_ITAG2.3genome_mapping.gff > A-AFFY-87_AffyGeneChipTomatoGenome.probes_ITAG2.3genome_mapping.bed
+# Fetch chrom sizes
+twoBitInfo genome.2bit chrom.sizes
+# Convert bed to bigbed
+bedToBigBed -tab -type=bed6+4 A-AFFY-87_AffyGeneChipTomatoGenome.probes_ITAG2.3genome_mapping.bed chrom.sizes A-AFFY-87_AffyGeneChipTomatoGenome.probes_ITAG2.3genome_mapping.bb
 ```
 
 ### SNPs
@@ -146,7 +134,7 @@ Register data with command line interface
 avedata register --species 'Solanum Lycopersicum' \
                  --genome SL.2.40 \
                  --datatype 2bit \
-                 http://<dataserver>.S_lycopersicum_chromosomes.2.40.fa.2bit
+                 http://<dataserver>/S_lycopersicum_chromosomes.2.40.fa.2bit
 
 avedata register --species 'Solanum Lycopersicum' \
                  --genome SL.2.40 \
@@ -155,13 +143,14 @@ avedata register --species 'Solanum Lycopersicum' \
 
 avedata register --species 'Solanum Lycopersicum' \
                  --genome SL.2.40 \
-                 --datatype bigbed \
-                 http://<dataserver>.gene_models.bb
+                 --datatype genes \
+                 http://<dataserver>/gene_models.bb
 
 avedata register --species 'Solanum Lycopersicum' \
                  --genome SL.2.40 \
                  --datatype features \
-                 ./db/tomato/gene_models.gff.gz
+                 http://<dataserver>/A-AFFY-87.bb
+# `A-AFFY-87` will be used as track label
 ```
 
 ## Run service

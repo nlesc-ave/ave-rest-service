@@ -1,16 +1,17 @@
 import os
+from urllib.parse import urlparse
 
 import click
 import requests
+from flask import current_app
 from werkzeug.contrib.profiler import ProfilerMiddleware
 
-from .db import get_db, init_db
 from .avedata import connexion_app, app
-from .register import validate_data, import_gff
-from .genes import big_bed_2_whoosh
+from .db import get_db, init_db
+from .features import features_2_whoosh
+from .genes import genes_2_whoosh
+from .register import validate_data
 
-from urllib.parse import urlparse
-from flask import current_app
 
 @click.group()
 def cli():
@@ -63,10 +64,11 @@ def register(species, genome, datatype, filename):
         db.commit()
         # if gff file is registered import featur info into features table
         if datatype == "features":
-            import_gff(db, meta_id, filename)
-        if datatype == 'bigbed':
+            whoosh_dir = get_woosh_dir(genome + '-features')
+            features_2_whoosh(filename, whoosh_dir)
+        if datatype == 'genes':
             whoosh_dir = get_woosh_dir(filename)
-            big_bed_2_whoosh(filename, whoosh_dir)
+            genes_2_whoosh(filename, whoosh_dir)
 
         print("New datafile has been registered.")
 
