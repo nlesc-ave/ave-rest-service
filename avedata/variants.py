@@ -215,6 +215,9 @@ def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_positio
     # load reference sequence from a 2bit file
     ref_seq = get_sequence(ref_file, chrom_id, start_position, end_position)
 
+    if len(haplotypes) == 0:
+        return no_variants_response(accessions, ref_seq)
+
     add_sequence2haplotypes(haplotypes, ref_seq, start_position)
 
     (hierarchy, ordered_haplotypes) = cluster_haplotypes(haplotypes)
@@ -222,4 +225,19 @@ def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_positio
     return {
         'hierarchy': hierarchy,
         'haplotypes': ordered_haplotypes
+    }
+
+
+def no_variants_response(accessions, ref_seq):
+    haplotype = {
+        'accessions': accessions,
+        'haplotype_id': uuid.uuid4().hex,
+        'sequence': ref_seq,
+        'variants': []
+    }
+    return {
+        'hierarchy': {
+            'haplotype_id': haplotype['id']
+        },
+        'haplotypes': [haplotype]
     }
