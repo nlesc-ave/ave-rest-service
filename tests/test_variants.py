@@ -19,7 +19,7 @@ class Test_get_variants__singleSNP_altInSingleAccession(object):
     def test_allAccessions(self):
         accessions = []
 
-        (variants, sequences) = get_variants(self.variant_file, self.chrom_id, self.start_position, self.end_position, accessions)
+        (variants, sequences, myaccessions) = get_variants(self.variant_file, self.chrom_id, self.start_position, self.end_position, accessions)
 
         expected_sequences = {
             'RF_001_SZAXPI008746-45': 'G',
@@ -117,7 +117,7 @@ class Test_get_variants__singleSNP_altInSingleAccession(object):
     def test_subsetAccessionsAreEqualToRef(self):
         accessions = ['RF_077_SZAXPI009348-27', 'RF_001_SZAXPI008746-45']
 
-        (variants, sequences) = get_variants(self.variant_file, self.chrom_id, self.start_position, self.end_position, accessions)
+        (variants, sequences, myaccessions) = get_variants(self.variant_file, self.chrom_id, self.start_position, self.end_position, accessions)
 
         expected_sequences = {
             'RF_077_SZAXPI009348-27': 'G',
@@ -134,7 +134,7 @@ class Test_get_variants__singleSNP_altInSingleAccession(object):
     def test_subsetEvenRefAlf(self):
         accessions = ['RF_052_SZAXPI009329-133', 'RF_001_SZAXPI008746-45']
 
-        (variants, sequences) = get_variants(self.variant_file, self.chrom_id, self.start_position, self.end_position, accessions)
+        (variants, sequences, myaccessions) = get_variants(self.variant_file, self.chrom_id, self.start_position, self.end_position, accessions)
 
         expected_sequences = {
             'RF_001_SZAXPI008746-45': 'G',
@@ -164,7 +164,7 @@ class Test_get_variants__singleSNP_altInMultiAccession(object):
     def test_allAccession(self):
         accessions = []
 
-        (variants, sequences) = get_variants(self.variant_file, self.chrom_id, self.start_position, self.end_position, accessions)
+        (variants, sequences, myaccessions) = get_variants(self.variant_file, self.chrom_id, self.start_position, self.end_position, accessions)
 
         expected_sequences = {
             'RF_001_SZAXPI008746-45': 'A',
@@ -291,7 +291,7 @@ class Test_get_variants__twoSNP(object):
     def test_allAccession(self):
         accessions = []
 
-        (variants, sequences) = get_variants(self.variant_file, self.chrom_id, self.start_position, self.end_position, accessions)
+        (variants, sequences, myaccessions) = get_variants(self.variant_file, self.chrom_id, self.start_position, self.end_position, accessions)
 
         expected_sequences = {
             'RF_001_SZAXPI008746-45': 'AG',
