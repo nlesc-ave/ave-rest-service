@@ -237,7 +237,7 @@ def no_variants_response(accessions, ref_seq):
     }
     return {
         'hierarchy': {
-            'haplotype_id': haplotype['id']
+            'haplotype_id': haplotype['haplotype_id']
         },
         'haplotypes': [haplotype]
     }
