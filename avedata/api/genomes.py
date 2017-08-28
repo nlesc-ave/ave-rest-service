@@ -1,5 +1,5 @@
 import connexion
-
+from flask import current_app
 from ..db import get_db
 from ..features import get_annotations
 from ..features import get_featuretypes
@@ -135,6 +135,14 @@ def haplotypes(genome_id, chrom_id, start_position, end_position, accessions=Non
     """
     Calculate haplotypes for chosen region and set of accessions.
     """
+    # if region is too big refuse, return error
+    requested_range = end_position - start_position
+    max_range = int(current_app.config['MAX_RANGE'])
+    if requested_range > max_range:
+        return connexion.problem(406, "Not Acceptable",
+            "Requested range {0} is larger than maximum allowed range {1}".format(requested_range, max_range))
+
+
     db = get_db()
     # to construct haplotypes, both:
     # variants from bcf file and
