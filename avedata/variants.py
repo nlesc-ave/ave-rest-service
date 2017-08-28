@@ -124,7 +124,7 @@ def get_variants(variant_file, chrom_id, start_position, end_position, accession
                         genotype[f] = str(v.format(f)[idx])
                     variant['genotypes'].append(genotype)
             variants.append(variant)
-    return variants, sequences
+    return variants, sequences, accessions
 
 
 def cluster_sequences(sequences):
@@ -206,7 +206,7 @@ def cluster_haplotypes(haplotypes):
 
 
 def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_position, accessions):
-    (variants, sequences) = get_variants(variant_file, chrom_id, start_position, end_position,
+    (variants, sequences, accessions) = get_variants(variant_file, chrom_id, start_position, end_position,
                                          accessions)
 
     haplotypes = cluster_sequences(sequences)
