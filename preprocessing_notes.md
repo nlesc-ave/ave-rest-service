@@ -1,6 +1,6 @@
 # Data Processing
 
-## getting vcfs and going from multiple (per accession) to singel vcf file
+## getting vcfs and going from multiple (per accession) to single vcf file
 generate compressed bcf file from vcf file:
 ```
 bcftools view -O b 1001genomes_snp-short-indel_with_tair10_only_ACGTN.vcf.gz > 1001genomes_snp-short-indel_with_tair10_only_ACGTN.bcf
