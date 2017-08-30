@@ -34,7 +34,7 @@ def run(debug=False, profiler=False):
 @click.option('--species', help='Species name')
 @click.option('--genome', help='Name of the reference genome')
 @click.option('--datatype', help='Type of the data',
-              type=click.Choice(['features', 'variants', '2bit', 'bigbed']))
+              type=click.Choice(['features', 'variants', '2bit', 'genes']))
 @click.argument('filename')
 def register(species, genome, datatype, filename):
     """Add file metadata information to the database"""

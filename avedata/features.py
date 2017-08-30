@@ -9,8 +9,8 @@ from pybedtools.contrib.bigbed import bigbed_to_bed
 
 analyzer = analysis.NgramWordAnalyzer(minsize=3)
 schema = wf.Schema(chrom=wf.ID(stored=True),
-                   start=wf.ID(stored=True),
-                   end=wf.ID(stored=True),
+                   start=wf.NUMERIC(int, stored=True, signed=False),
+                   end=wf.NUMERIC(int, stored=True, signed=False),
                    track=wf.ID(stored=True),
                    attributes=wf.TEXT(analyzer=analyzer, stored=True),
                    name=wf.TEXT(analyzer=analyzer, stored=True))

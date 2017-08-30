@@ -96,7 +96,7 @@ def gene_track_uri(genome_id):
     db = get_db()
     query = """SELECT filename
                FROM metadata
-               WHERE genome=? AND datatype='bigbed'"""
+               WHERE genome=? AND datatype='genes'"""
     cursor = db.cursor()
     cursor.execute(query, (genome_id, ))
     result = cursor.fetchone()
