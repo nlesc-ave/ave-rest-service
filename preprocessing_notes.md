@@ -12,21 +12,21 @@ gunzip: ./ERZ020503/RF_062_SZAXPI009337-15.vcf.gz: unexpected end of file
 gunzip: ./ERZ020503/RF_062_SZAXPI009337-15.vcf.gz: uncompress failed
 ```
 
-concatenating vcf files:
-`vcf-concat myvcfs/*.vcf.gz | gzip > out.vcf.gz`
+~~concatenating vcf files:
+`vcf-concat myvcfs/*.vcf.gz | gzip > out.vcf.gz`~~
 
-
+files come from sra here:
 ftp.sra.ebi.ac.uk
 and the directory _vol1_
 directories: ERZ020447 - ERZ020530
 
 
-ungzip vcf files
-compress with bgzip
+* ungzip vcf files
+* each file compress with bgzip
 `bgzip sample.vcf`
-index with tabix
+# index with tabix
 `tabix -p vcf sample.vcf.gzip`
-merge into one variant file
+* merge into one variant file
 `vcf-merge *.vcf.gz > all-snps.vcf`
 
 
