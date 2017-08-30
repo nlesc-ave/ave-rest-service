@@ -1,5 +1,4 @@
 # Data Processing
-#AVE
 
 ## preprocessing
 generate compressed bcf file from vcf file:
@@ -24,7 +23,7 @@ directories: ERZ020447 - ERZ020530
 * ungzip vcf files
 * each file compress with bgzip
 `bgzip sample.vcf`
-# index with tabix
+* index with tabix
 `tabix -p vcf sample.vcf.gzip`
 * merge into one variant file
 `vcf-merge *.vcf.gz > all-snps.vcf`
