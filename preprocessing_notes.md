@@ -21,6 +21,7 @@ directories: ERZ020447 - ERZ020530
 
 
 * ungzip vcf files
+`gunzip sample.vcf.gz`
 * each file compress with bgzip
 `bgzip sample.vcf`
 * index with tabix
