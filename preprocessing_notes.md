@@ -1,7 +1,6 @@
 # Data Processing
-#AVE
 
-## preprocessing
+## getting vcfs and going from multiple (per accession) to single vcf file
 generate compressed bcf file from vcf file:
 ```
 bcftools view -O b 1001genomes_snp-short-indel_with_tair10_only_ACGTN.vcf.gz > 1001genomes_snp-short-indel_with_tair10_only_ACGTN.bcf
@@ -12,21 +11,22 @@ gunzip: ./ERZ020503/RF_062_SZAXPI009337-15.vcf.gz: unexpected end of file
 gunzip: ./ERZ020503/RF_062_SZAXPI009337-15.vcf.gz: uncompress failed
 ```
 
-concatenating vcf files:
-`vcf-concat myvcfs/*.vcf.gz | gzip > out.vcf.gz`
+~~concatenating vcf files:
+`vcf-concat myvcfs/*.vcf.gz | gzip > out.vcf.gz`~~
 
-
+files come from sra here:
 ftp.sra.ebi.ac.uk
 and the directory _vol1_
 directories: ERZ020447 - ERZ020530
 
 
-ungzip vcf files
-compress with bgzip
+* ungzip vcf files
+`gunzip sample.vcf.gz`
+* each file compress with bgzip
 `bgzip sample.vcf`
-index with tabix
+* index with tabix
 `tabix -p vcf sample.vcf.gzip`
-merge into one variant file
+* merge into one variant file
 `vcf-merge *.vcf.gz > all-snps.vcf`
 
 
