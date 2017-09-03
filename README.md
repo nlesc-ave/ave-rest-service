@@ -3,7 +3,7 @@
 [![Build Status](https://travis-ci.org/nlesc-ave/ave-rest-service.svg?branch=master)](https://travis-ci.org/nlesc-ave/ave-rest-service)
 [![SonarCloud Gate](https://sonarcloud.io/api/badges/gate?key=ave-rest-service)](https://sonarcloud.io/dashboard?id=ave-rest-service)
 [![SonarCloud Coverage](https://sonarcloud.io/api/badges/measure?key=ave-rest-service&metric=coverage)](https://sonarcloud.io/component_measures/domain/Coverage?id=ave-rest-service)
-[![Docker Automated buil](https://img.shields.io/docker/automated/ave2/allelic-variation-explorer.svg)]()
+[![Docker Automated buil](https://img.shields.io/docker/automated/ave2/allelic-variation-explorer.svg)](https://hub.docker.com/r/ave2/allelic-variation-explorer/)
 
 Serving variant, annotation and genome data for AVE visualisation.
 
@@ -163,3 +163,65 @@ It will print the `<url>` it is hosting at.
 
 The api endpoint is at `<url>/api/`.
 The swagger ui is at `<url>/api/ui`.
+
+## Deploy using Docker
+
+A Docker image is available on [Docker Hub](https://hub.docker.com/r/ave2/allelic-variation-explorer/).
+
+The Docker image contains no data it must be supplied using volumes. It expects the following volumes:
+
+* /data, location for 2bit, bcf and bigbed files. Hosted as http://&lt;aveserver&gt;/data
+* /whoosh, full text indices for genes and features
+* /meta, directory in which ave meta database is stored
+
+### Run service
+
+```bash
+mkdir data
+mkdir whoosh
+mkdir meta
+docker run -d -v $PWD/data:/data -v $PWD/whoosh:/whoosh -v $PWD/meta:/meta --name ave -p 80:80 ave2/allelic-variation-explorer
+```
+
+Will run webserver on port 80 of host machine. Will use ``&lt;aveserver&gt;` as placeholder for the hostname or ip adress of the host machine.
+
+The web interface is available at `http://&lt;aveserver&gt/;
+
+### Register data
+
+Example commands using files for tomato in `data/tomato/SL.2.40` directory, namely:
+* genome.2bit
+* tomato_snps.bcf
+* gene_models.bb
+* A-AFFY-87.bb
+
+```bash
+docker exec ave \
+    avedata register \
+    --species 'Solanum Lycopersicum' \
+    --genome SL.2.40 \
+    --datatype 2bit \
+    http://<aveserver>/data/tomato/SL.2.40/genome.2bit
+
+docker exec ave \
+    avedata register \
+    --species 'Solanum Lycopersicum' \
+    --genome SL.2.40 \
+    --datatype variants \
+    /data/tomato/SL.2.40/tomato_snps.bcf
+
+docker exec ave \
+    avedata register \
+    --species 'Solanum Lycopersicum' \
+    --genome SL.2.40 \
+    --datatype genes \
+    http://<aveserver>/data/tomato/SL.2.40/gene_models.bb
+
+docker exec ave \
+    avedata register \
+    --species 'Solanum Lycopersicum' \
+    --genome SL.2.40 \
+    --datatype features \
+    http://<aveserver>/data/tomato/SL.2.40/A-AFFY-87.bb
+# `A-AFFY-87` will be used as track label
+```
