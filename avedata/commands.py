@@ -26,7 +26,6 @@ def run(debug=False, profiler=False):
     if profiler:
         app.config['PROFILE'] = True
         app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[30])
-    connexion_app.add_api('swagger.yml', arguments=app.config)
     connexion_app.run(port=8080, debug=debug)
 
 

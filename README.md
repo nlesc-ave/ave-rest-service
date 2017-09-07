@@ -164,6 +164,13 @@ It will print the `<url>` it is hosting at.
 The api endpoint is at `<url>/api/`.
 The swagger ui is at `<url>/api/ui`.
 
+The above command will run a single threaded low performance web server.
+
+Use [gunicorn](http://gunicorn.org/) to run in production with
+```bash
+gunicorn -w 4 --threads 2 -t 60 avedata.avedata:app
+```
+
 ## Deploy using Docker
 
 A Docker image is available on [Docker Hub](https://hub.docker.com/r/ave2/allelic-variation-explorer/).

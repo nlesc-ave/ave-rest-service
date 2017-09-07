@@ -9,7 +9,10 @@ app = connexion_app.app
 CORS(app)
 
 app.config.update(dict(
-    DATABASE='ave.db'
+    DATABASE='ave.db',
+    SCHEME='http',
+    HOSTPORT='0.0.0.0'
 ))
 app.config.from_pyfile(os.path.join(os.getcwd(),
                                     'settings.cfg'), silent=True)
+connexion_app.add_api('swagger.yml', arguments=app.config)
