@@ -1,6 +1,6 @@
-import os
-import click
-from pyfaidx import Fasta
+from subprocess import check_call, CalledProcessError, DEVNULL
+
+from click import ClickException
 from cyvcf2 import VCF
 
 
@@ -8,42 +8,43 @@ def validate_data(file_abs_path, datatype):
     """Validate datafile.
     Validation method depends on the datatype
     """
-    if datatype == "sequence":
-        is_valid_fasta(file_abs_path)
-    elif datatype == "variants":
+    if datatype == '2bit':
+        is_valid_2bit(file_abs_path)
+    elif datatype in ('genes', 'features'):
+        is_valid_bigbed(file_abs_path)
+    elif datatype == 'variants':
         is_valid_bcf(file_abs_path)
-    # TODO add validate for genes/features bigbed urls
 
 
-def is_valid_fasta(fasta_file):
-    """Check if provided fasta file is in propper format"""
-
-    # check if it is
-
-    # try to open file with `pyfaidx`
-    # check if there is an idex file
-    index_file = ".".join([fasta_file, 'fai'])
-    if not os.path.isfile(index_file):
-        message = "Fasta index not found. The index will be created"
-        click.echo(click.style(message, fg='green'))
-
+def is_valid_2bit(url):
+    """Check if provided 2bit url is in proper format"""
+    args = (
+        'twoBitInfo',
+        url,
+        'stdout'
+    )
     try:
-        fasta = Fasta(fasta_file)
-        print(fasta)
-    except UnicodeDecodeError as err:
-        message = """Error while accessing fasta file.\n
-        Please ensure it is a valid fasta file."""
-        click.echo(click.style(message, fg='red'))
-        click.echo(err)
+        check_call(args, stdout=DEVNULL)
+    except CalledProcessError:
+        raise ClickException('2bit url could not be opened')
 
 
-def is_valid_bcf(vcf_file):
+def is_valid_bcf(bcf_file):
     """Check if provided bcf file is in proper format"""
 
     try:
-        vcf = VCF(vcf_file)
-    except OSError as error:
-        message = "Error while parsing bcf file with cyvcf2"
-        click.echo(click.style(message, fg='red'))
-        click.echo(error)
+        VCF(bcf_file)
+    except OSError:
+        raise ClickException("Error while opening bcf file with cyvcf2")
 
+
+def is_valid_bigbed(url):
+    """Check if provided bigbed url is in proper format"""
+    args = (
+        'bigBedInfo',
+        url
+    )
+    try:
+        check_call(args, stdout=DEVNULL)
+    except CalledProcessError:
+        raise ClickException("Error opening bigbed url")

@@ -15,10 +15,11 @@ dependencies:
 - bioconda::samtools=1.4=0
 - bioconda::ucsc-bedtobigbed=332=0
 - bioconda::ucsc-bigbedtobed=332=0
+- bioconda::ucsc-bigBedInfo=332=0
 - bioconda::ucsc-fatotwobit=332=0
 - bioconda::ucsc-twobittofa=332=0
 - bioconda::ucsc-twoBitInfo=332=0
-- biaconda::bedtools=2.26.0
+- bioconda::bedtools=2.26.0
 - conda-forge::curl=7.52.1=0
 - conda-forge::numpy=1.12.1=py35_blas_openblas_200
 - conda-forge::pip=9.0.1=py35_0

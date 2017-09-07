@@ -37,20 +37,9 @@ def run(debug=False, profiler=False):
 @click.argument('filename')
 def register(species, genome, datatype, filename):
     """Add file metadata information to the database"""
-    # check if file exists
-    file_abs_path = os.path.join(os.getcwd(), filename)
-    if not os.path.isfile(file_abs_path):
-        try:
-            s = requests.Session()
-            s.head(filename)
-        except requests.HTTPError:
-            print("file or URL %s is not available" %
-                  click.format_filename(filename))
-            return
-
     # validate if the provided files can be accessed
     # by relevant libraries
-    validate_data(file_abs_path, datatype)
+    validate_data(filename, datatype)
 
     with app.app_context():
         db = get_db()
@@ -58,7 +47,6 @@ def register(species, genome, datatype, filename):
                    VALUES (?,?,?,?)"""
         cursor = db.cursor()
         cursor.execute(query, (species, genome, datatype, filename))
-        meta_id = cursor.lastrowid
         # commit database updates
         db.commit()
         # if gff file is registered import featur info into features table
@@ -82,6 +70,7 @@ def get_woosh_dir(url):
     whoosh_base_dir = current_app.config['WHOOSH_BASE_DIR']
     whoosh_dir = os.path.join(whoosh_base_dir, filename)
     return whoosh_dir
+
 
 @click.command()
 def initdb():

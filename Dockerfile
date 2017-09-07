@@ -19,7 +19,7 @@ ADD nginx.conf /etc/nginx/sites-enabled/default
 RUN cd /var/www/html && curl -L 'https://bintray.com/nlesc-ave/ave/download_file?file_path=ave-app-latest.tar.bz2' | tar -jxf -
 
 WORKDIR /app
-CMD service nginx start && gunicorn -w 4 --threads 2 -t 60 avedata.avedata:app
+CMD service nginx start && gunicorn -w 4 --threads 2 -t 60 -b 127.0.0.1:8080 avedata.avedata:app
 
 VOLUME /data
 VOLUME /meta
