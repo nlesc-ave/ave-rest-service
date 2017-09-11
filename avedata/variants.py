@@ -93,12 +93,14 @@ def get_variants(variant_file, chrom_id, start_position, end_position, accession
     variants = []
     for v in vcf_variants:
         if v.is_snp:
+            an = alt2ambiguousnucleotide(v.ALT)
             variant = {
                 'chrom': v.CHROM,
                 'pos': v.POS,
                 'id': v.ID,
                 'ref': v.REF,
                 'alt': v.ALT,
+                'alt_ambiguous_nucleotide': an,
                 'qual': v.QUAL,
                 'filter': v.FILTER,
                 'info': dict(v.INFO),
@@ -110,15 +112,13 @@ def get_variants(variant_file, chrom_id, start_position, end_position, accession
                 if genotype[0] == -1:
                     sequences[acc] += v.REF
                 else:
-                    # ignores heterozygosity
-                    # always picks most frequent ALT
-                    sequences[acc] += v.ALT[0]
+                    sequences[acc] += an
                     # add info to variant object
                     # genotype should contain all format fields for each
-                    # actual varint at this position
+                    # actual variant at this position
                     genotype = {
                         'accession': acc,
-                        'genotype': str(genotype[:2])
+                        'genotype': str(genotype[:2]),
                     }
                     for f in v.FORMAT[1:]:
                         genotype[f] = str(v.format(f)[idx])
@@ -241,3 +241,36 @@ def no_variants_response(accessions, ref_seq):
         },
         'haplotypes': [haplotype]
     }
+
+
+def alt2ambiguousnucleotide(alts):
+    """Translate list of alt nucleotides to single IUPAC abmiguity symbol
+
+    Uses http://www.dnabaser.com/articles/IUPAC%20ambiguity%20codes.html
+
+    Args:
+        alts: List of alternate nucleotides of a SNP
+
+    Raises:
+        KeyError: when multi alt is not in translation map
+
+    Returns:
+        string: Ambiguous nucleotide
+    """
+    if len(alts) == 1:
+        return alts[0]
+    amap = {
+        'AC': 'M',
+        'AT': 'W',
+        'CG': 'S',
+        'GT': 'K',
+        'AG': 'R',
+        'CT': 'Y',
+        'CGT': 'B',
+        'AGT': 'D',
+        'ACT': 'H',
+        'ACG': 'V',
+        'ACGT': 'N',
+    }
+    alts_str = ''.join(sorted(alts))
+    return amap[alts_str]

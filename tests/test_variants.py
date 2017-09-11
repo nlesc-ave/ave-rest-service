@@ -1,5 +1,7 @@
+import pytest
+
 from avedata.variants import get_variants, cluster_sequences, add_variants2haplotypes, add_sequence2haplotypes, \
-    cluster_haplotypes
+    cluster_haplotypes, alt2ambiguousnucleotide
 
 """
 Tests run on a filtered vcf file 
@@ -189,7 +191,7 @@ class Test_get_variants__singleSNP_altInMultiAccession(object):
             'RF_022_SZAXPI009302-129': 'A',
             'RF_023_SZAXPI009303-133': 'A',
             'RF_024_SZAXPI009304-136': 'A',
-            'RF_025_SZAXPI009305-140': 'T',
+            'RF_025_SZAXPI009305-140': 'K',
             'RF_026_SZAXPI009306-142': 'A',
             'RF_027_SZAXPI009307-158': 'A',
             'RF_028_SZAXPI009308-166': 'A',
@@ -212,7 +214,7 @@ class Test_get_variants__singleSNP_altInMultiAccession(object):
             'RF_045_SZAXPI009324-109': 'A',
             'RF_046_SZAXPI008748-47': 'A',
             'RF_047_SZAXPI009326-113': 'A',
-            'RF_049_SZAXPI009327-123': 'T',
+            'RF_049_SZAXPI009327-123': 'K',
             'RF_051_SZAXPI009328-129': 'A',
             'RF_052_SZAXPI009329-133': 'A',
             'RF_053_SZAXPI009330-136': 'A',
@@ -222,19 +224,19 @@ class Test_get_variants__singleSNP_altInMultiAccession(object):
             'RF_057_SZAXPI009334-166': 'A',
             'RF_058_SZAXPI009359-46': 'A',
             'RF_059_SZAXPI009335-169': 'A',
-            'RF_063_SZAXPI009338-16-2': 'T',
-            'RF_064_SZAXPI009339-17-2': 'T',
-            'RF_065_SZAXPI009340-18': 'T',
-            'RF_066_SZAXPI009341-19': 'T',
-            'RF_067_SZAXPI009342-21': 'T',
-            'RF_068_SZAXPI009343-22-2': 'T',
-            'RF_069_SZAXPI009344-23': 'T',
-            'RF_070_SZAXPI008749-56': 'T',
-            'RF_071_SZAXPI009345-24': 'T',
-            'RF_072_SZAXPI008752-75': 'T',
-            'RF_073_SZAXPI009346-25': 'T',
+            'RF_063_SZAXPI009338-16-2': 'K',
+            'RF_064_SZAXPI009339-17-2': 'K',
+            'RF_065_SZAXPI009340-18': 'K',
+            'RF_066_SZAXPI009341-19': 'K',
+            'RF_067_SZAXPI009342-21': 'K',
+            'RF_068_SZAXPI009343-22-2': 'K',
+            'RF_069_SZAXPI009344-23': 'K',
+            'RF_070_SZAXPI008749-56': 'K',
+            'RF_071_SZAXPI009345-24': 'K',
+            'RF_072_SZAXPI008752-75': 'K',
+            'RF_073_SZAXPI009346-25': 'K',
             'RF_074_SZAXPI008753-79': 'A',
-            'RF_075_SZAXPI009347-26': 'T',
+            'RF_075_SZAXPI009347-26': 'K',
             'RF_077_SZAXPI009348-27': 'A',
             'RF_078_SZAXPI009349-30': 'A',
             'RF_088_SZAXPI009350-31': 'A',
@@ -254,6 +256,7 @@ class Test_get_variants__singleSNP_altInMultiAccession(object):
         assert len(variants) == 1
         variant = variants[0]
         assert variant['alt'] == ['T', 'G']
+        assert variant['alt_ambiguous_nucleotide'] == 'K'
         assert variant['chrom'] == self.chrom_id
         assert variant['ref'] == 'A'
         assert len(variant['genotypes']) == 14
@@ -316,7 +319,7 @@ class Test_get_variants__twoSNP(object):
             'RF_022_SZAXPI009302-129': 'AG',
             'RF_023_SZAXPI009303-133': 'AG',
             'RF_024_SZAXPI009304-136': 'AG',
-            'RF_025_SZAXPI009305-140': 'TG',
+            'RF_025_SZAXPI009305-140': 'KG',
             'RF_026_SZAXPI009306-142': 'AG',
             'RF_027_SZAXPI009307-158': 'AG',
             'RF_028_SZAXPI009308-166': 'AG',
@@ -339,7 +342,7 @@ class Test_get_variants__twoSNP(object):
             'RF_045_SZAXPI009324-109': 'AG',
             'RF_046_SZAXPI008748-47': 'AG',
             'RF_047_SZAXPI009326-113': 'AG',
-            'RF_049_SZAXPI009327-123': 'TG',
+            'RF_049_SZAXPI009327-123': 'KG',
             'RF_051_SZAXPI009328-129': 'AG',
             'RF_052_SZAXPI009329-133': 'AT',
             'RF_053_SZAXPI009330-136': 'AG',
@@ -349,19 +352,19 @@ class Test_get_variants__twoSNP(object):
             'RF_057_SZAXPI009334-166': 'AG',
             'RF_058_SZAXPI009359-46': 'AG',
             'RF_059_SZAXPI009335-169': 'AG',
-            'RF_063_SZAXPI009338-16-2': 'TG',
-            'RF_064_SZAXPI009339-17-2': 'TG',
-            'RF_065_SZAXPI009340-18': 'TG',
-            'RF_066_SZAXPI009341-19': 'TG',
-            'RF_067_SZAXPI009342-21': 'TG',
-            'RF_068_SZAXPI009343-22-2': 'TG',
-            'RF_069_SZAXPI009344-23': 'TG',
-            'RF_070_SZAXPI008749-56': 'TG',
-            'RF_071_SZAXPI009345-24': 'TG',
-            'RF_072_SZAXPI008752-75': 'TG',
-            'RF_073_SZAXPI009346-25': 'TG',
+            'RF_063_SZAXPI009338-16-2': 'KG',
+            'RF_064_SZAXPI009339-17-2': 'KG',
+            'RF_065_SZAXPI009340-18': 'KG',
+            'RF_066_SZAXPI009341-19': 'KG',
+            'RF_067_SZAXPI009342-21': 'KG',
+            'RF_068_SZAXPI009343-22-2': 'KG',
+            'RF_069_SZAXPI009344-23': 'KG',
+            'RF_070_SZAXPI008749-56': 'KG',
+            'RF_071_SZAXPI009345-24': 'KG',
+            'RF_072_SZAXPI008752-75': 'KG',
+            'RF_073_SZAXPI009346-25': 'KG',
             'RF_074_SZAXPI008753-79': 'AG',
-            'RF_075_SZAXPI009347-26': 'TG',
+            'RF_075_SZAXPI009347-26': 'KG',
             'RF_077_SZAXPI009348-27': 'AG',
             'RF_078_SZAXPI009349-30': 'AG',
             'RF_088_SZAXPI009350-31': 'AG',
@@ -381,6 +384,7 @@ class Test_get_variants__twoSNP(object):
         assert len(variants) == 2
         variant1 = variants[0]
         assert variant1['alt'] == ['T', 'G']
+        assert variant1['alt_ambiguous_nucleotide'] == 'K'
         assert variant1['chrom'] == self.chrom_id
         assert variant1['ref'] == 'A'
         assert len(variant1['genotypes']) == 14
@@ -806,3 +810,43 @@ class Test_cluster_haplotypes(object):
             }]
         }
         assert hierarchy == expected_hierarchy
+
+
+@pytest.mark.parametrize("test_input,expected", [
+    (['A'], 'A'),
+    (['G'], 'G'),
+    (['C'], 'C'),
+    (['T'], 'T'),
+    (['U'], 'U'),
+    (['N'], 'N'),
+    (['W'], 'W'),
+    (['Z'], 'Z'),
+    (['-'], '-'),
+    (['.'], '.'),
+    (['A', 'T'], 'W'),
+    (['T', 'A'], 'W'),
+    (['C', 'G'], 'S'),
+    (['G', 'C'], 'S'),
+    (['A', 'C'], 'M'),
+    (['C', 'A'], 'M'),
+    (['G', 'T'], 'K'),
+    (['T', 'G'], 'K'),
+    (['A', 'G'], 'R'),
+    (['G', 'A'], 'R'),
+    (['C', 'T'], 'Y'),
+    (['T', 'C'], 'Y'),
+    (['C', 'G', 'T'], 'B'),
+    (['A', 'G', 'T'], 'D'),
+    (['A', 'C', 'T'], 'H'),
+    (['A', 'C', 'G'], 'V'),
+    (['A', 'C', 'G', 'T'], 'N'),
+])
+def test_alt2ambiguousnucleotide(test_input, expected):
+    result = alt2ambiguousnucleotide(test_input)
+
+    assert result == expected
+
+
+def test_alt2ambiguousnucleotide_multiunknown():
+    with pytest.raises(KeyError, message='EF'):
+        alt2ambiguousnucleotide(['E', 'F'])

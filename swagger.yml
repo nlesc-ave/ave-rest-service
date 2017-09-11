@@ -345,6 +345,9 @@ definitions:
         description: The list of alternative alleles at this position
         items:
           type: string
+      alt_ambiguous_nucleotide:
+        type: string
+        description: The list of alternative alleles at this position mapped to an ambiguous nucleotide
       qual:
         type: number
         description: A quality score associated with the inference of the given alleles.
@@ -367,6 +370,7 @@ definitions:
     - id
     - ref
     - alt
+    - alt_ambiguous_nucleotide
     - qual
     - filter
     - info
