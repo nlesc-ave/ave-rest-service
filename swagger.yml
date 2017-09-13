@@ -4,12 +4,16 @@ swagger: '2.0'
 info:
   title: AVE REST API
   description: Allelic Variation Explorer REST API, Serving variant, annotation and genome data for AVE visualisation.
-  version: "0.0.2"
+  version: {{VERSION}}
+{% if HOSTPORT is defined %}
 # the domain of the service
 host: {{HOSTPORT}}
+{% endif %}
+{% if SCHEME is defined %}
 # array of all schemes that your API supports
 schemes:
   - {{SCHEME}}
+{% endif %}
 # will be prefixed to all paths
 basePath: /api/
 produces:

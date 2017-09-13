@@ -1,8 +1,11 @@
 from setuptools import setup
 
+exec(open('avedata/version.py').read())
+
 setup(
     name='avedata',
     packages=['avedata'],
+    version=__version__,
     include_package_data=True,
     install_requires=[
         'flask',

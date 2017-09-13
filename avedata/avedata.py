@@ -1,18 +1,34 @@
 import os
+from urllib.parse import urlparse
+
 import connexion
-from flask import Flask, request, session, g, redirect, url_for, abort, \
-    render_template, flash
 from flask_cors import CORS
 
-connexion_app = connexion.App(__name__, specification_dir='../')
+from .version import __version__
+
+connexion_app = connexion.FlaskApp(__name__, specification_dir='../')
 app = connexion_app.app
 CORS(app)
 
 app.config.update(dict(
+    # File path for database
     DATABASE='ave.db',
-    SCHEME='http',
-    HOSTPORT='0.0.0.0'
+    # Maximum number of base pairs at which haplotype clustering is performed
+    MAX_RANGE=50000,
+    # Directory to store whoosh full text indices
+    WHOOSH_BASE_DIR='.',
 ))
-app.config.from_pyfile(os.path.join(os.getcwd(),
-                                    'settings.cfg'), silent=True)
-connexion_app.add_api('swagger.yml', arguments=app.config)
+app.config.from_pyfile(os.path.join(os.getcwd(), 'settings.cfg'), silent=True)
+
+
+def spec_config():
+    url = os.environ.get('EXTERNAL_URL', app.config.get('EXTERNAL_URL', None))
+    conf = {'VERSION': __version__}
+    if url:
+        o = urlparse(url)
+        conf['HOSTPORT'] = o.netloc
+        conf['SCHEME'] = o.scheme
+    return conf
+
+
+connexion_app.add_api('swagger.yml', arguments=spec_config())

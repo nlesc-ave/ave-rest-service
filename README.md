@@ -162,7 +162,7 @@ avadata run
 It will print the `<url>` it is hosting at.
 
 The api endpoint is at `<url>/api/`.
-The swagger ui is at `<url>/api/ui`.
+The Swagger UI is at `<url>/api/ui`.
 
 The above command will run a single threaded low performance web server.
 
@@ -174,6 +174,8 @@ gunicorn -w 4 --threads 2 -t 60 avedata.avedata:app
 ## Deploy using Docker
 
 A Docker image is available on [Docker Hub](https://hub.docker.com/r/ave2/allelic-variation-explorer/).
+
+The Docker image contains the [ave-app](https://github.com/nlesc-ave/ave-app) as the web-based user interface.
 
 The Docker image contains no data it must be supplied using volumes. It expects the following volumes:
 
@@ -187,12 +189,17 @@ The Docker image contains no data it must be supplied using volumes. It expects 
 mkdir data
 mkdir whoosh
 mkdir meta
-docker run -d -v $PWD/data:/data -v $PWD/whoosh:/whoosh -v $PWD/meta:/meta --name ave -p 80:80 ave2/allelic-variation-explorer
+docker run -d \
+  -v $PWD/data:/data -v $PWD/whoosh:/whoosh -v $PWD/meta:/meta \
+  -e EXTERNAL_URL=http://$(hostname) -p 80:80 \
+  --name ave ave2/allelic-variation-explorer
 ```
 
-Will run webserver on port 80 of host machine. Will use ``&lt;aveserver&gt;` as placeholder for the hostname or ip adress of the host machine.
+Command above will run web server on port 80 of host machine.
 
-The web interface is available at `http://&lt;aveserver&gt/;
+To make Swagger UI api calls the EXTERNAL_URL environment variable is needed,
+because the Python web service is behind NGINX reverse proxy, causing the url where the api is available on to change,
+the EXTERNAL_URL allows Swagger UI to use the externally available api endpoint.
 
 ### Register data
 
