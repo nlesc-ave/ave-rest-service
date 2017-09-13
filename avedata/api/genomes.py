@@ -114,14 +114,13 @@ def haplotypes(genome_id, chrom_id, start_position, end_position, accessions=Non
     requested_range = end_position - start_position
     max_range = int(current_app.config['MAX_RANGE'])
     if requested_range > max_range:
-        return connexion.problem(406, "Not Acceptable",
-            "Requested range {0} is larger than maximum allowed range {1}".format(requested_range, max_range))
-
+        message = 'Requested range {0} is larger than maximum allowed range {1}'.format(requested_range, max_range)
+        return connexion.problem(406, "Not Acceptable", message)
 
     db = get_db()
     # to construct haplotypes, both:
     # variants from bcf file and
-    # reference sequence from 2bit (or fasta)
+    # reference sequence from 2bit
     # are needed
 
     query = """SELECT filename
@@ -132,7 +131,8 @@ def haplotypes(genome_id, chrom_id, start_position, end_position, accessions=Non
     variants_row = cursor.fetchone()
     if variants_row is None:
         ext = {'genome_id': genome_id}
-        return connexion.problem(404, "Not Found", "Genome with id \'{0}\' contains no variants".format(genome_id), ext=ext)
+        message = "Genome with id \'{0}\' contains no variants".format(genome_id)
+        return connexion.problem(404, "Not Found", message, ext=ext)
     variant_file = variants_row['filename']
 
     query = """SELECT filename
@@ -144,7 +144,8 @@ def haplotypes(genome_id, chrom_id, start_position, end_position, accessions=Non
     ref_row = cursor.fetchone()
     if ref_row is None:
         ext = {'genome_id': genome_id}
-        return connexion.problem(404, "Not Found", "Genome with id \'{0}\' not found".format(genome_id), ext=ext)
+        message = "Genome with id \'{0}\' not found".format(genome_id)
+        return connexion.problem(404, "Not Found", message, ext=ext)
 
     ref_file = ref_row['filename']
 
