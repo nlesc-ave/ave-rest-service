@@ -2,7 +2,6 @@ import os
 from urllib.parse import urlparse
 
 import click
-import requests
 from flask import current_app
 from werkzeug.contrib.profiler import ProfilerMiddleware
 
@@ -11,22 +10,25 @@ from .db import get_db, init_db
 from .features import features_2_whoosh
 from .genes import genes_2_whoosh
 from .register import validate_data
+from .version import __version__
 
 
 @click.group()
+@click.version_option(__version__)
 def cli():
     pass
 
 
 @click.command()
+@click.option('--port', '-p', help='TCP port to bind to', default=8080)
 @click.option('--debug', help='Enable debug mode', is_flag=True)
 @click.option('--profiler', help='Enable profiler mode', is_flag=True)
-def run(debug=False, profiler=False):
+def run(port, debug=False, profiler=False):
     """Run web service"""
     if profiler:
         app.config['PROFILE'] = True
         app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[30])
-    connexion_app.run(port=8080, debug=debug)
+    connexion_app.run(port=port, debug=debug)
 
 
 @click.command()
