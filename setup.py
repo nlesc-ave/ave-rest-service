@@ -1,16 +1,21 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 exec(open('avedata/version.py').read())
 
 setup(
     name='avedata',
-    packages=['avedata'],
+    packages=find_packages(),
     version=__version__,
     include_package_data=True,
     install_requires=[
         'flask',
         'click',
-        'connexion'
+        'connexion',
+        'whoosh',
+        'pybedtools',
+        'cyvcf2',
+        'numpy',
+        'scipy',
     ],
     package_data={
       'avedata': ['schema.sql', 'swagger.yml']

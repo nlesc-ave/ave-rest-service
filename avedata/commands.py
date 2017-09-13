@@ -1,16 +1,14 @@
-import os
-from urllib.parse import urlparse
-
 import click
 from flask import current_app
 from werkzeug.contrib.profiler import ProfilerMiddleware
 
-from .avedata import connexion_app, app
+from .app import connexion_app, app
 from .db import get_db, init_db
 from .features import features_2_whoosh
 from .genes import genes_2_whoosh
 from .register import validate_data
 from .version import __version__
+from .whoosh import get_woosh_dir
 
 
 @click.group()
@@ -52,26 +50,15 @@ def register(species, genome, datatype, filename):
         # commit database updates
         db.commit()
         # if gff file is registered import featur info into features table
+        whoosh_base_dir = current_app.config['WHOOSH_BASE_DIR']
         if datatype == "features":
-            whoosh_dir = get_woosh_dir(genome + '-features')
+            whoosh_dir = get_woosh_dir(genome + '-features', whoosh_base_dir)
             features_2_whoosh(filename, whoosh_dir)
         if datatype == 'genes':
-            whoosh_dir = get_woosh_dir(filename)
+            whoosh_dir = get_woosh_dir(filename, whoosh_base_dir)
             genes_2_whoosh(filename, whoosh_dir)
 
         print("New datafile has been registered.")
-
-
-def get_woosh_dir(url):
-    """
-    Based on the bigbed url and base whoosh directory
-    from settings generate the path for whoosh directory for index of this bed file
-    """
-    path = urlparse(url).path
-    filename = path.split('/')[-1]
-    whoosh_base_dir = current_app.config['WHOOSH_BASE_DIR']
-    whoosh_dir = os.path.join(whoosh_base_dir, filename)
-    return whoosh_dir
 
 
 @click.command()

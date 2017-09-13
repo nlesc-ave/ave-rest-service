@@ -1,1 +1,2 @@
 include avedata/schema.sql
+include avedata/swagger.yml

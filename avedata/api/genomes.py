@@ -1,12 +1,13 @@
 import connexion
 from flask import current_app
+
 from ..db import get_db
 from ..features import featurebb2label, find_features
+from ..genes import find_genes
 from ..sequence import get_chrominfo
 from ..variants import get_accessions_list, AccessionsLookupError
 from ..variants import get_haplotypes
-from ..commands import get_woosh_dir
-from ..genes import find_genes
+from ..whoosh import get_woosh_dir
 
 
 def get(genome_id):
@@ -176,7 +177,8 @@ def gene_search(genome_id, query):
     genes_file = row['filename']
 
     # then we'll find out what is the whoosh path for index of this bigbed file
-    whoosh_dir = get_woosh_dir(genes_file)
+    whoosh_base_dir = current_app.config['WHOOSH_BASE_DIR']
+    whoosh_dir = get_woosh_dir(genes_file, whoosh_base_dir)
     return find_genes(whoosh_dir, query)
 
 
@@ -194,5 +196,6 @@ def feature_search(genome_id, query):
         ext = {'genome_id': genome_id}
         return connexion.problem(404, "Not Found", "Genome with id \'{0}\' not found".format(genome_id), ext=ext)
 
-    whoosh_dir = get_woosh_dir(genome_id + '-features')
+    whoosh_base_dir = current_app.config['WHOOSH_BASE_DIR']
+    whoosh_dir = get_woosh_dir(genome_id + '-features', whoosh_base_dir)
     return find_features(whoosh_dir, query)

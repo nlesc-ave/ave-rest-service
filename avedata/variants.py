@@ -10,7 +10,7 @@ import scipy.cluster.hierarchy as hcl
 import scipy.cluster
 from Levenshtein import hamming
 
-from avedata.sequence import get_sequence
+from .sequence import get_sequence
 
 
 def scipyclust2json(clusters, labels):

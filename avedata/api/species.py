@@ -1,6 +1,7 @@
+import urllib
+
 from ..db import get_db
 from .genomes import get as get_genome
-import urllib
 
 
 def all():

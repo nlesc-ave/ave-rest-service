@@ -168,7 +168,7 @@ The above command will run a single threaded low performance web server.
 
 Use [gunicorn](http://gunicorn.org/) to run in production with
 ```bash
-gunicorn -w 4 --threads 2 -t 60 avedata.avedata:app
+gunicorn -w 4 --threads 2 -t 60 avedata.app:app
 ```
 
 ## Deploy using Docker
