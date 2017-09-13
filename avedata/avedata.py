@@ -3,6 +3,7 @@ from urllib.parse import urlparse
 
 import connexion
 from flask_cors import CORS
+from pkg_resources import resource_filename
 
 from .version import __version__
 
@@ -31,4 +32,5 @@ def spec_config():
     return conf
 
 
-connexion_app.add_api('swagger.yml', arguments=spec_config())
+swagger_file = resource_filename(__name__, 'swagger.yml')
+connexion_app.add_api(swagger_file, arguments=spec_config())

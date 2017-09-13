@@ -12,6 +12,9 @@ setup(
         'click',
         'connexion'
     ],
+    package_data={
+      'avedata': ['schema.sql', 'swagger.yml']
+    },
     entry_points='''
         [console_scripts]
         avedata=avedata.commands:cli

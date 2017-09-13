@@ -1,6 +1,8 @@
-from flask import current_app, g
 import sqlite3
 import os
+
+from pkg_resources import resource_string
+from flask import current_app, g
 
 
 def connect_db():
@@ -12,8 +14,8 @@ def connect_db():
 
 def init_db():
     db = connect_db()
-    with current_app.open_resource('schema.sql', mode='r') as f:
-        db.cursor().executescript(f.read())
+    sql = resource_string(__name__, 'schema.sql').decode('utf8')
+    db.cursor().executescript(sql)
     db.commit()
     return db
 
@@ -28,10 +30,3 @@ def get_db():
         else:
             g.sqlite_db = connect_db()
     return g.sqlite_db
-
-
-# @current_app.teardown_appcontext
-# def close_db(error):
-#     """Closes the database at the end of the request."""
-#     if hasattr(g, 'sqlite_db'):
-#         g.sqlite_db.close()

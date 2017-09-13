@@ -8,7 +8,7 @@
 Serving variant, annotation and genome data for AVE visualisation.
 
 ## REST API
-[swagger UI](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/nlesc-ave/ave-rest-service/master/swagger.yml)
+[swagger UI](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/nlesc-ave/ave-rest-service/master/avedata/swagger.yml)
 
 ## INSTALL
 
