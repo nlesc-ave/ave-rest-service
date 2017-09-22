@@ -5,9 +5,10 @@
 [![SonarCloud Coverage](https://sonarcloud.io/api/badges/measure?key=ave-rest-service&metric=coverage)](https://sonarcloud.io/component_measures/domain/Coverage?id=ave-rest-service)
 [![Docker Automated buil](https://img.shields.io/docker/automated/ave2/allelic-variation-explorer.svg)](https://hub.docker.com/r/ave2/allelic-variation-explorer/)
 
-Serving variant, annotation and genome data for AVE visualisation.
+Serving variant, annotation and genome data for [AVE visualisation](https://github.com/nlesc-ave/ave-app).
 
 ## REST API
+
 [swagger UI](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/nlesc-ave/ave-rest-service/master/avedata/swagger.yml)
 
 ## INSTALL
@@ -170,6 +171,20 @@ Use [gunicorn](http://gunicorn.org/) to run in production with
 ```bash
 gunicorn -w 4 --threads 2 -t 60 avedata.app:app
 ```
+
+## Deploy on bare metal/virtual machine
+
+A deployment without Docker requires the following parts:
+1. a running ave rest service, see instructions in previous chapter
+2. the [ave application](https://bintray.com/nlesc-ave/ave/ave-app/latest#files) distribution.
+3. a directory with *.2bit and *.bb (bigbed) data files that must be reachable by web browsers, not required if data files are hosted on another web server.
+4. a running [NGINX web server](http://nginx.org/), to host the ave application, data files and reverse proxy the service.
+
+An example config file for the web server is available at `./nginx.conf`.
+An [ave application distribution](https://bintray.com/nlesc-ave/ave/ave-app/latest#files) must be extracted in the root (http://&lt;somehost&gt;/) of the web server.
+The web server must be configured to proxy requests incoming at `/api` to be forwarded to the service.
+
+See the `./Dockerfile` file for commands how to to setup ave2 on a Debian based OS.
 
 ## Deploy using Docker
 
