@@ -176,15 +176,19 @@ gunicorn -w 4 --threads 2 -t 60 avedata.app:app
 
 A deployment without Docker requires the following parts:
 1. a running ave rest service, see instructions in previous chapter
-2. the [ave application](https://bintray.com/nlesc-ave/ave/ave-app/latest#files) distribution.
-3. a directory with *.2bit and *.bb (bigbed) data files that must be reachable by web browsers, not required if data files are hosted on another web server.
-4. a running [NGINX web server](http://nginx.org/), to host the ave application, data files and reverse proxy the service.
+2. extracted [ave application](https://bintray.com/nlesc-ave/ave/ave-app/latest#files) distribution, which is the the web-based user interface.
+3. a directory with *.2bit and *.bb (bigbed) data files, not required if data files are already hosted on another web server.
+4. a running [NGINX web server](http://nginx.org/)
+
+The NGINX web server should be configured with the following:
+
+* The [ave application](https://bintray.com/nlesc-ave/ave/ave-app/latest#files) distribution must be extracted into the root of the web server.
+* Proxy requests incoming at `http://<somehost>/api/` to the service.
+* Host the directory with data files on for example `http://<somehost>/data/`, and the `avedata register ...` commands should use `http://&lt;somehost&gt/data/<somefile.(2bit|bb)>` as urls
 
 An example config file for the web server is available at `./nginx.conf`.
-An [ave application distribution](https://bintray.com/nlesc-ave/ave/ave-app/latest#files) must be extracted in the root (http://&lt;somehost&gt;/) of the web server.
-The web server must be configured to proxy requests incoming at `/api` to be forwarded to the service.
 
-See the `./Dockerfile` file for commands how to to setup ave2 on a Debian based OS.
+See the `./Dockerfile` file for commands how to to setup ave on a Debian based OS.
 
 ## Deploy using Docker
 
