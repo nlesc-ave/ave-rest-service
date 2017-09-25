@@ -12,7 +12,14 @@ ADD environment.yml /app/environment.yml
 ENV PATH /opt/conda/envs/ave2/bin:$PATH
 
 RUN conda update conda -y && \
-    conda env create -f environment.yml
+    conda env create -f environment.yml && \
+    # Anaconda twoBitInfo, twoBitToFa and bigBedInfo can not handle https, download latest binary from source
+    curl -o /opt/conda/envs/ave2/bin/twoBitInfo http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/twoBitInfo && \
+    chmod +x /opt/conda/envs/ave2/bin/twoBitInfo && \
+    curl -o /opt/conda/envs/ave2/bin/twoBitToFa http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/twoBitToFa && \
+    chmod +x /opt/conda/envs/ave2/bin/twoBitToFa && \
+    curl -o /opt/conda/envs/ave2/bin/bigBedInfo http://hgdownload.cse.ucsc.edu/admin/exe/linux.x86_64/bigBedInfo && \
+    chmod +x /opt/conda/envs/ave2/bin/bigBedInfo
 
 ADD . /app
 

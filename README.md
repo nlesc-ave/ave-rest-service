@@ -220,6 +220,17 @@ To make Swagger UI api calls the EXTERNAL_URL environment variable is needed,
 because the Python web service is behind NGINX reverse proxy, causing the url where the api is available on to change,
 the EXTERNAL_URL allows Swagger UI to use the externally available api endpoint.
 
+### Encrypted
+
+The Docker container uses http, to use https, a reverse proxy with Let's Encrypt certificate can be put infront of the Docker container.
+
+The Docker container must be run with an external url of `https://$(hostname)` format and a port which is not 443. 
+
+Configure a web server like NGINX to server https on port 443 and proxy all requests to the container.
+Use [Certbot](https://certbot.eff.org/) to generate the certificate pair and configure the web server. 
+
+See example server conf in commented out block in `./nginx.conf` file.
+
 ### Register data
 
 Example commands using files for tomato in `data/tomato/SL.2.40` directory, namely:
