@@ -128,7 +128,9 @@ def expected_genome():
             'feature_tracks': [{'label': 'A-AFFY-87', 'url': 'tests/data/A-AFFY-87.bb'}],
             'gene_track': 'tests/data/S_lycopersicum_May_2012.chr6-0-100000.bb',
             'genome_id': 'SL.2.40',
-            'reference': 'tests/data/S_lycopersicum_chromosomes.2.40.chr6-0-100000.2bit'}
+            'reference': 'tests/data/S_lycopersicum_chromosomes.2.40.chr6-0-100000.2bit',
+            'species': {'name': 'Solanum Lycopersicum',
+                        'species_id': 'Solanum%20Lycopersicum'}}
 
 
 def test_get_genomes_of_species(myapp, expected_genome):

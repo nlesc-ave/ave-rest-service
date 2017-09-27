@@ -1,5 +1,6 @@
 import sqlite3
 import os
+import urllib
 
 from pkg_resources import resource_string
 from flask import current_app, g
@@ -81,30 +82,23 @@ def genome_of_filename(filename):
     return c.fetchone()[0]
 
 
-def genome_filename(genome_id):
+def get_filename(genome_id, datatype):
     db = get_db()
-    query = """SELECT filename
-                   FROM metadata
-                   WHERE genome=? AND datatype='2bit'"""
+    query = 'SELECT filename FROM metadata WHERE genome=? AND datatype=?'
     cursor = db.cursor()
-    cursor.execute(query, (genome_id,))
+    cursor.execute(query, (genome_id, datatype,))
     result = cursor.fetchone()
     if result is None:
         raise LookupError()
     return result[0]
+
+
+def genome_filename(genome_id):
+    return get_filename(genome_id, '2bit')
 
 
 def variants_filename(genome_id):
-    db = get_db()
-    query = """SELECT filename
-               FROM metadata
-               WHERE genome=? AND datatype='variants'"""
-    cursor = db.cursor()
-    cursor.execute(query, (genome_id, ))
-    result = cursor.fetchone()
-    if result is None:
-        raise LookupError()
-    return result[0]
+    return get_filename(genome_id, 'variants')
 
 
 def feature_urls(genome_id):
@@ -120,17 +114,7 @@ def feature_urls(genome_id):
 
 
 def gene_url(genome_id):
-    db = get_db()
-    query = """SELECT filename
-               FROM metadata
-               WHERE genome=? AND datatype='genes'"""
-    cursor = db.cursor()
-    cursor.execute(query, (genome_id, ))
-    result = cursor.fetchone()
-    if result is None:
-        raise LookupError()
-    filename = result[0]
-    return filename
+    return get_filename(genome_id, 'genes')
 
 
 def species_names():
@@ -151,3 +135,26 @@ def genomes_of_species(species_id):
     for row in cursor.execute(query, (species_id, )):
         genome_ids.append(row['genome'])
     return genome_ids
+
+
+def build_species(name):
+    species_id = urllib.parse.quote(name)
+    return {'name': name, "species_id": species_id}
+
+
+def all_species():
+    species_list = []
+    for name in species_names():
+        species_list.append(build_species(name))
+    return species_list
+
+
+def species_of_genome(genome_id):
+    db = get_db()
+    query = "SELECT species FROM metadata WHERE genome=? AND datatype='2bit'"
+    cursor = db.cursor()
+    cursor.execute(query, (genome_id, ))
+    result = cursor.fetchone()
+    if result is None:
+        raise LookupError()
+    return build_species(result[0])

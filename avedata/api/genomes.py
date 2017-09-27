@@ -1,7 +1,7 @@
 import connexion
 from flask import current_app
 
-from ..db import genome_filename, variants_filename, feature_urls, gene_url
+from ..db import genome_filename, variants_filename, feature_urls, gene_url, species_of_genome
 from ..features import featurebb2label, find_features
 from ..genes import find_genes
 from ..sequence import get_chrominfo, InvalidChromosome
@@ -18,6 +18,7 @@ def get(genome_id):
             'feature_tracks': feature_tracks(genome_id),
             'accessions': accession_list(genome_id),
             'reference': genome_filename(genome_id),
+            'species': species_of_genome(genome_id)
         }
         try:
             genome_info['gene_track'] = gene_url(genome_id)
