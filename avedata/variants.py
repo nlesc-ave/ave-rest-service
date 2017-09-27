@@ -2,7 +2,6 @@ import uuid
 from itertools import combinations
 from collections import defaultdict
 from functools import reduce
-from copy import deepcopy
 
 from cyvcf2 import VCF
 import numpy as np
@@ -110,6 +109,8 @@ def get_variants(variant_file, chrom_id, start_position, end_position, accession
             }
             variants[variant_index] = variant
             genotypes[variant_index] = {}
+            formats = [f for f in v.FORMAT if f != 'GT']  # exclude genotype it is parsed separately
+            sample_cols = {f: v.format(f) for f in formats}
             for idx, (acc, genotype) in enumerate(zip(all_accessions, v.genotypes)):
                 if acc not in accessions:
                     continue
@@ -124,8 +125,8 @@ def get_variants(variant_file, chrom_id, start_position, end_position, accession
                         'accession': acc,
                         'genotype': str(genotype[:2]),
                     }
-                    for f in v.FORMAT[1:]:
-                        genotype4acc[f] = str(v.format(f)[idx])
+                    for f in formats:
+                        genotype4acc[f] = str(sample_cols[f][idx].tolist())
                     genotypes[variant_index][acc] = genotype4acc
 
     vcf.close()
