@@ -56,3 +56,11 @@ def find_features(whoosh_dir, query):
         whoosh_results = searcher.search(whoosh_query)
         ix.close()
         return [map_hit(r) for r in whoosh_results]
+
+
+def drop_track(track, whoosh_dir):
+    ix = open_dir(whoosh_dir)
+    with ix.writer() as writer:
+        writer.delete_by_term('track', track)
+        writer.commit()
+    ix.close()

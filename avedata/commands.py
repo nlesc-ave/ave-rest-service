@@ -1,10 +1,13 @@
+import os
+from shutil import rmtree
+
 import click
 from flask import current_app
 from werkzeug.contrib.profiler import ProfilerMiddleware
 
 from .app import connexion_app, app
-from .db import get_db, init_db
-from .features import features_2_whoosh
+from .db import genome_of_filename, init_db, insert_file, delete_file, all_metas, is_genes, is_features
+from .features import features_2_whoosh, featurebb2label, drop_track
 from .genes import genes_2_whoosh
 from .register import validate_data
 from .version import __version__
@@ -42,33 +45,28 @@ def register(species, genome, datatype, filename):
     validate_data(filename, datatype)
 
     with app.app_context():
-        db = get_db()
-        query = """INSERT INTO metadata (species, genome, datatype, filename)
-                   VALUES (?,?,?,?)"""
-        cursor = db.cursor()
-        cursor.execute(query, (species, genome, datatype, filename))
-        # commit database updates
-        db.commit()
-        # if gff file is registered import featur info into features table
-        whoosh_base_dir = current_app.config['WHOOSH_BASE_DIR']
-        if datatype == "features":
-            whoosh_dir = get_woosh_dir(genome + '-features', whoosh_base_dir)
-            features_2_whoosh(filename, whoosh_dir)
-        if datatype == 'genes':
-            whoosh_dir = get_woosh_dir(filename, whoosh_base_dir)
-            genes_2_whoosh(filename, whoosh_dir)
-
+        register_file(datatype, filename, genome, species)
         click.echo("New datafile has been registered.")
+
+
+def register_file(datatype, filename, genome, species):
+    insert_file(datatype, filename, genome, species)
+    # if gff file is registered import featur info into features table
+    whoosh_base_dir = current_app.config['WHOOSH_BASE_DIR']
+    if datatype == "features":
+        whoosh_dir = get_woosh_dir(genome + '-features', whoosh_base_dir)
+        features_2_whoosh(filename, whoosh_dir)
+    if datatype == 'genes':
+        whoosh_dir = get_woosh_dir(filename, whoosh_base_dir)
+        genes_2_whoosh(filename, whoosh_dir)
 
 
 @cli.command()
 def list():
     """List of registered files/urls in the database"""
     with app.app_context():
-        c = get_db().cursor()
-        sql = 'SELECT species, genome, datatype, filename FROM metadata'
         print("species\tgenome\tdatatype\tfilename")
-        for row in c.execute(sql):
+        for row in all_metas():
             print("\t".join(row))
 
 
@@ -77,13 +75,31 @@ def list():
 def deregister(filename):
     """Remove a filename or url from the database"""
     with app.app_context():
-        c = get_db().cursor()
-        sql = 'DELETE FROM metadata WHERE filename=?'
-        c.execute(sql, (filename,))
+        whoosh_base_dir = current_app.config['WHOOSH_BASE_DIR']
+        if is_genes(filename):
+            whoosh_dir = get_woosh_dir(filename, whoosh_base_dir)
+            rmtree(whoosh_dir)
+        elif is_features(filename):
+            genome = genome_of_filename(filename)
+            whoosh_dir = get_woosh_dir(genome + '-features', whoosh_base_dir)
+            track = featurebb2label(filename)
+            drop_track(track, whoosh_dir)
+        delete_file(filename)
         click.echo("Deregistered entry")
 
 
 @cli.command()
-def initdb():
+def init_db():
+    """Initializes database"""
     with app.app_context():
         init_db()
+        click.echo("Database initialized")
+
+
+@cli.command()
+def drop_db():
+    """Drops database"""
+    with app.app_context():
+        dbfn = current_app.config['DATABASE']
+        os.remove(dbfn)
+        click.echo("Database removed")

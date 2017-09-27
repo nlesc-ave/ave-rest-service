@@ -36,7 +36,7 @@ def myapp(tmpdir):
 def test_get_species(myapp):
     with myapp.test_request_context():
         setup_database()
-        response = species.all()
+        response = species.search()
         assert response == [{'name': 'Solanum Lycopersicum', 'species_id': 'Solanum%20Lycopersicum'}]
 
 

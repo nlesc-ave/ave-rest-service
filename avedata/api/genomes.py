@@ -1,7 +1,7 @@
 import connexion
 from flask import current_app
 
-from ..db import get_db
+from ..db import genome_filename, variants_filename, feature_urls, gene_url
 from ..features import featurebb2label, find_features
 from ..genes import find_genes
 from ..sequence import get_chrominfo, InvalidChromosome
@@ -17,11 +17,14 @@ def get(genome_id):
             'chromosomes': chromosomes(genome_id),
             'feature_tracks': feature_tracks(genome_id),
             'accessions': accession_list(genome_id),
-            'reference': two_bit_uri(genome_id),
+            'reference': genome_filename(genome_id),
         }
-        gene_track = gene_track_uri(genome_id)
-        if gene_track:
-            genome_info['gene_track'] = gene_track
+        try:
+            genome_info['gene_track'] = gene_url(genome_id)
+        except LookupError:
+            # gene_track is optional
+            pass
+
         return genome_info
     except LookupError:
         ext = {'genome_id': genome_id}
@@ -34,28 +37,13 @@ def chromosomes(genome_id):
         get list of chromosomes and fetch their 'chrom_id': len
         return [{'chrom_id': length},]
     """
-    db = get_db()
-    query = """SELECT filename
-               FROM metadata
-               WHERE genome=? AND datatype='2bit'"""
-    cursor = db.cursor()
-    cursor.execute(query, (genome_id, ))
-    result = cursor.fetchone()
-    if result is None:
-        raise LookupError()
-    filename = result[0]
+    filename = genome_filename(genome_id)
     return get_chrominfo(filename)
 
 
 def feature_tracks(genome_id):
-    db = get_db()
-    query = """SELECT filename
-               FROM metadata
-               WHERE genome=? AND datatype='features'"""
-    cursor = db.cursor()
     tracks = []
-    for row in cursor.execute(query, (genome_id, )):
-        url = row[0]
+    for url in feature_urls(genome_id):
         label = featurebb2label(url)
         track = {
             'label': label,
@@ -66,45 +54,8 @@ def feature_tracks(genome_id):
 
 
 def accession_list(genome_id):
-    db = get_db()
-    query = """SELECT filename
-               FROM metadata
-               WHERE genome=? AND datatype='variants'"""
-    cursor = db.cursor()
-    cursor.execute(query, (genome_id, ))
-    result = cursor.fetchone()
-    if result is None:
-        return []
-    filename = result[0]
+    filename = variants_filename(genome_id)
     return get_accessions_list(filename)
-
-
-def two_bit_uri(genome_id):
-    db = get_db()
-    query = """SELECT filename
-               FROM metadata
-               WHERE genome=? AND datatype='2bit'"""
-    cursor = db.cursor()
-    cursor.execute(query, (genome_id, ))
-    result = cursor.fetchone()
-    if result is None:
-        raise LookupError()
-    filename = result['filename']
-    return filename
-
-
-def gene_track_uri(genome_id):
-    db = get_db()
-    query = """SELECT filename
-               FROM metadata
-               WHERE genome=? AND datatype='genes'"""
-    cursor = db.cursor()
-    cursor.execute(query, (genome_id, ))
-    result = cursor.fetchone()
-    if result is None:
-        return None
-    filename = result['filename']
-    return filename
 
 
 def haplotypes(genome_id, chrom_id, start_position, end_position, accessions=None):
@@ -118,37 +69,23 @@ def haplotypes(genome_id, chrom_id, start_position, end_position, accessions=Non
         message = 'Requested range {0} is larger than maximum allowed range {1}'.format(requested_range, max_range)
         return connexion.problem(406, "Not Acceptable", message)
 
-    db = get_db()
     # to construct haplotypes, both:
     # variants from bcf file and
     # reference sequence from 2bit
     # are needed
-
-    query = """SELECT filename
-               FROM metadata
-               WHERE genome=? AND datatype='variants'"""
-    cursor = db.cursor()
-    cursor.execute(query, (genome_id, ))
-    variants_row = cursor.fetchone()
-    if variants_row is None:
+    try:
+        variant_file = variants_filename(genome_id)
+    except LookupError:
         ext = {'genome_id': genome_id}
         message = "Genome with id \'{0}\' contains no variants".format(genome_id)
         return connexion.problem(404, "Not Found", message, ext=ext)
-    variant_file = variants_row['filename']
 
-    query = """SELECT filename
-            FROM metadata
-            WHERE genome=?
-            AND datatype='2bit'"""
-    cursor = db.cursor()
-    cursor.execute(query, (genome_id, ))
-    ref_row = cursor.fetchone()
-    if ref_row is None:
+    try:
+        ref_file = genome_filename(genome_id)
+    except LookupError:
         ext = {'genome_id': genome_id}
         message = "Genome with id \'{0}\' not found".format(genome_id)
         return connexion.problem(404, "Not Found", message, ext=ext)
-
-    ref_file = ref_row['filename']
 
     if accessions is None:
         accessions = []
@@ -165,20 +102,11 @@ def haplotypes(genome_id, chrom_id, start_position, end_position, accessions=Non
 
 
 def gene_search(genome_id, query):
-    # first we need to mach all big bed files for this genome
-    # based on info in metadata sqlite table
-    db = get_db()
-    sql_query = """SELECT filename
-               FROM metadata
-               WHERE genome=? AND datatype='genes'"""
-    cursor = db.cursor()
-    cursor.execute(sql_query, (genome_id, ))
-    row = cursor.fetchone()
-    if row is None:
+    try:
+        genes_file = gene_url(genome_id)
+    except LookupError:
         ext = {'genome_id': genome_id}
-        return connexion.problem(404, "Not Found", "Genome with id \'{0}\' not found".format(genome_id), ext=ext)
-
-    genes_file = row['filename']
+        return connexion.problem(404, "Not Found", "Genes for genome with id \'{0}\' not found".format(genome_id), ext=ext)
 
     # then we'll find out what is the whoosh path for index of this bigbed file
     whoosh_base_dir = current_app.config['WHOOSH_BASE_DIR']
@@ -187,18 +115,9 @@ def gene_search(genome_id, query):
 
 
 def feature_search(genome_id, query):
-    # first we need to mach all big bed files for this genome
-    # based on info in metadata sqlite table
-    db = get_db()
-    sql_query = """SELECT filename
-               FROM metadata
-               WHERE genome=? AND datatype='features'"""
-    cursor = db.cursor()
-    cursor.execute(sql_query, (genome_id, ))
-    row = cursor.fetchone()
-    if row is None:
+    if not feature_urls(genome_id):
         ext = {'genome_id': genome_id}
-        return connexion.problem(404, "Not Found", "Genome with id \'{0}\' not found".format(genome_id), ext=ext)
+        return connexion.problem(404, "Not Found", "Features for genome with id \'{0}\' not found".format(genome_id), ext=ext)
 
     whoosh_base_dir = current_app.config['WHOOSH_BASE_DIR']
     whoosh_dir = get_woosh_dir(genome_id + '-features', whoosh_base_dir)

@@ -30,3 +30,124 @@ def get_db():
         else:
             g.sqlite_db = connect_db()
     return g.sqlite_db
+
+
+def insert_file(datatype, filename, genome, species):
+    db = get_db()
+    query = """INSERT INTO metadata (species, genome, datatype, filename)
+                       VALUES (?,?,?,?)"""
+    cursor = db.cursor()
+    cursor.execute(query, (species, genome, datatype, filename))
+    db.commit()
+
+
+def delete_file(filename):
+    db = get_db()
+    c = db.cursor()
+    sql = 'DELETE FROM metadata WHERE filename=?'
+    c.execute(sql, (filename,))
+    db.commit()
+
+
+def all_metas():
+    db = get_db()
+    c = db.cursor()
+    sql = 'SELECT species, genome, datatype, filename FROM metadata'
+    return c.execute(sql)
+
+
+def is_datatype(filename, datatype):
+    db = get_db()
+    c = db.cursor()
+    sql = 'SELECT 1 FROM metadata WHERE filename=? AND datatype=?'
+    c.execute(sql, (filename, datatype))
+    row = c.fetchone()
+    return row is not None and row[0] == '1'
+
+
+def is_genes(filename):
+    return is_datatype(filename, 'genes')
+
+
+def is_features(filename):
+    return is_datatype(filename, 'features')
+
+
+def genome_of_filename(filename):
+    db = get_db()
+    c = db.cursor()
+    sql = 'SELECT genome FROM metadata WHERE filename=?'
+    c.execute(sql, (filename, ))
+    return c.fetchone()[0]
+
+
+def genome_filename(genome_id):
+    db = get_db()
+    query = """SELECT filename
+                   FROM metadata
+                   WHERE genome=? AND datatype='2bit'"""
+    cursor = db.cursor()
+    cursor.execute(query, (genome_id,))
+    result = cursor.fetchone()
+    if result is None:
+        raise LookupError()
+    return result[0]
+
+
+def variants_filename(genome_id):
+    db = get_db()
+    query = """SELECT filename
+               FROM metadata
+               WHERE genome=? AND datatype='variants'"""
+    cursor = db.cursor()
+    cursor.execute(query, (genome_id, ))
+    result = cursor.fetchone()
+    if result is None:
+        raise LookupError()
+    return result[0]
+
+
+def feature_urls(genome_id):
+    db = get_db()
+    query = """SELECT filename
+                   FROM metadata
+                   WHERE genome=? AND datatype='features'"""
+    cursor = db.cursor()
+    urls = []
+    for row in cursor.execute(query, (genome_id,)):
+        urls.append(row[0])
+    return urls
+
+
+def gene_url(genome_id):
+    db = get_db()
+    query = """SELECT filename
+               FROM metadata
+               WHERE genome=? AND datatype='genes'"""
+    cursor = db.cursor()
+    cursor.execute(query, (genome_id, ))
+    result = cursor.fetchone()
+    if result is None:
+        raise LookupError()
+    filename = result[0]
+    return filename
+
+
+def species_names():
+    db = get_db()
+    query = "SELECT DISTINCT species FROM metadata"
+    cursor = db.cursor()
+    names = []
+    for row in cursor.execute(query):
+        names.append(row[0])
+    return names
+
+
+def genomes_of_species(species_id):
+    genome_ids = []
+    db = get_db()
+    query = "SELECT DISTINCT genome FROM metadata WHERE species=?"
+    cursor = db.cursor()
+    for row in cursor.execute(query, (species_id, )):
+        genome_ids.append(row['genome'])
+    return genome_ids

@@ -22,7 +22,7 @@ produces:
 paths:
   /species:
     get:
-      operationId: avedata.api.species.all
+      operationId: avedata.api.species.search
       summary: List of species
       description: |
         Fetch list of the species with available data.
