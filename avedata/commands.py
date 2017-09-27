@@ -17,7 +17,7 @@ def cli():
     pass
 
 
-@click.command()
+@cli.command()
 @click.option('--port', '-p', help='TCP port to bind to', default=8080)
 @click.option('--debug', help='Enable debug mode', is_flag=True)
 @click.option('--profiler', help='Enable profiler mode', is_flag=True)
@@ -29,7 +29,7 @@ def run(port, debug=False, profiler=False):
     connexion_app.run(port=port, debug=debug)
 
 
-@click.command()
+@cli.command()
 @click.option('--species', help='Species name')
 @click.option('--genome', help='Name of the reference genome')
 @click.option('--datatype', help='Type of the data',
@@ -58,21 +58,32 @@ def register(species, genome, datatype, filename):
             whoosh_dir = get_woosh_dir(filename, whoosh_base_dir)
             genes_2_whoosh(filename, whoosh_dir)
 
-        print("New datafile has been registered.")
+        click.echo("New datafile has been registered.")
 
 
-@click.command()
+@cli.command()
+def list():
+    """List of registered files/urls in the database"""
+    with app.app_context():
+        c = get_db().cursor()
+        sql = 'SELECT species, genome, datatype, filename FROM metadata'
+        print("species\tgenome\tdatatype\tfilename")
+        for row in c.execute(sql):
+            print("\t".join(row))
+
+
+@cli.command()
+@click.argument('filename')
+def deregister(filename):
+    """Remove a filename or url from the database"""
+    with app.app_context():
+        c = get_db().cursor()
+        sql = 'DELETE FROM metadata WHERE filename=?'
+        c.execute(sql, (filename,))
+        click.echo("Deregistered entry")
+
+
+@cli.command()
 def initdb():
     with app.app_context():
         init_db()
-
-
-@click.command()
-def dropdb():
-    click.echo('Dropped the database')
-
-
-cli.add_command(run)
-cli.add_command(register)
-cli.add_command(dropdb)
-cli.add_command(initdb)
