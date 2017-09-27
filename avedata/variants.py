@@ -121,7 +121,7 @@ def get_variants(variant_file, chrom_id, start_position, end_position, accession
                         'genotype': str(genotype[:2]),
                     }
                     for f in v.FORMAT[1:]:
-                        genotype[f] = str(v.format(f)[idx])
+                        genotype[f] = str(v.format(f)[idx].tolist())
                     variant['genotypes'].append(genotype)
             variants.append(variant)
     return variants, sequences, accessions
