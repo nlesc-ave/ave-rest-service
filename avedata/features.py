@@ -50,7 +50,7 @@ def map_hit(r):
 
 
 def find_features(whoosh_dir, query):
-    ix = open_dir(whoosh_dir)
+    ix = open_dir(whoosh_dir, readonly=True)
     with ix.searcher() as searcher:
         whoosh_query = MultifieldParser(["name", "attributes"], ix.schema).parse(query)
         whoosh_results = searcher.search(whoosh_query)
@@ -62,5 +62,4 @@ def drop_track(track, whoosh_dir):
     ix = open_dir(whoosh_dir)
     with ix.writer() as writer:
         writer.delete_by_term('track', track)
-        writer.commit()
     ix.close()

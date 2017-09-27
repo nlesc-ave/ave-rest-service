@@ -1,5 +1,6 @@
 import pytest
 from click.testing import CliRunner
+from whoosh.index import open_dir
 
 from avedata.commands import cli
 from avedata.app import app
@@ -132,8 +133,8 @@ def test_register_genes(tmpdir):
 
     assert 'New datafile has been registered.' in result.output
     assert result.exit_code == 0
-    whoosh_dir = tmpdir.join('S_lycopersicum_May_2012.chr6-0-100000.bb')
-    assert whoosh_dir.ensure_dir()
+    whoosh_dir = tmpdir.join('S_lycopersicum_May_2012.chr6-0-100000.bb').strpath
+    assert whoosh_doc_count(whoosh_dir) == 9
     list_result = cli_runner.invoke(cli, ['list'])
     assert fn in list_result.output
 
@@ -154,8 +155,8 @@ def test_register_features(tmpdir):
 
     assert 'New datafile has been registered.' in result.output
     assert result.exit_code == 0
-    whoosh_dir = tmpdir.join('SL.2.40-features')
-    assert whoosh_dir.ensure_dir()
+    whoosh_dir = tmpdir.join('SL.2.40-features').strpath
+    assert whoosh_doc_count(whoosh_dir) == 81
     list_result = cli_runner.invoke(cli, ['list'])
     assert fn in list_result.output
 
@@ -180,6 +181,8 @@ def test_deregister_genes(tmpdir):
 
     assert 'Deregistered entry' in result.output
     assert result.exit_code == 0
+    whoosh_dir_is_removed = 'S_lycopersicum_May_2012.chr6-0-100000.bb' not in set(tmpdir.listdir())
+    assert whoosh_dir_is_removed
 
 
 def test_deregister_features(tmpdir):
@@ -202,3 +205,13 @@ def test_deregister_features(tmpdir):
 
     assert 'Deregistered entry' in result.output
     assert result.exit_code == 0
+    whoosh_dir = tmpdir.join('SL.2.40-features').strpath
+    assert whoosh_doc_count(whoosh_dir) == 0
+
+
+def whoosh_doc_count(whoosh_dir):
+    ix = open_dir(whoosh_dir)
+    with ix.searcher() as searcher:
+        doc_count = searcher.doc_count()
+    ix.close()
+    return doc_count

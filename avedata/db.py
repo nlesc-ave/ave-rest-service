@@ -63,7 +63,7 @@ def is_datatype(filename, datatype):
     sql = 'SELECT 1 FROM metadata WHERE filename=? AND datatype=?'
     c.execute(sql, (filename, datatype))
     row = c.fetchone()
-    return row is not None and row[0] == '1'
+    return row is not None
 
 
 def is_genes(filename):
