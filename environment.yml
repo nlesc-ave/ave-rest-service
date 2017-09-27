@@ -28,7 +28,7 @@ dependencies:
 - conda-forge::sqlite=3.13.0=1
 - conda-forge::wheel=0.29.0=py35_0
 - conda-forge::python-levenshtein=0.12.0
-- conda-forge::simplejson=3.1
+- conda-forge::simplejson=3.11.1
 - pip:
   - click==6.7
   - connexion==1.1.9
