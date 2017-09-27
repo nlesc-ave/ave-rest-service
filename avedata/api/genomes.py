@@ -4,7 +4,7 @@ from flask import current_app
 from ..db import get_db
 from ..features import featurebb2label, find_features
 from ..genes import find_genes
-from ..sequence import get_chrominfo
+from ..sequence import get_chrominfo, InvalidChromosome
 from ..variants import get_accessions_list, AccessionsLookupError
 from ..variants import get_haplotypes
 from ..whoosh import get_woosh_dir
@@ -158,6 +158,10 @@ def haplotypes(genome_id, chrom_id, start_position, end_position, accessions=Non
     except AccessionsLookupError as e:
         ext = {'genome_id': genome_id, 'accessions': list(e.accessions)}
         return connexion.problem(404, "Not Found", "Some accessions not found", ext=ext)
+    except InvalidChromosome:
+        ext = {'genome_id': genome_id, 'chrom_id': chrom_id}
+        msg = "Chromosome '{chrom_id}' no found in '{genome_id}' genome".format(**ext)
+        return connexion.problem(404, "Not Found", msg, ext=ext)
 
 
 def gene_search(genome_id, query):

@@ -1,5 +1,12 @@
 from os import linesep
-from subprocess import check_output
+from subprocess import check_output, CalledProcessError, PIPE
+
+
+class InvalidChromosome(LookupError):
+    def __init__(self, file_name, chrom_id):
+        super().__init__()
+        self.file_name = file_name
+        self.chrom_id = chrom_id
 
 
 def get_chrominfo(filename):
@@ -37,7 +44,13 @@ def get_sequence(filename, chrom_id, start_position, end_position):
         filename,
         'stdout'
     )
-    fasta = check_output(args).decode('ascii')
-    header = '>' + chrom_id + ':' + \
-        str(start_position) + '-' + str(end_position) + linesep
-    return fasta.replace(header, '').replace(linesep, '')
+    try:
+        fasta = check_output(args, stderr=PIPE).decode('ascii')
+        header = '>' + chrom_id + ':' + \
+            str(start_position) + '-' + str(end_position) + linesep
+        return fasta.replace(header, '').replace(linesep, '')
+    except CalledProcessError as e:
+        if 'is not in' in e.stderr.decode('ascii'):
+            raise InvalidChromosome(filename, chrom_id)
+        else:
+            raise e
