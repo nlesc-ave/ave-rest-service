@@ -23,7 +23,7 @@ RUN conda update conda -y && \
 
 ADD . /app
 
-RUN python setup.py install && \
+RUN python setup.py develop && \
     cp settings.docker.cfg settings.cfg && \
     cp nginx.conf /etc/nginx/sites-enabled/default && \
     cd /var/www/html && \

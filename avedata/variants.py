@@ -2,7 +2,6 @@ import uuid
 from itertools import combinations
 from collections import defaultdict
 from functools import reduce
-from copy import deepcopy
 
 from cyvcf2 import VCF
 import numpy as np
@@ -152,8 +151,18 @@ def add_variants2haplotypes(haplotypes, variants):
                 if g['accession'] in haplotype['accessions']:
                     genotypes.append(g)
             if len(genotypes):
-                haplotype_variant = deepcopy(v)
-                haplotype_variant['genotypes'] = genotypes
+                haplotype_variant = {
+                    'chrom': v['chrom'],
+                    'pos': v['pos'],
+                    'id': v['id'],
+                    'ref': v['ref'],
+                    'alt': v['alt'],
+                    'alt_ambiguous_nucleotide': v['alt_ambiguous_nucleotide'],
+                    'qual': v['qual'],
+                    'filter': v['filter'],
+                    'info': v['info'],
+                    'genotypes': genotypes
+                }
                 haplotype['variants'].append(haplotype_variant)
 
 

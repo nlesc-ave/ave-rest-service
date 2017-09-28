@@ -1,5 +1,6 @@
 import connexion
-from flask import current_app
+from flask import current_app, Response
+import simplejson
 
 from ..db import genome_filename, variants_filename, feature_urls, gene_url, species_of_genome
 from ..features import featurebb2label, find_features
@@ -92,7 +93,8 @@ def haplotypes(genome_id, chrom_id, start_position, end_position, accessions=Non
         accessions = []
 
     try:
-        return get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_position, accessions)
+        res = get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_position, accessions)
+        return Response(simplejson.dumps(res), status=200, mimetype='application/json')
     except AccessionsLookupError as e:
         ext = {'genome_id': genome_id, 'accessions': list(e.accessions)}
         return connexion.problem(404, "Not Found", "Some accessions not found", ext=ext)

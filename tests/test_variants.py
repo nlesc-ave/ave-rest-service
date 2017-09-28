@@ -527,9 +527,15 @@ class Test_add_variants2haplotypes(object):
                 'accession': 'acc1',
                 'genotype': '[1, 1]'
             }],
+            'chrom': 'chr1',
+            'id': None,
+            'alt_ambiguous_nucleotide': 'T',
+            'qual': 1.234,
+            'filter': None,
+            'info': {"MQ": 57, "AF1": 1.0, "CI95": [1.0, 1.0], "SF": "62", "AC": 2, "FQ": -111.0, "DP": 30, "DP4": [0, 0, 9, 19], "AN": 2},
             'pos': 38496,
             'ref': 'G',
-            'alt': 'T'
+            'alt': ['T']
         }]
 
         add_variants2haplotypes(haplotypes, variants)
@@ -542,9 +548,15 @@ class Test_add_variants2haplotypes(object):
                     'accession': 'acc1',
                     'genotype': '[1, 1]'
                 }],
+                'chrom': 'chr1',
+                'id': None,
+                'alt_ambiguous_nucleotide': 'T',
+                'qual': 1.234,
+                'filter': None,
+                'info': {"MQ": 57, "AF1": 1.0, "CI95": [1.0, 1.0], "SF": "62", "AC": 2, "FQ": -111.0, "DP": 30, "DP4": [0, 0, 9, 19], "AN": 2},
                 'pos': 38496,
                 'ref': 'G',
-                'alt': 'T'
+                'alt': ['T']
             }]
         }]
         assert haplotypes == expected
@@ -562,9 +574,15 @@ class Test_add_variants2haplotypes(object):
                 'accession': 'acc2',
                 'genotype': '[1, 1]'
             }],
+            'chrom': 'chr1',
+            'id': None,
+            'alt_ambiguous_nucleotide': 'T',
+            'qual': 1.234,
+            'filter': None,
+            'info': {"MQ": 57, "AF1": 1.0, "CI95": [1.0, 1.0], "SF": "62", "AC": 2, "FQ": -111.0, "DP": 30, "DP4": [0, 0, 9, 19], "AN": 2},
             'pos': 38496,
             'ref': 'G',
-            'alt': 'T'
+            'alt': ['T']
         }]
 
         add_variants2haplotypes(haplotypes, variants)
@@ -577,9 +595,15 @@ class Test_add_variants2haplotypes(object):
                     'accession': 'acc1',
                     'genotype': '[1, 1]'
                 }],
+                'chrom': 'chr1',
+                'id': None,
+                'alt_ambiguous_nucleotide': 'T',
+                'qual': 1.234,
+                'filter': None,
+                'info': {"MQ": 57, "AF1": 1.0, "CI95": [1.0, 1.0], "SF": "62", "AC": 2, "FQ": -111.0, "DP": 30, "DP4": [0, 0, 9, 19], "AN": 2},
                 'pos': 38496,
                 'ref': 'G',
-                'alt': 'T'
+                'alt': ['T']
             }]
         }]
         assert haplotypes == expected
@@ -597,9 +621,15 @@ class Test_add_variants2haplotypes(object):
                 'accession': 'acc2',
                 'genotype': '[0, 1]'
             }],
+            'chrom': 'chr1',
+            'id': None,
+            'alt_ambiguous_nucleotide': 'T',
+            'qual': 1.234,
+            'filter': None,
+            'info': {"MQ": 57, "AF1": 1.0, "CI95": [1.0, 1.0], "SF": "62", "AC": 2, "FQ": -111.0, "DP": 30, "DP4": [0, 0, 9, 19], "AN": 2},
             'pos': 38496,
             'ref': 'G',
-            'alt': 'T'
+            'alt': ['T']
         }]
 
         add_variants2haplotypes(haplotypes, variants)
@@ -615,9 +645,15 @@ class Test_add_variants2haplotypes(object):
                     'accession': 'acc2',
                     'genotype': '[0, 1]'
                 }],
+                'chrom': 'chr1',
+                'id': None,
+                'alt_ambiguous_nucleotide': 'T',
+                'qual': 1.234,
+                'filter': None,
+                'info': {"MQ": 57, "AF1": 1.0, "CI95": [1.0, 1.0], "SF": "62", "AC": 2, "FQ": -111.0, "DP": 30, "DP4": [0, 0, 9, 19], "AN": 2},
                 'pos': 38496,
                 'ref': 'G',
-                'alt': 'T'
+                'alt': ['T']
             }]
         }]
         assert haplotypes == expected
@@ -634,7 +670,13 @@ class Test_add_variants2haplotypes(object):
             }],
             'pos': 38489,
             'ref': 'A',
-            'alt': 'T'
+            'alt': ['T'],
+            'chrom': 'chr1',
+            'id': None,
+            'alt_ambiguous_nucleotide': 'T',
+            'qual': 1.234,
+            'filter': None,
+            'info': {"MQ": 57, "AF1": 1.0, "CI95": [1.0, 1.0], "SF": "62", "AC": 2, "FQ": -111.0, "DP": 30, "DP4": [0, 0, 9, 19], "AN": 2},
         }, {
             'genotypes': [{
                 'accession': 'acc1',
@@ -642,7 +684,13 @@ class Test_add_variants2haplotypes(object):
             }],
             'pos': 38496,
             'ref': 'G',
-            'alt': 'T'
+            'alt': ['T'],
+            'chrom': 'chr1',
+            'id': None,
+            'alt_ambiguous_nucleotide': 'T',
+            'qual': 1.234,
+            'filter': None,
+            'info': {"MQ": 57, "AF1": 1.0, "CI95": [1.0, 1.0], "SF": "62", "AC": 2, "FQ": -111.0, "DP": 30, "DP4": [0, 0, 9, 19], "AN": 2},
         }]
 
         add_variants2haplotypes(haplotypes, variants)
@@ -657,7 +705,13 @@ class Test_add_variants2haplotypes(object):
                 }],
                 'pos': 38489,
                 'ref': 'A',
-                'alt': 'T'
+                'alt': ['T'],
+                'chrom': 'chr1',
+                'id': None,
+                'alt_ambiguous_nucleotide': 'T',
+                'qual': 1.234,
+                'filter': None,
+                'info': {"MQ": 57, "AF1": 1.0, "CI95": [1.0, 1.0], "SF": "62", "AC": 2, "FQ": -111.0, "DP": 30, "DP4": [0, 0, 9, 19], "AN": 2},
             }, {
                 'genotypes': [{
                     'accession': 'acc1',
@@ -665,7 +719,13 @@ class Test_add_variants2haplotypes(object):
                 }],
                 'pos': 38496,
                 'ref': 'G',
-                'alt': 'T'
+                'alt': ['T'],
+                'chrom': 'chr1',
+                'id': None,
+                'alt_ambiguous_nucleotide': 'T',
+                'qual': 1.234,
+                'filter': None,
+                'info': {"MQ": 57, "AF1": 1.0, "CI95": [1.0, 1.0], "SF": "62", "AC": 2, "FQ": -111.0, "DP": 30, "DP4": [0, 0, 9, 19], "AN": 2},
             }]
         }]
         assert haplotypes == expected

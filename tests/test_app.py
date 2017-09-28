@@ -1,4 +1,5 @@
 import pytest
+import simplejson
 
 from avedata.app import app
 from avedata.db import init_db
@@ -166,8 +167,9 @@ def test_get_haplotypes(myapp):
         setup_database()
         response = genomes.haplotypes(genome_id='SL.2.40', chrom_id='SL2.40ch06', start_position=2000,
                                       end_position=3000)
-        assert len(response['haplotypes']) == 28
-        assert len(response['hierarchy']['children']) == 1
+        data = simplejson.loads(response.get_data())
+        assert len(data['haplotypes']) == 28
+        assert len(data['hierarchy']['children']) == 1
         # Content of response is better tests in test_variants.py
 
 
