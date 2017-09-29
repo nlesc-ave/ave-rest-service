@@ -5,6 +5,10 @@ generate compressed bcf file from vcf file:
 ```
 bcftools view -O b 1001genomes_snp-short-indel_with_tair10_only_ACGTN.vcf.gz > 1001genomes_snp-short-indel_with_tair10_only_ACGTN.bcf
 
+### Tomato
+
+Download all analysis (vcf) files from http://www.ebi.ac.uk/ena/data/view/PRJEB5235
+
 gunzip: ./ERZ020502/RF_060_SZAXPI009336-14.vcf.gz: unexpected end of file
 gunzip: ./ERZ020502/RF_060_SZAXPI009336-14.vcf.gz: uncompress failed
 gunzip: ./ERZ020503/RF_062_SZAXPI009337-15.vcf.gz: unexpected end of file
