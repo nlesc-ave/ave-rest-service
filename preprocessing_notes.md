@@ -7,6 +7,7 @@ bcftools view -O b 1001genomes_snp-short-indel_with_tair10_only_ACGTN.vcf.gz > 1
 
 ### Tomato
 
+Download reference genome from ftp://ftp.solgenomics.net/tomato_genome/assembly/build_2.40/S_lycopersicum_chromosomes.2.40.fa.gz
 Download all analysis (vcf) files from http://www.ebi.ac.uk/ena/data/view/PRJEB5235
 
 gunzip: ./ERZ020502/RF_060_SZAXPI009336-14.vcf.gz: unexpected end of file
