@@ -71,7 +71,7 @@ class Test_get_variants__singleSNP_altInSingleAccession(object):
             'RF_047_SZAXPI009326-113': 'G',
             'RF_049_SZAXPI009327-123': 'G',
             'RF_051_SZAXPI009328-129': 'G',
-            'RF_052_SZAXPI009329-133': 'T',
+            'RF_052_SZAXPI009329-133': 'K',
             'RF_053_SZAXPI009330-136': 'G',
             'RF_054_SZAXPI009331-140': 'G',
             'RF_055_SZAXPI009332-142': 'G',
@@ -140,7 +140,7 @@ class Test_get_variants__singleSNP_altInSingleAccession(object):
 
         expected_sequences = {
             'RF_001_SZAXPI008746-45': 'G',
-            'RF_052_SZAXPI009329-133': 'T'
+            'RF_052_SZAXPI009329-133': 'K'
         }
         assert expected_sequences == sequences
         assert len(variants) == 1
@@ -191,7 +191,7 @@ class Test_get_variants__singleSNP_altInMultiAccession(object):
             'RF_022_SZAXPI009302-129': 'A',
             'RF_023_SZAXPI009303-133': 'A',
             'RF_024_SZAXPI009304-136': 'A',
-            'RF_025_SZAXPI009305-140': 'K',
+            'RF_025_SZAXPI009305-140': 'G',
             'RF_026_SZAXPI009306-142': 'A',
             'RF_027_SZAXPI009307-158': 'A',
             'RF_028_SZAXPI009308-166': 'A',
@@ -214,7 +214,7 @@ class Test_get_variants__singleSNP_altInMultiAccession(object):
             'RF_045_SZAXPI009324-109': 'A',
             'RF_046_SZAXPI008748-47': 'A',
             'RF_047_SZAXPI009326-113': 'A',
-            'RF_049_SZAXPI009327-123': 'K',
+            'RF_049_SZAXPI009327-123': 'G',
             'RF_051_SZAXPI009328-129': 'A',
             'RF_052_SZAXPI009329-133': 'A',
             'RF_053_SZAXPI009330-136': 'A',
@@ -224,19 +224,19 @@ class Test_get_variants__singleSNP_altInMultiAccession(object):
             'RF_057_SZAXPI009334-166': 'A',
             'RF_058_SZAXPI009359-46': 'A',
             'RF_059_SZAXPI009335-169': 'A',
-            'RF_063_SZAXPI009338-16-2': 'K',
-            'RF_064_SZAXPI009339-17-2': 'K',
-            'RF_065_SZAXPI009340-18': 'K',
-            'RF_066_SZAXPI009341-19': 'K',
-            'RF_067_SZAXPI009342-21': 'K',
-            'RF_068_SZAXPI009343-22-2': 'K',
-            'RF_069_SZAXPI009344-23': 'K',
-            'RF_070_SZAXPI008749-56': 'K',
-            'RF_071_SZAXPI009345-24': 'K',
-            'RF_072_SZAXPI008752-75': 'K',
-            'RF_073_SZAXPI009346-25': 'K',
+            'RF_063_SZAXPI009338-16-2': 'R',
+            'RF_064_SZAXPI009339-17-2': 'G',
+            'RF_065_SZAXPI009340-18': 'G',
+            'RF_066_SZAXPI009341-19': 'T',
+            'RF_067_SZAXPI009342-21': 'T',
+            'RF_068_SZAXPI009343-22-2': 'T',
+            'RF_069_SZAXPI009344-23': 'T',
+            'RF_070_SZAXPI008749-56': 'T',
+            'RF_071_SZAXPI009345-24': 'T',
+            'RF_072_SZAXPI008752-75': 'T',
+            'RF_073_SZAXPI009346-25': 'G',
             'RF_074_SZAXPI008753-79': 'A',
-            'RF_075_SZAXPI009347-26': 'K',
+            'RF_075_SZAXPI009347-26': 'G',
             'RF_077_SZAXPI009348-27': 'A',
             'RF_078_SZAXPI009349-30': 'A',
             'RF_088_SZAXPI009350-31': 'A',
@@ -256,7 +256,6 @@ class Test_get_variants__singleSNP_altInMultiAccession(object):
         assert len(variants) == 1
         variant = variants[0]
         assert variant['alt'] == ['T', 'G']
-        assert variant['alt_ambiguous_nucleotide'] == 'K'
         assert variant['chrom'] == self.chrom_id
         assert variant['ref'] == 'A'
         assert len(variant['genotypes']) == 14
@@ -278,6 +277,17 @@ class Test_get_variants__singleSNP_altInMultiAccession(object):
             'RF_075_SZAXPI009347-26',
         ]
         assert expected_genotype_accessions == genotype_accessions
+        genotype = variant['genotypes'][0]
+        assert genotype == {
+            'accession': 'RF_025_SZAXPI009305-140',
+            'alt_ambiguous_nucleotide': 'G',
+            'genotype': '[2, 2]',
+            'is_homozygous': True,
+            'DP': '[26]',
+            'GQ': '[99]',
+            'PL': '[255, -2147483648, -2147483648, 78, -2147483648, 0]',
+        }
+        assert genotype['alt_ambiguous_nucleotide'] == 'G'
 
 
 class Test_get_variants__twoSNP(object):
@@ -319,7 +329,7 @@ class Test_get_variants__twoSNP(object):
             'RF_022_SZAXPI009302-129': 'AG',
             'RF_023_SZAXPI009303-133': 'AG',
             'RF_024_SZAXPI009304-136': 'AG',
-            'RF_025_SZAXPI009305-140': 'KG',
+            'RF_025_SZAXPI009305-140': 'GG',
             'RF_026_SZAXPI009306-142': 'AG',
             'RF_027_SZAXPI009307-158': 'AG',
             'RF_028_SZAXPI009308-166': 'AG',
@@ -342,9 +352,9 @@ class Test_get_variants__twoSNP(object):
             'RF_045_SZAXPI009324-109': 'AG',
             'RF_046_SZAXPI008748-47': 'AG',
             'RF_047_SZAXPI009326-113': 'AG',
-            'RF_049_SZAXPI009327-123': 'KG',
+            'RF_049_SZAXPI009327-123': 'GG',
             'RF_051_SZAXPI009328-129': 'AG',
-            'RF_052_SZAXPI009329-133': 'AT',
+            'RF_052_SZAXPI009329-133': 'AK',
             'RF_053_SZAXPI009330-136': 'AG',
             'RF_054_SZAXPI009331-140': 'AG',
             'RF_055_SZAXPI009332-142': 'AG',
@@ -352,19 +362,19 @@ class Test_get_variants__twoSNP(object):
             'RF_057_SZAXPI009334-166': 'AG',
             'RF_058_SZAXPI009359-46': 'AG',
             'RF_059_SZAXPI009335-169': 'AG',
-            'RF_063_SZAXPI009338-16-2': 'KG',
-            'RF_064_SZAXPI009339-17-2': 'KG',
-            'RF_065_SZAXPI009340-18': 'KG',
-            'RF_066_SZAXPI009341-19': 'KG',
-            'RF_067_SZAXPI009342-21': 'KG',
-            'RF_068_SZAXPI009343-22-2': 'KG',
-            'RF_069_SZAXPI009344-23': 'KG',
-            'RF_070_SZAXPI008749-56': 'KG',
-            'RF_071_SZAXPI009345-24': 'KG',
-            'RF_072_SZAXPI008752-75': 'KG',
-            'RF_073_SZAXPI009346-25': 'KG',
+            'RF_063_SZAXPI009338-16-2': 'RG',
+            'RF_064_SZAXPI009339-17-2': 'GG',
+            'RF_065_SZAXPI009340-18': 'GG',
+            'RF_066_SZAXPI009341-19': 'TG',
+            'RF_067_SZAXPI009342-21': 'TG',
+            'RF_068_SZAXPI009343-22-2': 'TG',
+            'RF_069_SZAXPI009344-23': 'TG',
+            'RF_070_SZAXPI008749-56': 'TG',
+            'RF_071_SZAXPI009345-24': 'TG',
+            'RF_072_SZAXPI008752-75': 'TG',
+            'RF_073_SZAXPI009346-25': 'GG',
             'RF_074_SZAXPI008753-79': 'AG',
-            'RF_075_SZAXPI009347-26': 'KG',
+            'RF_075_SZAXPI009347-26': 'GG',
             'RF_077_SZAXPI009348-27': 'AG',
             'RF_078_SZAXPI009349-30': 'AG',
             'RF_088_SZAXPI009350-31': 'AG',
@@ -384,7 +394,6 @@ class Test_get_variants__twoSNP(object):
         assert len(variants) == 2
         variant1 = variants[0]
         assert variant1['alt'] == ['T', 'G']
-        assert variant1['alt_ambiguous_nucleotide'] == 'K'
         assert variant1['chrom'] == self.chrom_id
         assert variant1['ref'] == 'A'
         assert len(variant1['genotypes']) == 14
@@ -413,7 +422,16 @@ class Test_get_variants__twoSNP(object):
         assert variant2['ref'] == 'G'
         assert len(variant2['genotypes']) == 1
         genotype = variant2['genotypes'][0]
-        assert genotype['accession'] == 'RF_052_SZAXPI009329-133'
+        expected_genotype = {
+            'DP': '[43]',
+            'GQ': '[58]',
+            'PL': '[55, 0, 255]',
+            'accession': 'RF_052_SZAXPI009329-133',
+            'alt_ambiguous_nucleotide': 'K',
+            'genotype': '[0, 1]',
+            'is_homozygous': False
+        }
+        assert genotype == expected_genotype
 
 
 class Test_cluster_sequences(object):
@@ -529,7 +547,6 @@ class Test_add_variants2haplotypes(object):
             }],
             'chrom': 'chr1',
             'id': None,
-            'alt_ambiguous_nucleotide': 'T',
             'qual': 1.234,
             'filter': None,
             'info': {"MQ": 57, "AF1": 1.0, "CI95": [1.0, 1.0], "SF": "62", "AC": 2, "FQ": -111.0, "DP": 30, "DP4": [0, 0, 9, 19], "AN": 2},
@@ -550,7 +567,6 @@ class Test_add_variants2haplotypes(object):
                 }],
                 'chrom': 'chr1',
                 'id': None,
-                'alt_ambiguous_nucleotide': 'T',
                 'qual': 1.234,
                 'filter': None,
                 'info': {"MQ": 57, "AF1": 1.0, "CI95": [1.0, 1.0], "SF": "62", "AC": 2, "FQ": -111.0, "DP": 30, "DP4": [0, 0, 9, 19], "AN": 2},
@@ -576,7 +592,6 @@ class Test_add_variants2haplotypes(object):
             }],
             'chrom': 'chr1',
             'id': None,
-            'alt_ambiguous_nucleotide': 'T',
             'qual': 1.234,
             'filter': None,
             'info': {"MQ": 57, "AF1": 1.0, "CI95": [1.0, 1.0], "SF": "62", "AC": 2, "FQ": -111.0, "DP": 30, "DP4": [0, 0, 9, 19], "AN": 2},
@@ -597,7 +612,6 @@ class Test_add_variants2haplotypes(object):
                 }],
                 'chrom': 'chr1',
                 'id': None,
-                'alt_ambiguous_nucleotide': 'T',
                 'qual': 1.234,
                 'filter': None,
                 'info': {"MQ": 57, "AF1": 1.0, "CI95": [1.0, 1.0], "SF": "62", "AC": 2, "FQ": -111.0, "DP": 30, "DP4": [0, 0, 9, 19], "AN": 2},
@@ -623,7 +637,6 @@ class Test_add_variants2haplotypes(object):
             }],
             'chrom': 'chr1',
             'id': None,
-            'alt_ambiguous_nucleotide': 'T',
             'qual': 1.234,
             'filter': None,
             'info': {"MQ": 57, "AF1": 1.0, "CI95": [1.0, 1.0], "SF": "62", "AC": 2, "FQ": -111.0, "DP": 30, "DP4": [0, 0, 9, 19], "AN": 2},
@@ -647,7 +660,6 @@ class Test_add_variants2haplotypes(object):
                 }],
                 'chrom': 'chr1',
                 'id': None,
-                'alt_ambiguous_nucleotide': 'T',
                 'qual': 1.234,
                 'filter': None,
                 'info': {"MQ": 57, "AF1": 1.0, "CI95": [1.0, 1.0], "SF": "62", "AC": 2, "FQ": -111.0, "DP": 30, "DP4": [0, 0, 9, 19], "AN": 2},
@@ -673,7 +685,6 @@ class Test_add_variants2haplotypes(object):
             'alt': ['T'],
             'chrom': 'chr1',
             'id': None,
-            'alt_ambiguous_nucleotide': 'T',
             'qual': 1.234,
             'filter': None,
             'info': {"MQ": 57, "AF1": 1.0, "CI95": [1.0, 1.0], "SF": "62", "AC": 2, "FQ": -111.0, "DP": 30, "DP4": [0, 0, 9, 19], "AN": 2},
@@ -687,7 +698,6 @@ class Test_add_variants2haplotypes(object):
             'alt': ['T'],
             'chrom': 'chr1',
             'id': None,
-            'alt_ambiguous_nucleotide': 'T',
             'qual': 1.234,
             'filter': None,
             'info': {"MQ": 57, "AF1": 1.0, "CI95": [1.0, 1.0], "SF": "62", "AC": 2, "FQ": -111.0, "DP": 30, "DP4": [0, 0, 9, 19], "AN": 2},
@@ -708,7 +718,6 @@ class Test_add_variants2haplotypes(object):
                 'alt': ['T'],
                 'chrom': 'chr1',
                 'id': None,
-                'alt_ambiguous_nucleotide': 'T',
                 'qual': 1.234,
                 'filter': None,
                 'info': {"MQ": 57, "AF1": 1.0, "CI95": [1.0, 1.0], "SF": "62", "AC": 2, "FQ": -111.0, "DP": 30, "DP4": [0, 0, 9, 19], "AN": 2},
@@ -722,7 +731,6 @@ class Test_add_variants2haplotypes(object):
                 'alt': ['T'],
                 'chrom': 'chr1',
                 'id': None,
-                'alt_ambiguous_nucleotide': 'T',
                 'qual': 1.234,
                 'filter': None,
                 'info': {"MQ": 57, "AF1": 1.0, "CI95": [1.0, 1.0], "SF": "62", "AC": 2, "FQ": -111.0, "DP": 30, "DP4": [0, 0, 9, 19], "AN": 2},
@@ -748,22 +756,24 @@ class Test_add_sequence2haplotypes(object):
             'variants': [{
                 'genotypes': [{
                     'accession': 'acc1',
-                    'genotype': '[0, 1]'
+                    'genotype': '[0, 1]',
+                    'alt_ambiguous_nucleotide': 'W',
                 }],
                 'pos': 38489,
                 'ref': 'A',
-                'alt': 'T'
+                'alt': ['T']
             }, {
                 'genotypes': [{
                     'accession': 'acc1',
-                    'genotype': '[1, 1]'
+                    'genotype': '[1, 1]',
+                    'alt_ambiguous_nucleotide': 'T',
                 }],
                 'pos': 38496,
                 'ref': 'G',
-                'alt': 'T'
+                'alt': ['T']
             }]
         }]
-        ref_seq = 'CCCCCCCCCCCC'
+        ref_seq = 'CCACCCCCCGCC'
         start_position = 38486
 
         add_sequence2haplotypes(haplotypes, ref_seq, start_position)
@@ -771,23 +781,25 @@ class Test_add_sequence2haplotypes(object):
         expected = [{
             'haplotype_id': 'hap1',
             'accessions': ['acc1'],
-            'sequence': 'CCTCCCCCCTCC',
+            'sequence': 'CCWCCCCCCTCC',
             'variants': [{
                 'genotypes': [{
                     'accession': 'acc1',
-                    'genotype': '[0, 1]'
+                    'genotype': '[0, 1]',
+                    'alt_ambiguous_nucleotide': 'W',
                 }],
                 'pos': 38489,
                 'ref': 'A',
-                'alt': 'T'
+                'alt': ['T']
             }, {
                 'genotypes': [{
                     'accession': 'acc1',
-                    'genotype': '[1, 1]'
+                    'genotype': '[1, 1]',
+                    'alt_ambiguous_nucleotide': 'T',
                 }],
                 'pos': 38496,
                 'ref': 'G',
-                'alt': 'T'
+                'alt': ['T']
             }]
         }]
         assert haplotypes == expected

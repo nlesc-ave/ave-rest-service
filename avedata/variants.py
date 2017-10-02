@@ -92,32 +92,39 @@ def get_variants(variant_file, chrom_id, start_position, end_position, accession
     variants = []
     for v in vcf_variants:
         if v.is_snp:
-            an = alt2ambiguousnucleotide(v.ALT)
             variant = {
                 'chrom': v.CHROM,
                 'pos': v.POS,
                 'id': v.ID,
                 'ref': v.REF,
                 'alt': v.ALT,
-                'alt_ambiguous_nucleotide': an,
                 'qual': v.QUAL,
                 'filter': v.FILTER,
                 'info': dict(v.INFO),
                 'genotypes': []
             }
-            for idx, (acc, genotype) in enumerate(zip(all_accessions, v.genotypes)):
+            for idx, (acc, gt) in enumerate(zip(all_accessions, v.genotypes)):
                 if acc not in accessions:
                     continue
-                if genotype[0] == -1:
+                if gt[0] == -1:
+                    # sample has no variant, use ref
                     sequences[acc] += v.REF
                 else:
+                    gt.pop()  # drop phase
+                    # gt are ref+alt indices, if the are the same then is homozygous
+                    is_homozygous = len(set(gt)) == 1
+                    all_bases = [v.REF] + v.ALT
+                    sample_bases = [all_bases[i] for i in set(gt)]
+                    an = alt2ambiguousnucleotide(sample_bases)
                     sequences[acc] += an
                     # add info to variant object
                     # genotype should contain all format fields for each
                     # actual variant at this position
                     genotype = {
                         'accession': acc,
-                        'genotype': str(genotype[:2]),
+                        'genotype': str(gt),
+                        'alt_ambiguous_nucleotide': an,
+                        'is_homozygous': is_homozygous,
                     }
                     for f in v.FORMAT[1:]:
                         genotype[f] = str(v.format(f)[idx].tolist())
@@ -157,7 +164,6 @@ def add_variants2haplotypes(haplotypes, variants):
                     'id': v['id'],
                     'ref': v['ref'],
                     'alt': v['alt'],
-                    'alt_ambiguous_nucleotide': v['alt_ambiguous_nucleotide'],
                     'qual': v['qual'],
                     'filter': v['filter'],
                     'info': v['info'],
@@ -174,7 +180,14 @@ def add_sequence2haplotypes(haplotypes, ref_seq, start_position):
         haplotype_sequence = list(ref_seq)
         for v in h['variants']:
             # start_position is 1-based and vcf, while seq is 0-based, require -1
-            haplotype_sequence[v['pos'] - start_position - 1] = v['alt'][0]
+            pos = v['pos'] - start_position - 1
+            if haplotype_sequence[pos] == v['ref']:
+                haplotype_sequence[pos] = v['genotypes'][0]['alt_ambiguous_nucleotide']
+            else:
+                msg = 'Nucleotide at pos {2} for {3} in ' \
+                      'reference genome ({0}) is not the same as reference of variant ({1})'
+                acc = v['genotypes'][0]['accession']
+                raise Exception(msg.format(haplotype_sequence[pos], v['ref'], pos, acc))
         h['sequence'] = "".join(haplotype_sequence)
 
 
