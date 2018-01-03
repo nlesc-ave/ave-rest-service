@@ -229,7 +229,7 @@ def cluster_haplotypes(haplotypes):
 
 def get_haplotypes(variant_file, ref_file, chrom_id, start_position, end_position, accessions):
     (variants, sequences, accessions) = get_variants(variant_file, chrom_id, start_position, end_position,
-                                         accessions)
+                                                     accessions)
 
     haplotypes = cluster_sequences(sequences)
     add_variants2haplotypes(haplotypes, variants)

@@ -3,55 +3,103 @@
 [![Build Status](https://travis-ci.org/nlesc-ave/ave-rest-service.svg?branch=master)](https://travis-ci.org/nlesc-ave/ave-rest-service)
 [![SonarCloud Gate](https://sonarcloud.io/api/badges/gate?key=ave-rest-service)](https://sonarcloud.io/dashboard?id=ave-rest-service)
 [![SonarCloud Coverage](https://sonarcloud.io/api/badges/measure?key=ave-rest-service&metric=coverage)](https://sonarcloud.io/component_measures/domain/Coverage?id=ave-rest-service)
-[![Docker Automated buil](https://img.shields.io/docker/automated/ave2/allelic-variation-explorer.svg)](https://hub.docker.com/r/ave2/allelic-variation-explorer/)
+[![Docker Automated build](https://img.shields.io/docker/automated/ave2/allelic-variation-explorer.svg)](https://hub.docker.com/r/ave2/allelic-variation-explorer/)
 
-Serving variant, annotation and genome data for [AVE visualisation](https://github.com/nlesc-ave/ave-app).
+The Allelic Variation Explorer rest service clusters genomic variants and lists the available datasets.
 
-## REST API
+Combined with [ave-app](https://github.com/nlesc-ave/ave-app) allow for visualization of clustered genomic variants for a certain genomic range in a genome browser.
+ 
+![Screenshot of Allelic Variation Explorer](docs/screenshot.png) 
 
-[swagger UI](http://petstore.swagger.io/?url=https://raw.githubusercontent.com/nlesc-ave/ave-rest-service/master/avedata/swagger.yml)
+This service is the back end for the [ave-app](https://github.com/nlesc-ave/ave-app) front end.
+The front end runs in the users web browser and communicates with the back end running on a web server somewhere.
+The front end is the user interface and the back end is the service serving the variant, annotation and genomic data.
+The front end and back end communicate with each other according to the [Swagger specification](https://swagger.io/) in [swagger.yml](avedata/swagger.yml).
 
-## INSTALL
+* [Architecture](#architecture)
+* [Deployment](#deployment)
+  * [Demo](#demo)
+  * [Encrypted](#encrypted)
+* [Data pre processing](#data-pre-processing)
+  * [Genome sequence](#genome-sequence)
+  * [Variants](#variants)
+  * [Genes](#genes)
+  * [Genomic features annotations](#genomic-features-annotations)
+* [Data registration](#data-registration)
+  * [Register genome](#register-genome)
+  * [Register variants](#register-variants)
+  * [Register genes](#register-genes)
+  * [Register feature annotations](#register-feature-annotations)
+* [Develop](#develop)
+  * [Setup](#setup)
+  * [Configuration](#configuration)
+  * [Run service](#run-service)
+  * [Run commands](#run-commands)
+  * [Build Docker image](#build-docker-image)
 
-Ave requires a [Anaconda3](https://www.continuum.io/downloads) or [miniconda3](https://conda.io/miniconda.html) installation.
+## Architecture
 
-To create a new Anaconda environment with all the ave dependencies installed.
+![Architecture](docs/architecture.svg)
+
+A deployment of Allelic Variation Explorer consists of the following parts:
+* a running ave rest service
+* an extracted [ave-app](https://bintray.com/nlesc-ave/ave/ave-app/latest#files) build archive.
+* *.2bit, *.bcf and *.bb (bigbed) data files, green in diagram
+* a directory with full text indices for genes and features in whoosh format, red in diagram
+* an AVE meta database file, will be filled by [data registration commands](#data-registration), yellow in diagram
+* a [NGINX web server](http://nginx.org/), for hosting app and data files and proxy-ing ave rest service behind a single port
+* a Docker image combining all above, see `./Dockerfile` for the instructions used to install all the parts
+
+## Deployment
+
+A Docker image is available on [Docker Hub](https://hub.docker.com/r/ave2/allelic-variation-explorer/).
+
+Any change to the master branch of this repo or the [ave-app](https://github.com/nlesc-ave/ave-app) will trigger an automatic build of the [Docker image](https://hub.docker.com/r/ave2/allelic-variation-explorer/).
+
+The Docker image contains no data it must be supplied using volumes. It expects the following volumes:
+
+* /data, location for 2bit, bcf and bigbed data files. Hosted as http://&lt;aveserver&gt;/data
+* /whoosh, full text indices for genes and features
+* /meta, directory in which ave meta database is stored
+
+Run the service with
 ```bash
-conda env create -f environment.yml
-```
-On osx use `enviroment.osx.yml` instead of `environment.yml`.
-
-Activate the environment
-```bash
-source activate ave2
-```
-
-Install ave for production with
-```bash
-python setup.py install
+mkdir data
+mkdir whoosh
+mkdir meta
+docker run -d \
+  -v $PWD/data:/data -v $PWD/whoosh:/whoosh -v $PWD/meta:/meta \
+  -e EXTERNAL_URL=http://$(hostname) -p 80:80 \
+  --name ave ave2/allelic-variation-explorer
 ```
 
-Install ave for development with
-```bash
-python setup.py develop
-```
+Command above will run web server on port 80 of host machine.
 
-If dependencies are changed in `environment.yml` then update conda env by runnning
-```
-conda env update -f environment.yml
-```
+The EXTERNAL_URL environment value is the url the web browser will use.
 
-## Configure
+After deployment the server is running, but contains no data, see [Data pre processing](#data-pre-processing) chapter how to prepare data followed by the [Data registration](#data-registration) chapter how to add data.
 
-The directory in which `avadata` is run should contain a `settings.cfg` configuration file.
+### Demo
 
-The repo contains an example config file called `settings.example.cfg`.
+A demo Docker image with a sample dataset is available at https://hub.docker.com/r/ave2/ave-demo/ .
 
-Make sure the `WHOOSH_BASE_DIR` directory exists.
+### Encrypted
+
+The Docker container uses http, to use https, a reverse proxy with Let's Encrypt certificate can be put in front of the Docker container.
+
+The Docker container must be run with an external url of `https://$(hostname)` format and a port which is not 443.
+
+Configure a web server like NGINX to server https on port 443 and proxy all requests to the container.
+Use [Certbot](https://certbot.eff.org/) to generate the certificate pair and configure the web server.
+
+See example server conf in commented out block in `./nginx.conf` file.
 
 ## Data pre processing
 
-Before data can be served it has to be preprocessed in following way.
+Before data can be registered it has to be preprocessed in following way.
+
+The tools used are available inside the [Docker container](#deployment) or can be installed in an [Anaconda environment](#setup).
+To perform the pre processing inside the Docker container, copy the raw files to the `/data` Docker volume and login to the Docker container with `docker exec -w /data -ti ave bash`.
 
 ### Genome sequence
 
@@ -65,17 +113,59 @@ The FASTA file can be converted to 2bit using:
 faToTwoBit genome.fa genome.2bit
 ```
 
-The (chromosome) sequence identifiers should match the ones in corresponding gff and bcf files.
+The sequence identifiers (chromosome/contig) should match the ones in corresponding variants (bcf) genes (bigbed) and genomic feature annotations (bigbed) files.
 
-### Genomic features annotations
+### Variants
 
-Gene annotations (transcripts) are treated differently than other feature annotations. It has
-to do with the fact that transcripts are displayed in separated track where
-UTRs, CDSs, exons and introns are rendered differently within one track.
+Variants need to be provided in single [BCF](https://samtools.github.io/hts-specs/VCFv4.3.pdf) formatted file.
 
-Gene or feature annotations must be provided as [bigBed](http://genome.ucsc.edu/goldenPath/help/bigBed.html) files.
+VCF files can be converted to a BCF file in the following way:
 
-Some gene bed files can be downloaded from http://bioviz.org/quickload/
+1. Merge VCF files with [SAMtools](http://www.htslib.org/doc/samtools.html) and [VCFtools](http://vcftools.sourceforge.net/perl_module.html)
+
+```sh
+# vcf-merge requires bgzipped and tabix indexed VCF files so do that first
+for f in $(ls *.vcf)
+do
+bgzip $f
+tabix -p vcf $f.gz
+done
+vcf-merge *.vcf.gz > variants.vcf
+```
+
+2. Sort by chromosome with [VCFtools](http://vcftools.sourceforge.net/perl_module.html)
+```sh
+vcf-sort -c variants.vcf > variants.sorted.vcf
+```
+
+3. Compress by [bgzip](http://www.htslib.org/doc/tabix.html) and index with [tabix](http://www.htslib.org/doc/tabix.html)
+```sh
+bgzip variants.sorted.vcf
+tabix -p vcf variants.sorted.vcf.gz
+```
+
+4. Convert to [BCF](https://samtools.github.io/hts-specs/BCFv2_qref.pdf) with [bcftools](https://samtools.github.io/bcftools/bcftools.html)
+```sh
+bcftools view -O b variants.sorted.vcf.gz > variants.sorted.bcf
+```
+
+5. Index with [bcftools](http://www.htslib.org/doc/bcftools.html)
+```sh
+bcftools index variants.sorted.bcf
+```
+
+### Genes
+
+The genes (or transcripts) are rendered in a gene track.
+
+Genes must be provided as [bigBed](http://genome.ucsc.edu/goldenPath/help/bigBed.html) formatted.
+A bigBed file can be converted from a [BED formatted](https://genome.ucsc.edu/FAQ/FAQformat.html#format1) file
+
+The gene bed file is expected to have 3 required the BED fields and the 9 additional BED fields all filled.
+So it should have exons and start/stop codons for one gene on a single line.
+
+Some gene bed files are available at http://bioviz.org/quickload/
+
 To convert a gene bed file to bigbed use:
 ```bash
 # Fetch chrom sizes
@@ -86,6 +176,12 @@ chmod +x bedToBigBed
 gunzip -c S_lycopersicum_May_2012.bed.gz | perl -n -e 'chomp;@F=split(/\t/);$F[13] = substr($F[13],0,255); print join("\t", @F),"\n";'  > S_lycopersicum_May_2012.bed.trimmed
 bedToBigBed -tab -type=bed12+2 S_lycopersicum_May_2012.bed.trimmed genome.txt S_lycopersicum_May_2012.bb
 ```
+
+### Genomic features annotations
+
+Each feature file will render a feature track. The feature track name is the same as the file name.
+
+Feature annotations must be provided as [bigBed](http://genome.ucsc.edu/goldenPath/help/bigBed.html) formatted files.
 
 To convert a gff feature file to bigbed use:
 
@@ -102,142 +198,16 @@ twoBitInfo genome.2bit chrom.sizes
 bedToBigBed -tab -type=bed6+4 -as=gff3.as A-AFFY-87_AffyGeneChipTomatoGenome.probes_ITAG2.3genome_mapping.bed chrom.sizes A-AFFY-87_AffyGeneChipTomatoGenome.probes_ITAG2.3genome_mapping.bb
 ```
 
-### SNPs
-SNPs need to be provided in single file in [VCF](https://samtools.github.io/hts-specs/VCFv4.3.pdf)
-They also need to be preprocessed in following way.
+## Data registration
 
-#### Sort by chromosome with [VCFtools](http://vcftools.sourceforge.net/perl_module.html)
-```sh
-vcf-sort -c variants.vcf > variants.sorted.vcf
-```
+After deployment the server is running, but contains no data.
+Data files must be registered so they show up in the web browser.
 
-#### Compress by [bgzip](http://www.htslib.org/doc/tabix.html) and index with [tabix](http://www.htslib.org/doc/tabix.html)
-```sh
-bgzip -c variants.sorted.vcf
-tabix -p vcf variants.sorted.vcf.gz
-```
+The following commands expect a running Docker container as described in the [Deployment](#deployment) chapter.
 
-### Convert to [BCF](https://samtools.github.io/hts-specs/BCFv2_qref.pdf) with [bcftools](https://samtools.github.io/bcftools/bcftools.html)
-```sh
-bcftools view -O b variants.sorted.vcf.gz > variants.sorted.bcf
-```
+The `<aveserver>` should be replaced with the `EXTERNAL_URL` environment variable which was used when starting the Docker container.
 
-### Index with [bcftools](https://samtools.github.io/bcftools/bcftools.html)
-```sh
-bcftools index variants.sorted.bcf
-```
-
-## Register data
-
-Register data with command line interface
-
-```sh
-# initialise the database
-avedata register --species 'Solanum Lycopersicum' \
-                 --genome SL.2.40 \
-                 --datatype 2bit \
-                 http://<dataserver>/S_lycopersicum_chromosomes.2.40.fa.2bit
-
-avedata register --species 'Solanum Lycopersicum' \
-                 --genome SL.2.40 \
-                 --datatype variants \
-                 ./db/tomato/tomato_snps.bcf
-
-avedata register --species 'Solanum Lycopersicum' \
-                 --genome SL.2.40 \
-                 --datatype genes \
-                 http://<dataserver>/gene_models.bb
-
-avedata register --species 'Solanum Lycopersicum' \
-                 --genome SL.2.40 \
-                 --datatype features \
-                 http://<dataserver>/A-AFFY-87.bb
-# `A-AFFY-87` will be used as track label
-```
-
-## Run service
-
-```bash
-avadata run
-```
-It will print the `<url>` it is hosting at.
-
-The api endpoint is at `<url>/api/`.
-The Swagger UI is at `<url>/api/ui`.
-
-The above command will run a single threaded low performance web server.
-
-Use [gunicorn](http://gunicorn.org/) to run in production with
-```bash
-gunicorn -w 4 --threads 2 -t 60 avedata.app:app
-```
-
-## Deploy on bare metal/virtual machine
-
-A deployment without Docker requires the following parts:
-1. a running ave rest service, see instructions in previous chapter
-2. extracted [ave application](https://bintray.com/nlesc-ave/ave/ave-app/latest#files) distribution, which is the the web-based user interface.
-3. a directory with *.2bit and *.bb (bigbed) data files, not required if data files are already hosted on another web server.
-4. a running [NGINX web server](http://nginx.org/)
-
-The NGINX web server should be configured with the following:
-
-* The [ave application](https://bintray.com/nlesc-ave/ave/ave-app/latest#files) distribution must be extracted into the root of the web server.
-* Proxy requests incoming at `http://<somehost>/api/` to the service.
-* Host the directory with data files on for example `http://<somehost>/data/`, and the `avedata register ...` commands should use `http://&lt;somehost&gt/data/<somefile.(2bit|bb)>` as urls
-
-An example config file for the web server is available at `./nginx.conf`.
-
-See the `./Dockerfile` file for commands how to to setup ave on a Debian based OS.
-
-## Deploy using Docker
-
-A Docker image is available on [Docker Hub](https://hub.docker.com/r/ave2/allelic-variation-explorer/).
-
-The Docker image contains the [ave-app](https://github.com/nlesc-ave/ave-app) as the web-based user interface.
-
-The Docker image contains no data it must be supplied using volumes. It expects the following volumes:
-
-* /data, location for 2bit, bcf and bigbed files. Hosted as http://&lt;aveserver&gt;/data
-* /whoosh, full text indices for genes and features
-* /meta, directory in which ave meta database is stored
-
-### Run service
-
-```bash
-mkdir data
-mkdir whoosh
-mkdir meta
-docker run -d \
-  -v $PWD/data:/data -v $PWD/whoosh:/whoosh -v $PWD/meta:/meta \
-  -e EXTERNAL_URL=http://$(hostname) -p 80:80 \
-  --name ave ave2/allelic-variation-explorer
-```
-
-Command above will run web server on port 80 of host machine.
-
-To make Swagger UI api calls the EXTERNAL_URL environment variable is needed,
-because the Python web service is behind NGINX reverse proxy, causing the url where the api is available on to change,
-the EXTERNAL_URL allows Swagger UI to use the externally available api endpoint.
-
-### Encrypted
-
-The Docker container uses http, to use https, a reverse proxy with Let's Encrypt certificate can be put infront of the Docker container.
-
-The Docker container must be run with an external url of `https://$(hostname)` format and a port which is not 443. 
-
-Configure a web server like NGINX to server https on port 443 and proxy all requests to the container.
-Use [Certbot](https://certbot.eff.org/) to generate the certificate pair and configure the web server. 
-
-See example server conf in commented out block in `./nginx.conf` file.
-
-### Register data
-
-Example commands using files for tomato in `data/tomato/SL.2.40` directory, namely:
-* genome.2bit
-* tomato_snps.bcf
-* gene_models.bb
-* A-AFFY-87.bb
+### Register genome
 
 ```bash
 docker exec ave \
@@ -246,26 +216,140 @@ docker exec ave \
     --genome SL.2.40 \
     --datatype 2bit \
     http://<aveserver>/data/tomato/SL.2.40/genome.2bit
+```
 
+The last argument is the location of the genome 2bit file as a http(s) url.
+
+The example url `http://<aveserver>/data/tomato/SL.2.40/genome.2bit` corresponds to the `/data/tomato/SL.2.40/genome.2bit` file which should be present inside the Docker container.
+
+The [ave-app](https://github.com/nlesc-ave/ave-app) front end will use this url to render reference genome sequence
+and the AVE rest service will use it to determine the chromosome list and build haplotype sequence.
+
+### Register variants
+
+```bash
 docker exec ave \
     avedata register \
     --species 'Solanum Lycopersicum' \
     --genome SL.2.40 \
     --datatype variants \
     /data/tomato/SL.2.40/tomato_snps.bcf
+```
 
+The `/data/tomato/SL.2.40/tomato_snps.bcf` file should be present inside the Docker container.
+
+To perform clustering a registered genome (2bit) file and corresponding variant (bcf) file is required.
+
+### Register genes
+
+One genome can have one gene track. The gene track shows exons, introns and untranslated regions.
+
+```bash
 docker exec ave \
     avedata register \
     --species 'Solanum Lycopersicum' \
     --genome SL.2.40 \
     --datatype genes \
     http://<aveserver>/data/tomato/SL.2.40/gene_models.bb
+```
 
+The example `http://<aveserver>/data/tomato/SL.2.40/gene_models.bb` corresponds to the `/data/tomato/SL.2.40/gene_models.bb` file which should be present inside the Docker container.
+
+Registration can take some time because a Whoosh full text index is build.
+
+### Register feature annotations
+
+One genome can have one ore more feature annotation files registered.
+
+```bash
 docker exec ave \
     avedata register \
     --species 'Solanum Lycopersicum' \
     --genome SL.2.40 \
     --datatype features \
     http://<aveserver>/data/tomato/SL.2.40/A-AFFY-87.bb
-# `A-AFFY-87` will be used as track label
 ```
+
+The example `http://<aveserver>/data/tomato/SL.2.40/A-AFFY-87.bb` corresponds to the `/data/tomato/SL.2.40/A-AFFY-87.bb` file which should be present inside the Docker container.
+
+The basename of the file, in this case `A-AFFY-87`, will be used as the track label.
+
+Registration can take some time because a Whoosh full text index is build.
+
+## Develop
+
+Below are instructions how to get a development version of the service up and running.
+
+Requirements:
+
+* [Anaconda3](https://www.continuum.io/downloads) or [miniconda3](https://conda.io/miniconda.html)
+
+### Setup
+
+To create a new Anaconda environment with all the ave dependencies installed.
+```bash
+conda env create -f environment.yml
+```
+On osx use `enviroment.osx.yml` instead of `environment.yml`.
+
+Activate the environment
+```bash
+source activate ave2
+```
+
+Install ave for development with
+```bash
+python setup.py develop
+```
+
+If dependencies are changed in `environment.yml` then update conda env by runnning
+```
+conda env update -f environment.yml
+``` 
+
+### Configuration
+
+The service needs a configuration file called `setting.cfg`.
+
+The repo contains an example config file called `settings.example.cfg`.
+Copy the example config file to `settings.cfg` and edit it.
+
+Make sure the `WHOOSH_BASE_DIR` directory exists.
+
+### Run service
+
+Change to directory with `settings.cfg` file.
+
+```bash
+gunicorn -w 4 --threads 2 -t 60 -b 127.0.0.1:8080 avedata.app:app
+```
+
+It will run the service on http://127.0.0.1:8080/ .
+The api endpoint is at `http://127.0.0.1:8080/api/`.
+The Swagger UI is at `http://127.0.0.1:8080/api/ui`.
+
+This will only run the Python web service, the hosting of the application and data files is explained in the [deployment](#deployment) chapter.
+
+### Run commands
+
+The `avedata` command line tool expects to be run from the directory containing the `settings.cfg` file.
+
+Available commands:
+* deregister  Remove a filename or url from the database
+* drop_db     Drops database
+* init_db     Initializes database
+* list        List of registered files/urls in the database
+* register    Add file metadata information to the database
+* run         Run as single threaded web service
+
+### Build Docker image
+
+Building the Docker image of the latest commit of the master branch is automatically build on Docker hub with the latest tag.
+
+If you have local changes and want to test the Docker container locally then you can build the Docker image with
+```bash
+docker -t ave2/allelic-variation-explorer .
+```
+
+The Docker image contains the latest version of [ave-app](https://github.com/nlesc-ave/ave-app).
+If you want to run a different version of the app you will need to replace curl/tar command in `./Dockerfile` with commands to put the app you want in `/var/www/html` directory and build a Docker image.

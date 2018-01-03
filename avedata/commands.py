@@ -25,7 +25,7 @@ def cli():
 @click.option('--debug', help='Enable debug mode', is_flag=True)
 @click.option('--profiler', help='Enable profiler mode', is_flag=True)
 def run(port, debug=False, profiler=False):
-    """Run web service"""
+    """Run as single threaded web service, for development only, use gunicorn in production"""
     if profiler:
         app.config['PROFILE'] = True
         app.wsgi_app = ProfilerMiddleware(app.wsgi_app, restrictions=[30])
