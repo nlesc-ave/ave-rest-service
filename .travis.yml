@@ -6,12 +6,11 @@ before_install:
   - if [ ! -e $HOME/conda/bin/activate ]; then
     wget -q -nc https://repo.continuum.io/miniconda/$INSTALLER;
     bash $INSTALLER -f -b -p $HOME/conda;
-    $HOME/conda/bin/conda env create -n ave2;
+    $HOME/conda/bin/conda env create -q -n ave2;
     mkdir -p /home/travis/conda/envs/ave2/lib/python3.5/site-packages;
     touch /home/travis/conda/envs/ave2/lib/python3.5/site-packages/easy-install.pth;
     fi
-  - df -h
-  - $HOME/conda/bin/conda env update -f environment.yml
+  - $HOME/conda/bin/conda env update -q -f environment.yml
   - source $HOME/conda/bin/activate ave2
   - pip install pylint coverage
 install: python setup.py develop

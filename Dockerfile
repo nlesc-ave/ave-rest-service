@@ -11,8 +11,8 @@ ADD environment.yml /app/environment.yml
 
 ENV PATH /opt/conda/envs/ave2/bin:$PATH
 
-RUN conda update conda -y && \
-    conda env create -f environment.yml
+RUN conda update conda -q -y && \
+    conda env create -q -f environment.yml
 
 ADD . /app
 
