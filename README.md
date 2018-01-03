@@ -348,7 +348,7 @@ Building the Docker image of the latest commit of the master branch is automatic
 
 If you have local changes and want to test the Docker container locally then you can build the Docker image with
 ```bash
-docker -t ave2/allelic-variation-explorer .
+docker build -t ave2/allelic-variation-explorer .
 ```
 
 The Docker image contains the latest version of [ave-app](https://github.com/nlesc-ave/ave-app).
