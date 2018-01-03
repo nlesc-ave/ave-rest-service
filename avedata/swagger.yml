@@ -429,24 +429,21 @@ definitions:
         type: string
         format: uri
         description: URL of 2bit file
-      vcf_header:
-        type: object
-        additionalProperties:
-          type: string
-        description: dictionary of vcf FORMAT and INFO maping id to description
       gene_track:
         type: string
         format: uri
         description: URL of bigBed file with gene annotations
       species:
         $ref: '#/definitions/Species'
+      variants_filename:
+        type: string
+        description: File name of variants (bcf) file
     required:
     - genome_id
     - chromosomes
     - feature_tracks
     - accessions
     - reference
-    - vcf_header
     - species
   HaplotypeNode:
     type: object

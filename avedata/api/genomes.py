@@ -22,6 +22,11 @@ def get(genome_id):
             'species': species_of_genome(genome_id)
         }
         try:
+            genome_info['variants_filename'] = variants_filename(genome_id)
+        except LookupError:
+            # variants_filename is optional
+            pass
+        try:
             genome_info['gene_track'] = gene_url(genome_id)
         except LookupError:
             # gene_track is optional
