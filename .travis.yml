@@ -10,6 +10,7 @@ before_install:
     mkdir -p /home/travis/conda/envs/ave2/lib/python3.5/site-packages;
     touch /home/travis/conda/envs/ave2/lib/python3.5/site-packages/easy-install.pth;
     fi
+  - df -h
   - $HOME/conda/bin/conda env update -f environment.yml
   - source $HOME/conda/bin/activate ave2
   - pip install pylint coverage

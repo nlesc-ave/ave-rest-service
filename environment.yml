@@ -1,4 +1,4 @@
-name: ave2
+name: ave22
 channels: !!python/tuple
 - anaconda-fusion
 - bioconda
