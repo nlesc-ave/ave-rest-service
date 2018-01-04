@@ -47,7 +47,7 @@ The Docker image is used for deploying the Allelic Variation Explorer on a serve
 A deployment of Allelic Variation Explorer consists of the following parts:
 * a running ave rest service
 * an extracted [ave-app](https://bintray.com/nlesc-ave/ave/ave-app/latest#files) build archive.
-* *.2bit, *.bcf and *.bb (bigbed) data files, green in diagram
+* 2bit (genome sequence), bcf (variants) and bigbed (genes and feature annotations) data files, green in diagram
 * a directory with full text indices for genes and features in whoosh format, filled by [data registration commands](#data-registration), red in diagram
 * an AVE meta database file, contains list of available datasets inside AVE, filled by [data registration commands](#data-registration), yellow in diagram
 * a [NGINX web server](http://nginx.org/), for hosting app and data files and proxy-ing ave rest service behind a single port
@@ -59,7 +59,9 @@ A Docker image is available on [Docker Hub](https://hub.docker.com/r/ave2/alleli
 
 Any change to the master branch of this repo or the [ave-app](https://github.com/nlesc-ave/ave-app) will trigger an automatic build of the [Docker image](https://hub.docker.com/r/ave2/allelic-variation-explorer/).
 
-The Docker image contains no data it must be supplied using volumes. It expects the following volumes:
+The Docker image contains no data and when data is added then the data will be lost when the Docker container is stopped/started.
+To get a deployment which is persists it's data we will use directories on the server and mount these as volumes in the Docker container.
+It expects the following volumes:
 
 * /data, location for 2bit, bcf and bigbed data files. Hosted as http://&lt;aveserver&gt;/data
 * /whoosh, full text indices for genes and features
@@ -67,6 +69,7 @@ The Docker image contains no data it must be supplied using volumes. It expects 
 
 Run the service with
 ```bash
+# Use sub directories in the current working directory to persist data
 mkdir data
 mkdir whoosh
 mkdir meta
