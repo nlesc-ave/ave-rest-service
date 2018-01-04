@@ -71,6 +71,18 @@ class AccessionsLookupError(LookupError):
         self.accessions = accessions
 
 
+class ReferenceBasepairMismatch(Exception):
+    def __init__(self, position, sample, reference, variant):
+        tpl = 'Nucleotide at pos {0} for {1} in ' \
+                      'reference genome ({2}) is not the same as reference of variant ({3})'
+        msg = tpl.format(position, sample, reference, variant)
+        super().__init__(msg)
+        self.position = position
+        self.sample = sample
+        self.reference = reference
+        self.variant = variant
+
+
 def get_variants(variant_file, chrom_id, start_position, end_position, accessions):
     region = '{0}:{1}-{2}'.format(chrom_id, start_position, end_position)
     vcf = VCF(variant_file)
@@ -181,13 +193,14 @@ def add_sequence2haplotypes(haplotypes, ref_seq, start_position):
         for v in h['variants']:
             # start_position is 1-based and vcf, while seq is 0-based, require -1
             pos = v['pos'] - start_position - 1
-            if haplotype_sequence[pos] == v['ref']:
+            if pos == -1:
+                # ignore variant outside ref seq
+                pass
+            elif haplotype_sequence[pos] == v['ref']:
                 haplotype_sequence[pos] = v['genotypes'][0]['alt_ambiguous_nucleotide']
             else:
-                msg = 'Nucleotide at pos {2} for {3} in ' \
-                      'reference genome ({0}) is not the same as reference of variant ({1})'
                 acc = v['genotypes'][0]['accession']
-                raise Exception(msg.format(haplotype_sequence[pos], v['ref'], pos, acc))
+                raise ReferenceBasepairMismatch(pos, acc, haplotype_sequence[pos], v['ref'])
         h['sequence'] = "".join(haplotype_sequence)
 
 

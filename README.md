@@ -76,6 +76,7 @@ docker run -d \
 Command above will run web server on port 80 of host machine.
 
 The EXTERNAL_URL environment value is the url the web browser will use.
+The hostname in the EXTERNAL_URL should be resolvable by the web browser and the Docker container, if it is not then use the ip-address.
 
 After deployment the server is running, but contains no data, see [Data pre processing](#data-pre-processing) chapter how to prepare data followed by the [Data registration](#data-registration) chapter how to add data.
 

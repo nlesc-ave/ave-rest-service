@@ -6,7 +6,7 @@ from ..db import genome_filename, variants_filename, feature_urls, gene_url, spe
 from ..features import featurebb2label, find_features
 from ..genes import find_genes
 from ..sequence import get_chrominfo, InvalidChromosome
-from ..variants import get_accessions_list, AccessionsLookupError
+from ..variants import get_accessions_list, AccessionsLookupError, ReferenceBasepairMismatch
 from ..variants import get_haplotypes
 from ..whoosh import get_woosh_dir
 
@@ -107,6 +107,13 @@ def haplotypes(genome_id, chrom_id, start_position, end_position, accessions=Non
         ext = {'genome_id': genome_id, 'chrom_id': chrom_id}
         msg = "Chromosome '{chrom_id}' no found in '{genome_id}' genome".format(**ext)
         return connexion.problem(404, "Not Found", msg, ext=ext)
+    except ReferenceBasepairMismatch as e:
+        ext = {
+            'genome_id': genome_id,
+            'position': e.position,
+        }
+        msg = 'In {genome_id}: '.format(**ext) + str(e)
+        return connexion.problem(500, "Internal server error", msg, ext=ext)
 
 
 def gene_search(genome_id, query):
