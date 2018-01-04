@@ -9,7 +9,7 @@ The Allelic Variation Explorer rest service clusters genomic variants and lists 
 
 Combined with [ave-app](https://github.com/nlesc-ave/ave-app) allow for visualization of clustered genomic variants for a certain genomic range in a genome browser.
  
-![Screenshot of Allelic Variation Explorer](docs/screenshot.png) 
+![Screenshot of Allelic Variation Explorer](https://github.com/nlesc-ave/ave-rest-service/raw/master/docs/screenshot.png) 
 
 This service is the back end for the [ave-app](https://github.com/nlesc-ave/ave-app) front end.
 The front end runs in the users web browser and communicates with the back end running on a web server somewhere.
@@ -39,7 +39,7 @@ The front end and back end communicate with each other according to the [Swagger
 
 ## Architecture
 
-![Architecture](docs/architecture.svg)
+![Architecture](https://github.com/nlesc-ave/ave-rest-service/raw/master/docs/architecture.svg)
 
 A deployment of Allelic Variation Explorer consists of the following parts:
 * a running ave rest service
