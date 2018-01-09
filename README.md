@@ -7,9 +7,9 @@
 
 The Allelic Variation Explorer rest service clusters genomic variants and lists the available datasets.
 
-Combined with [ave-app](https://github.com/nlesc-ave/ave-app) allow for visualization of clustered genomic variants for a certain genomic range in a genome browser.
- 
-![Screenshot of Allelic Variation Explorer](https://github.com/nlesc-ave/ave-rest-service/raw/master/docs/screenshot.png) 
+Combined with [ave-app](https://github.com/nlesc-ave/ave-app) will visualize clustered genomic variants for a certain genomic range in a genome browser.
+
+![Screenshot of Allelic Variation Explorer](https://github.com/nlesc-ave/ave-rest-service/raw/master/docs/screenshot.png)
 
 This service is the back end for the [ave-app](https://github.com/nlesc-ave/ave-app) front end.
 The front end runs in the users web browser and communicates with the back end running on a web server somewhere.
@@ -39,14 +39,17 @@ The front end and back end communicate with each other according to the [Swagger
 
 ## Architecture
 
-![Architecture](https://github.com/nlesc-ave/ave-rest-service/raw/master/docs/architecture.svg)
+![Architecture](https://github.com/nlesc-ave/ave-rest-service/raw/master/docs/architecture.png)
+
+The ave-rest-service and ave-app are wrapped up in a [Docker image](https://hub.docker.com/r/ave2/allelic-variation-explorer/).
+The Docker image is used for deploying the Allelic Variation Explorer on a server.
 
 A deployment of Allelic Variation Explorer consists of the following parts:
 * a running ave rest service
 * an extracted [ave-app](https://bintray.com/nlesc-ave/ave/ave-app/latest#files) build archive.
-* *.2bit, *.bcf and *.bb (bigbed) data files, green in diagram
-* a directory with full text indices for genes and features in [Whoosh](https://whoosh.readthedocs.io) format, red in diagram
-* an AVE meta database file, will be filled by [data registration commands](#data-registration), yellow in diagram
+* 2bit (genome sequence), bcf (variants) and bigbed (genes and feature annotations) data files, green in diagram
+* a directory with full text indices for genes and features in [Whoosh](https://whoosh.readthedocs.io) format, filled by [data registration commands](#data-registration), red in diagram
+* an AVE meta database file, contains list of available datasets inside AVE, filled by [data registration commands](#data-registration), yellow in diagram
 * a [NGINX web server](http://nginx.org/), for hosting app and data files and proxy-ing ave rest service behind a single port
 * a Docker image combining all above, see `./Dockerfile` for the instructions used to install all the parts
 
@@ -56,7 +59,9 @@ A Docker image is available on [Docker Hub](https://hub.docker.com/r/ave2/alleli
 
 Any change to the master branch of this repo or the [ave-app](https://github.com/nlesc-ave/ave-app) will trigger an automatic build of the [Docker image](https://hub.docker.com/r/ave2/allelic-variation-explorer/).
 
-The Docker image contains no data it must be supplied using volumes. It expects the following volumes:
+The Docker image contains no data and when data is added then the data will be lost when the Docker container is stopped/started.
+To get a deployment which is persists it's data we will use directories on the server and mount these as volumes in the Docker container.
+It expects the following volumes:
 
 * /data, location for 2bit, bcf and bigbed data files. Hosted as http://&lt;aveserver&gt;/data
 * /whoosh, full text indices for genes and features
@@ -64,6 +69,7 @@ The Docker image contains no data it must be supplied using volumes. It expects 
 
 Run the service with
 ```bash
+# Use sub directories in the current working directory to persist data
 mkdir data
 mkdir whoosh
 mkdir meta
@@ -302,7 +308,7 @@ python setup.py develop
 If dependencies are changed in `environment.yml` then update conda env by runnning
 ```
 conda env update -f environment.yml
-``` 
+```
 
 ### Configuration
 
