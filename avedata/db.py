@@ -119,7 +119,7 @@ def gene_url(genome_id):
 
 def species_names():
     db = get_db()
-    query = "SELECT DISTINCT species FROM metadata"
+    query = "SELECT DISTINCT species FROM metadata WHERE datatype='2bit'"
     cursor = db.cursor()
     names = []
     for row in cursor.execute(query):
@@ -130,7 +130,7 @@ def species_names():
 def genomes_of_species(species_id):
     genome_ids = []
     db = get_db()
-    query = "SELECT DISTINCT genome FROM metadata WHERE species=?"
+    query = "SELECT DISTINCT genome FROM metadata WHERE species=? AND datatype='2bit'"
     cursor = db.cursor()
     for row in cursor.execute(query, (species_id, )):
         genome_ids.append(row['genome'])
