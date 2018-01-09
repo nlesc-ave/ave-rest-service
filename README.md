@@ -45,7 +45,7 @@ A deployment of Allelic Variation Explorer consists of the following parts:
 * a running ave rest service
 * an extracted [ave-app](https://bintray.com/nlesc-ave/ave/ave-app/latest#files) build archive.
 * *.2bit, *.bcf and *.bb (bigbed) data files, green in diagram
-* a directory with full text indices for genes and features in whoosh format, red in diagram
+* a directory with full text indices for genes and features in [Whoosh](https://whoosh.readthedocs.io) format, red in diagram
 * an AVE meta database file, will be filled by [data registration commands](#data-registration), yellow in diagram
 * a [NGINX web server](http://nginx.org/), for hosting app and data files and proxy-ing ave rest service behind a single port
 * a Docker image combining all above, see `./Dockerfile` for the instructions used to install all the parts
@@ -69,14 +69,11 @@ mkdir whoosh
 mkdir meta
 docker run -d \
   -v $PWD/data:/data -v $PWD/whoosh:/whoosh -v $PWD/meta:/meta \
-  -e EXTERNAL_URL=http://$(hostname) -p 80:80 \
+  -p 80:80 \
   --name ave ave2/allelic-variation-explorer
 ```
 
 Command above will run web server on port 80 of host machine.
-
-The EXTERNAL_URL environment value is the url the web browser will use.
-The hostname in the EXTERNAL_URL should be resolvable by the web browser and the Docker container, if it is not then use the ip-address.
 
 After deployment the server is running, but contains no data, see [Data pre processing](#data-pre-processing) chapter how to prepare data followed by the [Data registration](#data-registration) chapter how to add data.
 
@@ -88,7 +85,7 @@ A demo Docker image with a sample dataset is available at https://hub.docker.com
 
 The Docker container uses http, to use https, a reverse proxy with Let's Encrypt certificate can be put in front of the Docker container.
 
-The Docker container must be run with an external url of `https://$(hostname)` format and a port which is not 443.
+The Docker container must be run a port which is not 443.
 
 Configure a web server like NGINX to server https on port 443 and proxy all requests to the container.
 Use [Certbot](https://certbot.eff.org/) to generate the certificate pair and configure the web server.
@@ -206,8 +203,6 @@ Data files must be registered so they show up in the web browser.
 
 The following commands expect a running Docker container as described in the [Deployment](#deployment) chapter.
 
-The `<aveserver>` should be replaced with the `EXTERNAL_URL` environment variable which was used when starting the Docker container.
-
 ### Register genome
 
 ```bash
@@ -216,14 +211,12 @@ docker exec ave \
     --species 'Solanum Lycopersicum' \
     --genome SL.2.40 \
     --datatype 2bit \
-    http://<aveserver>/data/tomato/SL.2.40/genome.2bit
+    /data/tomato/SL.2.40/genome.2bit
 ```
 
-The last argument is the location of the genome 2bit file as a http(s) url.
+The last argument is the location of the genome 2bit file (`/data/tomato/SL.2.40/genome.2bit` in this example), it must be an absolute path which starts with `/data/` and must be present inside the Docker container.
 
-The example url `http://<aveserver>/data/tomato/SL.2.40/genome.2bit` corresponds to the `/data/tomato/SL.2.40/genome.2bit` file which should be present inside the Docker container.
-
-The [ave-app](https://github.com/nlesc-ave/ave-app) front end will use this url to render reference genome sequence
+The [ave-app](https://github.com/nlesc-ave/ave-app) front end will use this path as the relative http(s) path to fetch reference genome sequence in the selected region
 and the AVE rest service will use it to determine the chromosome list and build haplotype sequence.
 
 ### Register variants
@@ -237,7 +230,7 @@ docker exec ave \
     /data/tomato/SL.2.40/tomato_snps.bcf
 ```
 
-The `/data/tomato/SL.2.40/tomato_snps.bcf` file should be present inside the Docker container.
+The `/data/tomato/SL.2.40/tomato_snps.bcf` file must be present inside the Docker container.
 
 To perform clustering a registered genome (2bit) file and corresponding variant (bcf) file is required.
 
@@ -251,12 +244,14 @@ docker exec ave \
     --species 'Solanum Lycopersicum' \
     --genome SL.2.40 \
     --datatype genes \
-    http://<aveserver>/data/tomato/SL.2.40/gene_models.bb
+    /data/tomato/SL.2.40/gene_models.bb
 ```
 
-The example `http://<aveserver>/data/tomato/SL.2.40/gene_models.bb` corresponds to the `/data/tomato/SL.2.40/gene_models.bb` file which should be present inside the Docker container.
+The last argument is the bigbed formatted file with genes (`/data/tomato/SL.2.40/gene_models.bb` in this example), it must be an absolute path which starts with `/data/` and must be present inside the Docker container.
 
-Registration can take some time because a Whoosh full text index is build.
+Registration can take some time because a [Whoosh](https://whoosh.readthedocs.io) full text index is build.
+
+The [ave-app](https://github.com/nlesc-ave/ave-app) front end will use this path as the relative http(s) path to fetch the genes in the selected region.
 
 ### Register feature annotations
 
@@ -268,14 +263,15 @@ docker exec ave \
     --species 'Solanum Lycopersicum' \
     --genome SL.2.40 \
     --datatype features \
-    http://<aveserver>/data/tomato/SL.2.40/A-AFFY-87.bb
+    /data/tomato/SL.2.40/A-AFFY-87.bb
 ```
 
-The example `http://<aveserver>/data/tomato/SL.2.40/A-AFFY-87.bb` corresponds to the `/data/tomato/SL.2.40/A-AFFY-87.bb` file which should be present inside the Docker container.
+The last argument is the bigbed formatted file with feature annotations (`/data/tomato/SL.2.40/A-AFFY-87.bb` in this example), it must be an absolute path which starts with `/data/` and must be present inside the Docker container.
 
+Registration can take some time because a [Whoosh](https://whoosh.readthedocs.io) full text index is build.
+
+The [ave-app](https://github.com/nlesc-ave/ave-app) front end will use this path as the relative http(s) path to fetch the feature annotations in the selected region.
 The basename of the file, in this case `A-AFFY-87`, will be used as the track label.
-
-Registration can take some time because a Whoosh full text index is build.
 
 ## Develop
 

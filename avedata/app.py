@@ -23,12 +23,7 @@ app.config.from_pyfile(os.path.join(os.getcwd(), 'settings.cfg'), silent=True)
 
 
 def spec_config():
-    url = os.environ.get('EXTERNAL_URL', app.config.get('EXTERNAL_URL', None))
     conf = {'VERSION': __version__}
-    if url:
-        o = urlparse(url)
-        conf['HOSTPORT'] = o.netloc
-        conf['SCHEME'] = o.scheme
     return conf
 
 
