@@ -17,15 +17,15 @@ def get(genome_id):
             'genome_id': genome_id,
             'chromosomes': chromosomes(genome_id),
             'feature_tracks': feature_tracks(genome_id),
-            'accessions': accession_list(genome_id),
             'reference': genome_filename(genome_id),
             'species': species_of_genome(genome_id)
         }
         try:
             genome_info['variants_filename'] = variants_filename(genome_id)
+            genome_info['accessions'] = accession_list(genome_id)
         except LookupError:
             # variants_filename is optional
-            pass
+            genome_info['accessions'] = []
         try:
             genome_info['gene_track'] = gene_url(genome_id)
         except LookupError:
