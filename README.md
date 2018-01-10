@@ -216,6 +216,8 @@ gunzip -c S_lycopersicum_May_2012.bed.gz | perl -n -e 'chomp;@F=split(/\t/);$F[1
 bedToBigBed -tab -type=bed12+2 S_lycopersicum_May_2012.bed.trimmed chrom.sizes S_lycopersicum_May_2012.bb
 ```
 
+A BigBed file with more than 256 chromosomes will not render, see [issue 37](https://github.com/nlesc-ave/ave-app/issues/37).
+
 ### Genomic features annotations
 
 Each feature file will render a feature track. The feature track name is the same as the file name.
@@ -238,6 +240,8 @@ bedToBigBed -tab -type=bed6+4 -as=gff3.as A-AFFY-87_AffyGeneChipTomatoGenome.pro
 ```
 
 The [gff3.as](https://github.com/nlesc-ave/ave-rest-service/blob/master/gff3.as) is used to describe the columns in the bed file.
+
+A BigBed file with more than 256 chromosomes will not render, see [issue 37](https://github.com/nlesc-ave/ave-app/issues/37).
 
 ## Data registration
 
