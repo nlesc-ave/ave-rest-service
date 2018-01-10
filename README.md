@@ -20,6 +20,8 @@ The front end and back end communicate with each other according to the [Swagger
 * [Deployment](#deployment)
   * [Demo](#demo)
   * [Encrypted](#encrypted)
+  * [Shutting down](#shutting-down)
+  * [Update image](#update-image)
 * [Data pre processing](#data-pre-processing)
   * [Genome sequence](#genome-sequence)
   * [Variants](#variants)
@@ -30,6 +32,7 @@ The front end and back end communicate with each other according to the [Swagger
   * [Register variants](#register-variants)
   * [Register genes](#register-genes)
   * [Register feature annotations](#register-feature-annotations)
+  * [Deregister](#deregister)
 * [Develop](#develop)
   * [Setup](#setup)
   * [Configuration](#configuration)
@@ -98,6 +101,23 @@ Use [Certbot](https://certbot.eff.org/) to generate the certificate pair and con
 
 See example server conf in commented out block in `./nginx.conf` file.
 
+### Shutting down
+
+The Docker container can be stopped using
+```bash
+docker rm -f ave
+```
+
+### Update image
+
+Make sure the Docker container is not running.
+
+The Docker image can be updated using
+
+```bash
+docker pull ave2/allelic-variation-explorer
+```
+
 ## Data pre processing
 
 Before data can be registered it has to be preprocessed in following way.
@@ -165,7 +185,22 @@ The genes (or transcripts) are rendered in a gene track.
 Genes must be provided as [bigBed](http://genome.ucsc.edu/goldenPath/help/bigBed.html) formatted.
 A bigBed file can be converted from a [BED formatted](https://genome.ucsc.edu/FAQ/FAQformat.html#format1) file
 
-The gene bed file is expected to have 3 required the BED fields and the 9 additional BED fields all filled.
+The gene bed file is expected to have the following columns:
+1. chrom, name of chromosome
+2. chromStart, start of gene, zero-indexed
+3. chromStart, end of gene, zero-indexed
+4. name, transcript identifier
+5. score
+6. strand
+7. thickStart, location of start codon
+8. thinkEnd, location of stop codon
+9. itemRgb
+10. blockCount, number of exons
+11. blockSizes
+12. blockStarts
+13. gene identifier
+14. description of gene
+
 So it should have exons and start/stop codons for one gene on a single line.
 
 Some gene bed files are available at http://bioviz.org/quickload/
@@ -202,6 +237,8 @@ twoBitInfo genome.2bit chrom.sizes
 bedToBigBed -tab -type=bed6+4 -as=gff3.as A-AFFY-87_AffyGeneChipTomatoGenome.probes_ITAG2.3genome_mapping.bed chrom.sizes A-AFFY-87_AffyGeneChipTomatoGenome.probes_ITAG2.3genome_mapping.bb
 ```
 
+The [gff3.as](https://github.com/nlesc-ave/ave-rest-service/blob/master/gff3.as) is used to describe the columns in the bed file.
+
 ## Data registration
 
 After deployment the server is running, but contains no data.
@@ -220,7 +257,7 @@ docker exec ave \
     /data/tomato/SL.2.40/genome.2bit
 ```
 
-The last argument is the location of the genome 2bit file (`/data/tomato/SL.2.40/genome.2bit` in this example), it must be an absolute path which starts with `/data/` and must be present inside the Docker container.
+The last argument is the location of the genome 2bit file (`/data/tomato/SL.2.40/genome.2bit` in this example), it must be an absolute path which starts with `/data/` must be readable by anyone inside the Docker container.
 
 The [ave-app](https://github.com/nlesc-ave/ave-app) front end will use this path as the relative http(s) path to fetch reference genome sequence in the selected region
 and the AVE rest service will use it to determine the chromosome list and build haplotype sequence.
@@ -236,7 +273,7 @@ docker exec ave \
     /data/tomato/SL.2.40/tomato_snps.bcf
 ```
 
-The `/data/tomato/SL.2.40/tomato_snps.bcf` file must be present inside the Docker container.
+The `/data/tomato/SL.2.40/tomato_snps.bcf` file must be readable by anyone inside the Docker container.
 
 To perform clustering a registered genome (2bit) file and corresponding variant (bcf) file is required.
 
@@ -253,7 +290,7 @@ docker exec ave \
     /data/tomato/SL.2.40/gene_models.bb
 ```
 
-The last argument is the bigbed formatted file with genes (`/data/tomato/SL.2.40/gene_models.bb` in this example), it must be an absolute path which starts with `/data/` and must be present inside the Docker container.
+The last argument is the bigbed formatted file with genes (`/data/tomato/SL.2.40/gene_models.bb` in this example), it must be an absolute path which starts with `/data/` and must be readable by anyone inside the Docker container.
 
 Registration can take some time because a [Whoosh](https://whoosh.readthedocs.io) full text index is build.
 
@@ -272,12 +309,23 @@ docker exec ave \
     /data/tomato/SL.2.40/A-AFFY-87.bb
 ```
 
-The last argument is the bigbed formatted file with feature annotations (`/data/tomato/SL.2.40/A-AFFY-87.bb` in this example), it must be an absolute path which starts with `/data/` and must be present inside the Docker container.
+The last argument is the bigbed formatted file with feature annotations (`/data/tomato/SL.2.40/A-AFFY-87.bb` in this example), it must be an absolute path which starts with `/data/` and must be readable by anyone inside the Docker container.
 
 Registration can take some time because a [Whoosh](https://whoosh.readthedocs.io) full text index is build.
 
 The [ave-app](https://github.com/nlesc-ave/ave-app) front end will use this path as the relative http(s) path to fetch the feature annotations in the selected region.
 The basename of the file, in this case `A-AFFY-87`, will be used as the track label.
+
+### Deregister
+
+To deregister one of the files use the deregister command.
+
+For example to deregister the `/data/tomato/SL.2.40/A-AFFY-87.bb` file use:
+```bash
+docker exec ave \
+    avedata deregister \
+    /data/tomato/SL.2.40/A-AFFY-87.bb
+```
 
 ## Develop
 
@@ -288,6 +336,12 @@ Requirements:
 * [Anaconda3](https://www.continuum.io/downloads) or [miniconda3](https://conda.io/miniconda.html)
 
 ### Setup
+
+First clone the repository
+```bash
+git clone https://github.com/nlesc-ave/ave-rest-service.git
+cd ave-rest-service
+```
 
 To create a new Anaconda environment with all the ave dependencies installed.
 ```bash
