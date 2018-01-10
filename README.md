@@ -103,7 +103,7 @@ See example server conf in commented out block in `./nginx.conf` file.
 Before data can be registered it has to be preprocessed in following way.
 
 The tools used are available inside the [Docker container](#deployment) or can be installed in an [Anaconda environment](#setup).
-To perform the pre processing inside the Docker container, copy the raw files to the `/data` Docker volume and login to the Docker container with `docker exec -w /data -ti ave bash`.
+To perform the pre processing inside the Docker container, copy the raw files to the `/data` Docker volume and login to the Docker container with `docker exec -ti ave bash`.
 
 ### Genome sequence
 
