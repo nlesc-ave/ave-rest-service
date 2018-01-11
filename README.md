@@ -4,6 +4,7 @@
 [![SonarCloud Gate](https://sonarcloud.io/api/badges/gate?key=ave-rest-service)](https://sonarcloud.io/dashboard?id=ave-rest-service)
 [![SonarCloud Coverage](https://sonarcloud.io/api/badges/measure?key=ave-rest-service&metric=coverage)](https://sonarcloud.io/component_measures/domain/Coverage?id=ave-rest-service)
 [![Docker Automated build](https://img.shields.io/docker/automated/ave2/allelic-variation-explorer.svg)](https://hub.docker.com/r/ave2/allelic-variation-explorer/)
+[![DOI](https://zenodo.org/badge/44877908.svg)](https://zenodo.org/badge/latestdoi/44877908)
 
 The Allelic Variation Explorer (AVE) is a web application to visualize (clustered) single-nucleotide variants across genomes.
 The Allelic Variation Explorer rest service clusters genomic variants and lists the available datasets.
