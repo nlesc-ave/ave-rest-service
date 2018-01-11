@@ -5,8 +5,8 @@
 [![SonarCloud Coverage](https://sonarcloud.io/api/badges/measure?key=ave-rest-service&metric=coverage)](https://sonarcloud.io/component_measures/domain/Coverage?id=ave-rest-service)
 [![Docker Automated build](https://img.shields.io/docker/automated/ave2/allelic-variation-explorer.svg)](https://hub.docker.com/r/ave2/allelic-variation-explorer/)
 
+The Allelic Variation Explorer (AVE) is a web application to visualize (clustered) single-nucleotide variants across genomes.
 The Allelic Variation Explorer rest service clusters genomic variants and lists the available datasets.
-
 Combined with [ave-app](https://github.com/nlesc-ave/ave-app) will visualize clustered genomic variants for a certain genomic range in a genome browser.
 
 ![Screenshot of Allelic Variation Explorer](https://github.com/nlesc-ave/ave-rest-service/raw/master/docs/screenshot.png)
@@ -19,7 +19,7 @@ The front end and back end communicate with each other according to the [Swagger
 * [Architecture](#architecture)
 * [Deployment](#deployment)
   * [Demo](#demo)
-  * [Encrypted](#encrypted)
+  * [Secure connection](#secure-connection)
   * [Shutting down](#shutting-down)
   * [Update image](#update-image)
 * [Data pre processing](#data-pre-processing)
@@ -47,12 +47,12 @@ The front end and back end communicate with each other according to the [Swagger
 The ave-rest-service and ave-app are wrapped up in a [Docker image](https://hub.docker.com/r/ave2/allelic-variation-explorer/).
 The Docker image is used for deploying the Allelic Variation Explorer on a server.
 
-A deployment of Allelic Variation Explorer consists of the following parts:
+The Allelic Variation Explorer consists of the following parts working together:
 * a running ave rest service
 * an extracted [ave-app](https://bintray.com/nlesc-ave/ave/ave-app/latest#files) build archive.
 * 2bit (genome sequence), bcf (variants) and bigbed (genes and feature annotations) data files, green in diagram
 * a directory with full text indices for genes and features in [Whoosh](https://whoosh.readthedocs.io) format, filled by [data registration commands](#data-registration), red in diagram
-* an AVE meta database file, contains list of available datasets inside AVE, filled by [data registration commands](#data-registration), yellow in diagram
+* an meta database file, contains list of available datasets inside the application, filled by [data registration commands](#data-registration), yellow in diagram
 * a [NGINX web server](http://nginx.org/), for hosting app and data files and proxy-ing ave rest service behind a single port
 * a Docker image combining all above, see `./Dockerfile` for the instructions used to install all the parts
 
@@ -90,9 +90,10 @@ After deployment the server is running, but contains no data, see [Data pre proc
 
 A demo Docker image with a sample dataset is available at https://hub.docker.com/r/ave2/ave-demo/ .
 
-### Encrypted
+### Secure connection
 
-The Docker container uses http, to use https, a reverse proxy with Let's Encrypt certificate can be put in front of the Docker container.
+The Docker container uses http which is an unencryted connection.
+To use a secure connection (https), a reverse proxy with Let's Encrypt certificate can be put in front of the Docker container.
 
 The Docker container must be run a port which is not 443.
 
@@ -120,7 +121,7 @@ docker pull ave2/allelic-variation-explorer
 
 ## Data pre processing
 
-Before data can be registered it has to be preprocessed in following way.
+Before data can be registered it has to be converted in the right format. Below describes pre processing steps to convert common formats into the formats the application expects.
 
 The tools used are available inside the [Docker container](#deployment) or can be installed in an [Anaconda environment](#setup).
 To perform the pre processing inside the Docker container, copy the raw files to the `/data` Docker volume and login to the Docker container with `docker exec -ti ave bash`.
