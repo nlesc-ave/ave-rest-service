@@ -129,6 +129,9 @@ def get_variants(variant_file, chrom_id, start_position, end_position, accession
                     sample_bases = [all_bases[i] for i in set(gt)]
                     an = alt2ambiguousnucleotide(sample_bases)
                     sequences[acc] += an
+                    if an == v.REF:
+                        # sample has variant that is same as ref nuc, ignore it
+                        continue
                     # add info to variant object
                     # genotype should contain all format fields for each
                     # actual variant at this position
