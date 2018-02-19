@@ -241,7 +241,7 @@ twoBitInfo genome.2bit chrom.sizes
 bedToBigBed -tab -type=bed6+4 -as=gff3.as A-AFFY-87_AffyGeneChipTomatoGenome.probes_ITAG2.3genome_mapping.bed chrom.sizes A-AFFY-87_AffyGeneChipTomatoGenome.probes_ITAG2.3genome_mapping.bb
 ```
 
-The [gff3.as](https://github.com/nlesc-ave/ave-rest-service/blob/master/gff3.as) is used to describe the columns in the bed file.
+The [gff3.as](https://github.com/nlesc-ave/ave-rest-service/blob/master/gff3.as) (in Docker container available as `/app/gff3.as`) is used to describe the columns in the bed file.
 
 A BigBed file with more than 256 chromosomes will not render, see [issue 37](https://github.com/nlesc-ave/ave-app/issues/37).
 
