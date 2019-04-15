@@ -24,7 +24,7 @@ dependencies:
 - biobuilds::vcftools=0.1.14
 - conda-forge::curl=7.52.1=0
 - conda-forge::numpy=1.13.3=py35_blas_openblas_201
-- conda-forge::pip=9.0.1=py35_0
+- conda-forge::pip=9.0.3=py35_0
 - conda-forge::scipy=1.0.0=py35_blas_openblas_201
 - conda-forge::setuptools=33.1.1=py35_0
 - conda-forge::sqlite=3.13.0=1
