@@ -1,5 +1,5 @@
 name: ave2
-channels: !!python/tuple
+channels:
 - anaconda-fusion
 - bioconda
 - biobuilds
